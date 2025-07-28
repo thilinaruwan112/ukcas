@@ -2,87 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 200 14% 94%;
-    --foreground: 0 0% 3.9%;
+    --background: 356 100% 98%;      /* Light mode background */
+    --foreground: 354 49% 22%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 354 49% 22%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 231 48% 48%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 291 64% 42%;
-    --accent-foreground: 0 0% 98%;
+    --popover-foreground: 354 49% 22%;
+    --primary: 354 49% 32%;
+    --primary-foreground: 356 33% 90%;
+    --secondary: 356 33% 90%;
+    --secondary-foreground: 354 49% 32%;
+    --muted: 356 33% 90%;
+    --muted-foreground: 353 29% 51%;
+    --accent: 355 25% 75%;
+    --accent-foreground: 354 49% 32%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 231 48% 48%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 356 33% 85%;
+    --input: 356 33% 85%;
+    --ring: 354 49% 32%;
+
+    /* Public site variables default to standard theme in light mode */
+    --public-bg: var(--background);
+    --public-card: var(--card);
+    --public-foreground: var(--foreground);
+
+    --sidebar-background: 353 39% 26%; /* Dark maroon-grey */
+    --sidebar-foreground: 356 33% 90%;
+    --sidebar-accent: 354 49% 32%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 353 39% 30%;
+    --sidebar-ring: 355 25% 75%;
   }
+ 
   .dark {
-    --background: 0 0% 3.9%;
+    /* Admin/Dashboard dark theme (light content area) */
+    --background: 240 5% 14%; /* Light gray */
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 240 6% 10%; /* Darker card for admin */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 240 5.9% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 231 48% 48%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 14.9%;
+    --primary: 354 49% 32%;
+    --primary-foreground: 356 33% 90%;
+    --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 291 64% 42%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 231 48% 48%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 354 49% 32%;
+    
+    /* Public site dark theme variables */
+    --public-bg: 222.2 84% 4.9%; /* Very dark blue */
+    --public-card: 222.2 84% 4.9%;
+    --public-foreground: 210 40% 98%;
+
+    /* Sidebar dark theme */
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-accent: 354 49% 32%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 6% 14%;
+    --sidebar-ring: 354 49% 32%;
+  }
+
+  /* NProgress styles */
+  #nprogress {
+    pointer-events: none;
+  }
+  #nprogress .bar {
+    background: hsl(var(--primary));
+    position: fixed;
+    z-index: 1031;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
   }
 }
-
+ 
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }

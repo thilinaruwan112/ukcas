@@ -1,0 +1,32 @@
+{
+  "Header": {
+    "home": "Home",
+    "institutes": "Institutes",
+    "blog": "Blog",
+    "events": "Events",
+    "verify": "Verify Certificate",
+    "about": "About",
+    "login": "Login",
+    "register": "Register Institute"
+  },
+  "Hero": {
+    "title": "The Global Standard in Educational Accreditation",
+    "subtitle": "The United Kingdom College of Advanced Studies (UKCAS) provides prestigious accreditation to educational institutions worldwide, ensuring the highest standards of quality and integrity.",
+    "button1": "Become Accredited",
+    "button2": "Find an Institute"
+  },
+  "Login": {
+    "portalLogin": "Portal Login",
+    "accessDashboard": "Access your dashboard.",
+    "institute": "Institute",
+    "admin": "Admin",
+    "instituteLogin": "Institute Login",
+    "instituteDescription": "Access your institute's dashboard to manage students and certificates.",
+    "adminLogin": "Admin Login",
+    "adminDescription": "Access the UKCAS administration panel.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "loginButtonInstitute": "Login to Institute Panel",
+    "loginButtonAdmin": "Login to Admin Panel"
+  }
+}
