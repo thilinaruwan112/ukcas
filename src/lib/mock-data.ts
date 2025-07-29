@@ -70,7 +70,7 @@ export const mockEvents: Event[] = [
     title: 'Global Education Summit 2024',
     date: '2024-11-05',
     location: 'London, UK',
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://images.unsplash.com/photo-1651608671506-4d57dfd57ee5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb25mZXJlbmNlJTIwZWR1Y2F0aW9ufGVufDB8fHx8MTc1Mzc4NTk4OXww&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'Join education leaders from around the world to discuss the future of learning and international collaboration.',
   },
   {
@@ -78,7 +78,7 @@ export const mockEvents: Event[] = [
     title: 'Workshop on New Accreditation Standards',
     date: '2024-09-20',
     location: 'Online',
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://images.unsplash.com/photo-1651608671506-4d57dfd57ee5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb25mZXJlbmNlJTIwZWR1Y2F0aW9ufGVufDB8fHx8MTc1Mzc4NTk4OXww&ixlib=rb-4.1.0&q=80&w=1080',
     description: 'A virtual workshop for institutes preparing for the new 2025 UKCAS accreditation standards.',
   },
 ];
@@ -160,3 +160,19 @@ export const mockAdminUsers: AdminUser[] = [
         password: 'password123'
     }
 ];
+
+export const mockStudents = [
+    { id: '1', name: 'Amelia Johnson', course: 'Computer Science', joinedDate: '2023-09-01' },
+    { id: '2', name: 'Benjamin Carter', course: 'Data Analytics', joinedDate: '2023-09-01' },
+    { id: '3', name: 'Charlotte Davis', course: 'AI & Machine Learning', joinedDate: '2023-09-01' },
+    { id: '4', name: 'Daniel Evans', course: 'Computer Science', joinedDate: '2023-09-01' },
+    { id: '5', name: 'Emily Garcia', course: 'Data Analytics', joinedDate: '2022-09-01' },
+    { id: '6', name: 'Franklin Harris', course: 'AI & Machine Learning', joinedDate: '2022-09-01' },
+    { id: '7',name: 'Grace Taylor', course: 'Data Science', joinedDate: '2024-01-15' },
+    { id: '8', name: 'Henry Wilson', course: 'Cybersecurity', joinedDate: '2024-01-15' },
+    { id: '9', name: 'Isabella Martinez', course: 'Software Engineering', joinedDate: '2024-01-15' },
+    { id: '10', name: 'Jack Anderson', course: 'Cloud Computing', joinedDate: '2024-01-15' },
+    { id: '11', name: 'Katherine Thomas', course: 'DevOps', joinedDate: '2024-01-15' },
+    { id: '12', name: 'Liam Hernandez', course: 'Blockchain', joinedDate: '2024-01-15' }
+];
+

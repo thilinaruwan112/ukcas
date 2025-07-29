@@ -45,3 +45,10 @@ export interface AdminUser {
   email: string;
   password?: string;
 }
+
+export interface Student {
+    id: string;
+    name: string;
+    course: string;
+    joinedDate: string;
+}
