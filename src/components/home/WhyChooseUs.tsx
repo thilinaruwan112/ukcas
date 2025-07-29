@@ -30,7 +30,7 @@ export default function WhyChooseUs() {
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="relative h-80 md:h-[500px] w-full">
                         <Image 
-                            src="https://placehold.co/800x600.png"
+                            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxM3x8c3R1ZGVudHN8ZW58MHx8fHwxNzUzNzg2MzUyfDA&ixlib=rb-4.1.0&q=80&w=1080"
                             alt="A team of professionals collaborating in a modern office"
                             fill
                             className="object-cover rounded-lg shadow-lg"
