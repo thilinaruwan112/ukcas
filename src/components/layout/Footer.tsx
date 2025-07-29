@@ -39,7 +39,7 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Contact Us</h4>
             <p className="text-sm">
               2nd Floor, College House, 17 King Edwards Road, Ruislip, London, HA4 7AE, United Kingdom<br />
-              Email: <a href="mailto:contact@ukcas.com" className="hover:text-primary">contact@ukcas.com</a><br />
+              Email: <a href="mailto:info@ukcas.co.uk" className="hover:text-primary">info@ukcas.co.uk</a><br />
               Register Number: 16348189
             </p>
           </div>
