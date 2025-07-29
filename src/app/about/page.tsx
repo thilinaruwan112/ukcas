@@ -15,7 +15,7 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative h-80 md:h-96 w-full">
             <Image
-              src="https://placehold.co/800x600.png"
+              src="https://images.unsplash.com/photo-1558989292-769fbc427975?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxvdXIlMjBtaXNzaW9ufGVufDB8fHx8MTc1Mzc4NjEwOXww&ixlib=rb-4.1.0&q=80&w=1080"
               alt="Group of professionals in a meeting"
               fill
               className="object-cover rounded-lg shadow-lg"
