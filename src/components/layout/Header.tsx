@@ -17,7 +17,6 @@ export default function Header() {
 
   const navLinks = [
     { href: '/', label: t('Header.home') },
-    { href: '/institutes', label: t('Header.institutes') },
     { href: '/blog', label: t('Header.blog') },
     { href: '/events', label: t('Header.events') },
     { href: '/verify-certificate', label: t('Header.verify') },
