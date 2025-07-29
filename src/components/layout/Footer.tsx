@@ -38,8 +38,7 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Contact Us</h4>
             <p className="text-sm">
-              123 Education Lane<br />
-              London, UK SW1A 0AA<br />
+              2nd Floor, College House, 17 King Edwards Road, Ruislip, London, HA4 7AE, United Kingdom<br />
               Email: <a href="mailto:contact@ukcas.com" className="hover:text-primary">contact@ukcas.com</a>
             </p>
           </div>
