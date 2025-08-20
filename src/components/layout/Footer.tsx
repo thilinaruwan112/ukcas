@@ -45,9 +45,6 @@ export default function Footer() {
         </div>
         <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} UKCAS. All Rights Reserved.</p>
-          <p className="mt-2">
-            Powered by <a href="https://payshia.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-foreground hover:text-primary">Payshia Software Solutions</a>
-          </p>
         </div>
       </div>
     </footer>
