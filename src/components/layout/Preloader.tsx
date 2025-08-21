@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export default function Preloader() {
   const [shouldRender, setShouldRender] = useState(false);
@@ -47,8 +48,7 @@ export default function Preloader() {
       )}
     >
       <div className="animate-pulse">
-        {/* Use special selectors to make the logo bigger for the preloader */}
-        <Logo className="[&_svg]:h-12 [&_svg]:w-12 [&_span]:text-4xl" />
+         <Image src="https://content-provider.pharmacollege.lk/ukcas/logo-long-1.png" alt="UKCAS Logo" width={280} height={80} className="h-20 w-auto" />
       </div>
     </div>
   );

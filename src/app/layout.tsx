@@ -13,7 +13,24 @@ export const metadata: Metadata = {
   title: 'UKCAS Accreditation Platform',
   description: 'Official platform for the United Kingdom College of Advanced Studies accreditation.',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+        { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon.ico', type: 'image/x-icon' },
+        { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: 'https://content-provider.pharmacollege.lk/ukcas/apple-touch-icon.png',
+    other: [
+        {
+            rel: 'icon',
+            url: 'https://content-provider.pharmacollege.lk/ukcas/android-chrome-192x192.png',
+            sizes: '192x192'
+        },
+        {
+            rel: 'icon',
+            url: 'https://content-provider.pharmacollege.lk/ukcas/android-chrome-512x512.png',
+            sizes: '512x512'
+        }
+    ]
   },
 };
 
