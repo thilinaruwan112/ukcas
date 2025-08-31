@@ -1,5 +1,9 @@
+
+'use client';
+
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -21,6 +25,8 @@ import { Button } from "@/components/ui/button";
 import DashboardHeader from "@/components/layout/DashboardHeader";
 
 export default function InstituteLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -35,19 +41,19 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard" isActive>
+                <SidebarMenuButton href="/dashboard" isActive={pathname === '/dashboard'}>
                   <HardDrive />
                   Dashboard
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/students">
+                <SidebarMenuButton href="/dashboard/students" isActive={pathname.startsWith('/dashboard/students')}>
                   <Users />
                   Students
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/certificates">
+                <SidebarMenuButton href="/dashboard/certificates" isActive={pathname.startsWith('/dashboard/certificates')}>
                   <GraduationCap />
                   Issue Certificates
                 </SidebarMenuButton>

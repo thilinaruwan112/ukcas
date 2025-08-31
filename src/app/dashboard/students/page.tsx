@@ -80,6 +80,12 @@ export default function StudentListPage() {
                         <FileDown className="mr-2 h-4 w-4" />
                         Export CSV
                     </Button>
+                    <Button asChild>
+                       <Link href="/dashboard/students/new">
+                           <UserPlus className="mr-2 h-4 w-4" />
+                           Add New Student
+                       </Link>
+                    </Button>
                 </div>
             </div>
             <Card>
