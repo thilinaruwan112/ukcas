@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,12 +24,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { mockInstitutes } from "@/lib/mock-data";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CERTIFICATE_COST = 10;
 
 const formSchema = z.object({
   studentName: z.string().min(2, { message: "Student name must be at least 2 characters." }),
-  courseName: z.string().min(3, { message: "Course name must be at least 3 characters." }),
+  courseName: z.string({
+    required_error: "Please select a course.",
+  }),
   issueDate: z.date({
     required_error: "An issue date is required.",
   }),
@@ -45,7 +49,6 @@ export default function IssueCertificatePage() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             studentName: "",
-            courseName: "",
         },
     });
 
@@ -91,6 +94,8 @@ export default function IssueCertificatePage() {
             });
 
             form.reset();
+            // @ts-ignore
+            form.setValue('courseName', undefined);
             setIsLoading(false);
         }, 1000);
     }
@@ -122,11 +127,20 @@ export default function IssueCertificatePage() {
                             name="courseName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Course or Qualification Name</FormLabel>
+                                <FormLabel>Course or Qualification Name</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
-                                        <Input placeholder="e.g., BSc in Computer Science" {...field} />
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a course from your programs" />
+                                    </SelectTrigger>
                                     </FormControl>
-                                     <FormMessage />
+                                    <SelectContent>
+                                        {institute?.courses.map(course => (
+                                            <SelectItem key={course} value={course}>{course}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
                                 </FormItem>
                             )}
                         />
