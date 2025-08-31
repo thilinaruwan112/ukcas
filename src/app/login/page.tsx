@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     // Check for admin login (hardcoded admin)
     if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
-      router.push('/admin');
+      router.push('/admin/select-institute');
       return;
     }
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
       u => u.email.toLowerCase() === identifier.toLowerCase() && u.password === password
     );
     if (user) {
-      router.push('/admin');
+      router.push('/admin/select-institute');
       return;
     }
 
