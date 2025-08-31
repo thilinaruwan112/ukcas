@@ -8,13 +8,14 @@ import { Label } from "@/components/ui/label";
 import { UserCog, ArrowLeft } from "lucide-react";
 import { mockAdminUsers } from '@/lib/mock-data';
 import type { AdminUser } from '@/lib/types';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EditUserPage() {
     const { toast } = useToast();
+    const router = useRouter();
     const params = useParams();
     const { id } = params;
     const [user, setUser] = useState<AdminUser | undefined>(undefined);
@@ -42,6 +43,7 @@ export default function EditUserPage() {
             title: "User Updated",
             description: `Details for ${user?.instituteName} have been saved.`,
         });
+        router.push('/admin/users');
     };
     
     if (isLoading) {

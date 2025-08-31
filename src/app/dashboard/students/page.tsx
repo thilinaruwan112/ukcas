@@ -12,12 +12,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { mockStudents } from '@/lib/mock-data';
-
-type Student = typeof mockStudents[0];
+import type { Student } from '@/lib/types';
 
 export default function StudentListPage() {
     const { toast } = useToast();
-    const [students, setStudents] = useState(mockStudents);
+    const [students, setStudents] = useState<Student[]>(mockStudents);
     const [searchTerm, setSearchTerm] = useState('');
     const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 

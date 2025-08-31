@@ -2,6 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { UserPlus } from "lucide-react";
 
 const applications = [
   { id: 1, name: "International University of Science", country: "Canada", date: "2024-07-20", status: "Pending" },
@@ -18,7 +20,12 @@ export default function AdminInstitutesPage() {
                     <h1 className="text-2xl font-bold">Accreditation Applications</h1>
                     <p className="text-muted-foreground">Review, approve, or deny applications from institutes.</p>
                 </div>
-                 <Button>Add New Institute</Button>
+                 <Button asChild>
+                    <Link href="/admin/users/new">
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Create Institute User
+                    </Link>
+                 </Button>
             </div>
             <Card>
                 <CardContent className="p-0">

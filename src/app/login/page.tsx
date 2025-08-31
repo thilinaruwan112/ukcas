@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useI18n } from "@/context/i18n-provider";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useToast } from '@/hooks/use-toast';
-import { mockAdminUsers } from '@/lib/mock-data';
+import { mockAdminUsers, mockInstitutes } from '@/lib/mock-data';
 
 export default function LoginPage() {
   const { t } = useI18n();
@@ -20,32 +20,36 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>, userType: 'Admin' | 'Institute') => {
     e.preventDefault();
-
-    if (userType === 'Institute') {
-      // For now, institute login just redirects
-      router.push('/dashboard');
-      return;
-    }
-
     const formData = new FormData(e.currentTarget);
     const identifier = formData.get('identifier') as string;
     const password = formData.get('password') as string;
 
-    // Hardcoded admin user
-    if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
-      router.push('/admin');
-      return;
+    if (userType === 'Institute') {
+      // Mock institute login check
+      if(identifier === 'institute@test.com' && password === 'password123') {
+        router.push('/dashboard');
+        return;
+      }
     }
 
-    // Check mock users by email
-    const user = mockAdminUsers.find(
-      u => u.email.toLowerCase() === identifier.toLowerCase() && u.password === password
-    );
+    if (userType === 'Admin') {
+       // Hardcoded admin user
+      if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
+        router.push('/admin');
+        return;
+      }
 
-    if (user) {
-      router.push('/admin');
-      return;
+      // Check mock users by email
+      const user = mockAdminUsers.find(
+        u => u.email.toLowerCase() === identifier.toLowerCase() && u.password === password
+      );
+
+      if (user) {
+        router.push('/admin');
+        return;
+      }
     }
+
 
     toast({
       variant: 'destructive',
@@ -64,13 +68,13 @@ export default function LoginPage() {
           id={`${userType}-identifier`}
           name="identifier"
           type={userType === 'Admin' ? 'text' : 'email'}
-          placeholder={userType === 'Admin' ? 'admin' : 'you@example.com'}
+          placeholder={userType === 'Admin' ? 'admin' : 'institute@test.com'}
           required
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor={`${userType}-password`}>{t('Login.passwordLabel')}</Label>
-        <Input id={`${userType}-password`} name="password" type="password" required />
+        <Input id={`${userType}-password`} name="password" type="password" required placeholder="password123"/>
       </div>
       <Button type="submit" className="w-full">
         {userType === 'Admin' ? t('Login.loginButtonAdmin') : t('Login.loginButtonInstitute')}

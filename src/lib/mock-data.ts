@@ -1,4 +1,4 @@
-import type { Institute, BlogPost, Event, Certificate, AdminUser } from './types';
+import type { Institute, BlogPost, Event, Certificate, AdminUser, Student } from './types';
 
 export const mockInstitutes: Institute[] = [
   {
@@ -137,31 +137,31 @@ export const mockCertificates: Certificate[] = [
 export const mockAdminUsers: AdminUser[] = [
     {
         id: '1',
-        instituteName: 'Code Alpha',
-        instituteAddress: 'Colombo',
-        registeredDate: '2025-06-06T10:30:00.000Z',
-        email: 'dulajhansana1973@gmail.com',
-        password: 'password123'
-    },
-    {
-        id: '2',
-        instituteName: 'Tech Institute',
-        instituteAddress: '123 Main Street, Colombo',
-        registeredDate: '2025-06-11T11:30:00.000Z',
-        email: 'admin@example.com',
-        password: 'password123'
-    },
-    {
-        id: '3',
         instituteName: 'Global Tech University',
         instituteAddress: 'London, UK',
         registeredDate: '2024-07-20T09:00:00.000Z',
         email: 'contact@globaltech.edu',
         password: 'password123'
-    }
+    },
+    {
+        id: '2',
+        instituteName: 'London School of Business',
+        instituteAddress: 'London, UK',
+        registeredDate: '2024-07-18T10:00:00.000Z',
+        email: 'info@lsb.ac.uk',
+        password: 'password123'
+    },
+    {
+        id: '3',
+        instituteName: 'Cambridge Arts College',
+        instituteAddress: 'Cambridge, UK',
+        registeredDate: '2024-07-15T11:00:00.000Z',
+        email: 'admissions@cambridgearts.ac.uk',
+        password: 'password123'
+    },
 ];
 
-export const mockStudents = [
+export const mockStudents: Student[] = [
     { id: '1', name: 'Amelia Johnson', course: 'Computer Science', joinedDate: '2023-09-01' },
     { id: '2', name: 'Benjamin Carter', course: 'Data Analytics', joinedDate: '2023-09-01' },
     { id: '3', name: 'Charlotte Davis', course: 'AI & Machine Learning', joinedDate: '2023-09-01' },
@@ -175,4 +175,3 @@ export const mockStudents = [
     { id: '11', name: 'Katherine Thomas', course: 'DevOps', joinedDate: '2024-01-15' },
     { id: '12', name: 'Liam Hernandez', course: 'Blockchain', joinedDate: '2024-01-15' }
 ];
-

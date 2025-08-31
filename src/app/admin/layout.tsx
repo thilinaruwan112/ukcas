@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/admin" isActive>
+                <SidebarMenuButton href="/admin" >
                   <HardDrive />
                   Dashboard
                 </SidebarMenuButton>
@@ -48,7 +48,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/users">
+                <SidebarMenuButton href="/admin/users" isActive>
                   <UserCircle />
                   User Maintenance
                 </SidebarMenuButton>
