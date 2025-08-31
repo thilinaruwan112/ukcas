@@ -1,18 +1,21 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2 } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet } from "lucide-react";
 import Link from 'next/link';
 import { mockAdminUsers } from '@/lib/mock-data';
 import type { AdminUser } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 
 export default function UserMaintenancePage() {
@@ -21,6 +24,8 @@ export default function UserMaintenancePage() {
     const [users, setUsers] = useState<AdminUser[]>(mockAdminUsers);
     const [searchTerm, setSearchTerm] = useState('');
     const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
+    const [userToTopUp, setUserToTopUp] = useState<AdminUser | null>(null);
+    const [topUpAmount, setTopUpAmount] = useState(0);
 
     const filteredUsers = users.filter(user =>
         user.instituteName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -44,6 +49,26 @@ export default function UserMaintenancePage() {
 
     const handleEditClick = (userId: string) => {
         router.push(`/admin/users/edit/${userId}`);
+    };
+
+    const handleTopUpClick = (user: AdminUser) => {
+        setUserToTopUp(user);
+    };
+
+    const handleTopUpConfirm = () => {
+        if (userToTopUp && topUpAmount > 0) {
+            setUsers(users.map(user => 
+                user.id === userToTopUp.id 
+                    ? { ...user, balance: user.balance + topUpAmount } 
+                    : user
+            ));
+            toast({
+                title: "Balance Updated",
+                description: `Added $${topUpAmount.toFixed(2)} to ${userToTopUp.instituteName}'s balance.`,
+            });
+            setUserToTopUp(null);
+            setTopUpAmount(0);
+        }
     };
 
     return (
@@ -75,7 +100,7 @@ export default function UserMaintenancePage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Institute Name</TableHead>
-                                <TableHead>Institute Address</TableHead>
+                                <TableHead>Balance</TableHead>
                                 <TableHead>Registered Date</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -86,7 +111,7 @@ export default function UserMaintenancePage() {
                                 filteredUsers.map((user) => (
                                 <TableRow key={user.id}>
                                     <TableCell className="font-medium">{user.instituteName}</TableCell>
-                                    <TableCell>{user.instituteAddress}</TableCell>
+                                    <TableCell>${user.balance.toFixed(2)}</TableCell>
                                     <TableCell>{new Date(user.registeredDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell className="text-right">
@@ -101,6 +126,10 @@ export default function UserMaintenancePage() {
                                                 <DropdownMenuItem onClick={() => handleEditClick(user.id)}>
                                                     <UserCog className="mr-2 h-4 w-4" />
                                                     <span>Edit</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleTopUpClick(user)}>
+                                                    <Wallet className="mr-2 h-4 w-4" />
+                                                    <span>Top-up Balance</span>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
@@ -158,6 +187,36 @@ export default function UserMaintenancePage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            
+            <Dialog open={!!userToTopUp} onOpenChange={() => { setUserToTopUp(null); setTopUpAmount(0); }}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Top-up Balance</DialogTitle>
+                  <DialogDescription>
+                    Enter the amount to add to the balance of <span className="font-semibold">{userToTopUp?.instituteName}</span>.
+                    Current balance: ${userToTopUp?.balance.toFixed(2)}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2">
+                    <Label htmlFor="topUpAmount">Top-up Amount ($)</Label>
+                    <Input 
+                        id="topUpAmount"
+                        type="number"
+                        value={topUpAmount || ''}
+                        onChange={(e) => setTopUpAmount(Number(e.target.value))}
+                        placeholder="e.g., 50"
+                        min="0.01"
+                        step="0.01"
+                    />
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button onClick={handleTopUpConfirm} disabled={topUpAmount <= 0}>Confirm Top-up</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
         </>
     );
 }

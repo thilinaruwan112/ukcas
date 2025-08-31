@@ -44,6 +44,7 @@ export interface AdminUser {
   registeredDate: string;
   email: string;
   password?: string;
+  balance: number;
 }
 
 export interface Student {

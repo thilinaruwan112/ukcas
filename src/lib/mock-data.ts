@@ -141,7 +141,8 @@ export const mockAdminUsers: AdminUser[] = [
         instituteAddress: 'London, UK',
         registeredDate: '2024-07-20T09:00:00.000Z',
         email: 'contact@globaltech.edu',
-        password: 'password123'
+        password: 'password123',
+        balance: 150
     },
     {
         id: '2',
@@ -149,7 +150,8 @@ export const mockAdminUsers: AdminUser[] = [
         instituteAddress: 'London, UK',
         registeredDate: '2024-07-18T10:00:00.000Z',
         email: 'info@lsb.ac.uk',
-        password: 'password123'
+        password: 'password123',
+        balance: 250
     },
     {
         id: '3',
@@ -157,7 +159,8 @@ export const mockAdminUsers: AdminUser[] = [
         instituteAddress: 'Cambridge, UK',
         registeredDate: '2024-07-15T11:00:00.000Z',
         email: 'admissions@cambridgearts.ac.uk',
-        password: 'password123'
+        password: 'password123',
+        balance: 85
     },
 ];
 
