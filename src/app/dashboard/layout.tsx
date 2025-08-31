@@ -20,6 +20,7 @@ import {
   GraduationCap,
   Settings,
   LogOut,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardHeader from "@/components/layout/DashboardHeader";
@@ -44,6 +45,12 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
                 <SidebarMenuButton href="/dashboard" isActive={pathname === '/dashboard'}>
                   <HardDrive />
                   Dashboard
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton href="/dashboard/courses" isActive={pathname.startsWith('/dashboard/courses')}>
+                  <BookOpen />
+                  Courses
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
