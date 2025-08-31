@@ -28,7 +28,7 @@ export default function SelectInstitutePage() {
                                 <h3 className="text-lg font-semibold">{institute.name}</h3>
                                 <p className="text-sm text-muted-foreground mb-4">{institute.country}</p>
                                 <Button asChild className="w-full">
-                                    <Link href="/admin/institutes">
+                                    <Link href="/dashboard">
                                         Manage
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Link>
