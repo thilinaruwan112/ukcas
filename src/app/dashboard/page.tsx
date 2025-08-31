@@ -1,5 +1,6 @@
+
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Users, GraduationCap, Wallet } from "lucide-react";
+import { Users, GraduationCap, Wallet, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -18,7 +19,7 @@ export default function InstituteDashboardPage() {
         <>
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
                  <h1 className="text-2xl font-bold">Dashboard</h1>
-                 <Button asChild><Link href="/dashboard/certificates">Issue New Certificate</Link></Button>
+                 <Button asChild><Link href="/dashboard/certificates/new">Issue New Certificate</Link></Button>
             </div>
 
             <Card className="bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800/50">
@@ -40,9 +41,17 @@ export default function InstituteDashboardPage() {
             </div>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>Recently Issued Certificates</CardTitle>
-                    <CardDescription>A list of the last 5 certificates issued by your institute.</CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Recently Issued Certificates</CardTitle>
+                        <CardDescription>A list of the last 5 certificates issued by your institute.</CardDescription>
+                    </div>
+                    <Button asChild variant="outline" size="sm">
+                        <Link href="/dashboard/certificates">
+                            View All
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <Table>

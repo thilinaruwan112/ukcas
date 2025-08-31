@@ -62,7 +62,7 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
               <SidebarMenuItem>
                 <SidebarMenuButton href="/dashboard/certificates" isActive={pathname.startsWith('/dashboard/certificates')}>
                   <GraduationCap />
-                  Issue Certificates
+                  Certificates
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
