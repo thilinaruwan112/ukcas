@@ -5,52 +5,45 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogIn } from "lucide-react";
-import Link from "next/link";
 import { useI18n } from "@/context/i18n-provider";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useToast } from '@/hooks/use-toast';
-import { mockAdminUsers, mockInstitutes } from '@/lib/mock-data';
+import { mockAdminUsers } from '@/lib/mock-data';
 
 export default function LoginPage() {
   const { t } = useI18n();
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>, userType: 'Admin' | 'Institute') => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const identifier = formData.get('identifier') as string;
     const password = formData.get('password') as string;
 
-    if (userType === 'Institute') {
-      // Mock institute login check
-      if(identifier === 'institute@test.com' && password === 'password123') {
-        router.push('/dashboard');
-        return;
-      }
+    // Check for institute login
+    if (identifier === 'institute@test.com' && password === 'password123') {
+      router.push('/dashboard');
+      return;
     }
 
-    if (userType === 'Admin') {
-       // Hardcoded admin user
-      if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
-        router.push('/admin');
-        return;
-      }
-
-      // Check mock users by email
-      const user = mockAdminUsers.find(
-        u => u.email.toLowerCase() === identifier.toLowerCase() && u.password === password
-      );
-
-      if (user) {
-        router.push('/admin');
-        return;
-      }
+    // Check for admin login (hardcoded admin)
+    if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
+      router.push('/admin');
+      return;
     }
 
+    // Check for other admin users from mock data
+    const user = mockAdminUsers.find(
+      u => u.email.toLowerCase() === identifier.toLowerCase() && u.password === password
+    );
+    if (user) {
+      router.push('/admin');
+      return;
+    }
 
+    // If no match is found
     toast({
       variant: 'destructive',
       title: 'Login Failed',
@@ -58,26 +51,26 @@ export default function LoginPage() {
     });
   };
 
-  const LoginForm = ({ userType }: { userType: 'Admin' | 'Institute' }) => (
-    <form className="space-y-4" onSubmit={(e) => handleLogin(e, userType)}>
+  const LoginForm = () => (
+    <form className="space-y-4" onSubmit={handleLogin}>
       <div className="space-y-2">
-        <Label htmlFor={`${userType}-identifier`}>
-          {userType === 'Admin' ? 'Username or Email' : t('Login.emailLabel')}
+        <Label htmlFor="identifier">
+          Username or Email
         </Label>
         <Input
-          id={`${userType}-identifier`}
+          id="identifier"
           name="identifier"
-          type={userType === 'Admin' ? 'text' : 'email'}
-          placeholder={userType === 'Admin' ? 'admin' : 'institute@test.com'}
+          type="text"
+          placeholder="Enter your username or email"
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor={`${userType}-password`}>{t('Login.passwordLabel')}</Label>
-        <Input id={`${userType}-password`} name="password" type="password" required placeholder="password123"/>
+        <Label htmlFor="password">{t('Login.passwordLabel')}</Label>
+        <Input id="password" name="password" type="password" required />
       </div>
       <Button type="submit" className="w-full">
-        {userType === 'Admin' ? t('Login.loginButtonAdmin') : t('Login.loginButtonInstitute')}
+        Login
       </Button>
     </form>
   );
@@ -98,34 +91,16 @@ export default function LoginPage() {
             <LanguageSwitcher />
           </div>
 
-          <Tabs defaultValue="institute" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="institute">{t('Login.institute')}</TabsTrigger>
-              <TabsTrigger value="admin">{t('Login.admin')}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="institute">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t('Login.instituteLogin')}</CardTitle>
-                  <CardDescription>{t('Login.instituteDescription')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <LoginForm userType="Institute" />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="admin">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t('Login.adminLogin')}</CardTitle>
-                  <CardDescription>{t('Login.adminDescription')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <LoginForm userType="Admin" />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <Card>
+              <CardHeader>
+                <CardTitle>Welcome Back</CardTitle>
+                <CardDescription>Enter your credentials to access your portal.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LoginForm />
+              </CardContent>
+            </Card>
+
         </div>
       </div>
     </div>
