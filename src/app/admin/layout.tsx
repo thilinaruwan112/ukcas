@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { BadgeCheck, LogOut, Building2, Calendar, HardDrive, Newspaper, Settings, UserCircle } from "lucide-react";
+import { LogOut, Building2, Settings, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AdminHeader from "@/components/layout/AdminHeader";
 
@@ -17,40 +17,16 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen w-full">
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
-            <Link href="/admin">
+            <Link href="/admin/institutes">
               <span className="text-xl font-bold text-sidebar-foreground px-2">UKCAS Admin</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/admin" isActive={pathname === '/admin'}>
-                  <HardDrive />
-                  Dashboard
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/institutes" isActive={pathname === '/admin/institutes'}>
+                <SidebarMenuButton href="/admin/institutes" isActive={pathname.startsWith('/admin/institutes')}>
                   <Building2 />
                   Institutes
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/certificates" isActive={pathname === '/admin/certificates'}>
-                  <BadgeCheck />
-                  Certificates
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/blogs" isActive={pathname === '/admin/blogs'}>
-                  <Newspaper />
-                  Blogs
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/events" isActive={pathname === '/admin/events'}>
-                  <Calendar />
-                  Events
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
