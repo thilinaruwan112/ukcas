@@ -23,13 +23,13 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { mockInstitutes } from "@/lib/mock-data";
+import { mockInstitutes, mockStudents } from "@/lib/mock-data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CERTIFICATE_COST = 10;
 
 const formSchema = z.object({
-  studentName: z.string().min(2, { message: "Student name must be at least 2 characters." }),
+  studentId: z.string({ required_error: "Please select a student." }),
   courseName: z.string({
     required_error: "Please select a course.",
   }),
@@ -44,12 +44,11 @@ export default function IssueCertificatePage() {
     
     // In a real app, this would come from a user session or context.
     const [institute, setInstitute] = React.useState(mockInstitutes.find(i => i.id === '1')); 
+    const [students, setStudents] = React.useState(mockStudents);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            studentName: "",
-        },
+        defaultValues: {},
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
@@ -80,6 +79,8 @@ export default function IssueCertificatePage() {
             // Deduct balance and create pending certificate (simulation)
             const newBalance = institute.balance - CERTIFICATE_COST;
             setInstitute({...institute, balance: newBalance });
+
+            const studentName = students.find(s => s.id === values.studentId)?.name || 'Unknown Student';
             
             console.log("New pending certificate submitted:", {
                 ...values,
@@ -90,12 +91,14 @@ export default function IssueCertificatePage() {
             
             toast({
                 title: "Certificate Submitted!",
-                description: `The new certificate for ${values.studentName} is pending admin approval. $${CERTIFICATE_COST.toFixed(2)} has been deducted from your balance.`,
+                description: `The new certificate for ${studentName} is pending admin approval. $${CERTIFICATE_COST.toFixed(2)} has been deducted from your balance.`,
             });
 
             form.reset();
             // @ts-ignore
             form.setValue('courseName', undefined);
+             // @ts-ignore
+            form.setValue('studentId', undefined);
             setIsLoading(false);
         }, 1000);
     }
@@ -111,13 +114,22 @@ export default function IssueCertificatePage() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField
                             control={form.control}
-                            name="studentName"
+                            name="studentId"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Student's Full Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="e.g., John Doe" {...field} />
-                                    </FormControl>
+                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a registered student" />
+                                        </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {students.map(student => (
+                                                <SelectItem key={student.id} value={student.id}>{student.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <FormMessage />
                                 </FormItem>
                             )}
