@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { LogOut, Search, Settings, Building } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
+import Link from 'next/link';
 
 export default function AdminHeader() {
     const router = useRouter();
@@ -33,10 +34,21 @@ export default function AdminHeader() {
                     <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                       <Link href="/admin/select-institute">
+                         <Building className="mr-2 h-4 w-4" />
+                         <span>Change Institute</span>
+                       </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-500 focus:text-red-500">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Logout</span>
+                    </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
