@@ -27,6 +27,12 @@ const nextConfig: NextConfig = {
         hostname: 'content-provider.pharmacollege.lk',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ukcas-server.payshia.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

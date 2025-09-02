@@ -9,6 +9,30 @@ export interface Institute {
   balance: number;
 }
 
+export interface ApiInstitute {
+    id: string;
+    name: string;
+    code: string;
+    type: string;
+    accreditation_status: 'Accredited' | 'Conditional' | 'Pending' | 'Rejected';
+    accreditation_valid_until: string;
+    email: string;
+    phone: string;
+    website: string;
+    address_line1: string;
+    address_line2: string;
+    city: string;
+    state: string;
+    country: string;
+    postal_code: string;
+    logo?: string;
+    cover_image?: string;
+    status: 'Active' | 'Inactive';
+    created_at: string;
+    updated_at: string;
+    created_by: string;
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
