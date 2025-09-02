@@ -21,7 +21,7 @@ export default function Hero() {
             <Button size="lg" asChild variant="secondary">
               <Link href="/registration">{t('Hero.button1')}</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground/50 hover:bg-primary-foreground/10 text-primary-foreground" asChild>
+            <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10" asChild>
               <Link href="/institutes">{t('Hero.button2')}</Link>
             </Button>
           </div>
