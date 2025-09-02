@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import type { ApiInstitute } from '@/lib/types';
 import Image from 'next/image';
-import { Building2, Globe, Link as LinkIcon, Mail, Phone } from 'lucide-react';
+import { Building2, Globe, Link as LinkIcon, Mail, Phone, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
@@ -83,6 +83,7 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                         </div>
 
                         <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                            <InfoItem label="Institute ID" value={institute.code} icon={<Fingerprint className="w-4 h-4 text-muted-foreground" />}/>
                             <InfoItem label="Accreditation Status" value={institute.accreditation_status} />
                             <InfoItem label="Valid Until" value={new Date(institute.accreditation_valid_until).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })} />
                             <InfoItem label="Institute Type" value={institute.type} />
@@ -109,4 +110,5 @@ function InfoItem({ label, value, icon }: { label: string, value: string, icon?:
         </div>
     )
 }
+
 
