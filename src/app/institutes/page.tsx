@@ -2,71 +2,96 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search } from "lucide-react";
-import InstituteCard from '@/components/institutes/InstituteCard';
 import type { ApiInstitute } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Building2 } from 'lucide-react';
 
+
+function InstituteListItem({ institute }: { institute: ApiInstitute }) {
+    const fullAddress = [institute.address_line1, institute.address_line2, institute.city, institute.state, institute.country]
+    .filter(Boolean)
+    .join(', ');
+
+    return (
+         <Link href="#" className="block hover:bg-accent/50 rounded-lg p-3 transition-colors">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
+                     {institute.logo ? (
+                        <Image
+                            src={`https://ukcas-server.payshia.com/${institute.logo}`}
+                            alt={`${institute.name} logo`}
+                            width={48}
+                            height={48}
+                            className="rounded-md object-contain p-1"
+                        />
+                    ) : (
+                        <Building2 className="w-6 h-6 text-muted-foreground" />
+                    )}
+                </div>
+                <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate">{institute.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">{fullAddress}</p>
+                </div>
+            </div>
+        </Link>
+    )
+}
 
 export default function InstitutesPage() {
   const [institutes, setInstitutes] = useState<ApiInstitute[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchInstitutes() {
-      try {
-        const response = await fetch('https://ukcas-server.payshia.com/institutes');
-        if (!response.ok) {
-          throw new Error('Failed to fetch institutes');
-        }
-        const data = await response.json();
-        setInstitutes(data);
-        setError(null);
-      } catch (err) {
-        if (err instanceof Error) {
-            setError(err.message);
-        } else {
-            setError("An unknown error occurred");
-        }
-      } finally {
+    if (searchTerm.length < 2) {
+        setInstitutes([]);
         setLoading(false);
-      }
+        return;
     }
 
-    fetchInstitutes();
-  }, []);
-  
-  const filteredInstitutes = searchTerm.length > 0 
-    ? institutes.filter(institute =>
-        institute.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+    setLoading(true);
+    const timerId = setTimeout(() => {
+        async function fetchInstitutes() {
+          try {
+            const response = await fetch(`https://ukcas-server.payshia.com/institutes?search=${searchTerm}`);
+            if (!response.ok) {
+              throw new Error('Failed to fetch institutes');
+            }
+            const data = await response.json();
+            setInstitutes(data);
+            setError(null);
+          } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unknown error occurred");
+            }
+          } finally {
+            setLoading(false);
+          }
+        }
+        fetchInstitutes();
+    }, 300); // Debounce API call
 
+    return () => clearTimeout(timerId);
+
+  }, [searchTerm]);
+  
   const InstitutesSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-                <div className="p-6 space-y-4">
-                    <div className="flex items-center gap-4">
-                        <Skeleton className="h-16 w-16 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                           <Skeleton className="h-5 w-3/4" />
-                           <Skeleton className="h-4 w-1/2" />
-                        </div>
-                    </div>
-                    <div className="space-y-1">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                    </div>
-                     <div className="flex justify-end pt-2">
-                        <Skeleton className="h-10 w-28" />
-                    </div>
+    <div className="space-y-2">
+        {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex items-center gap-4 p-3">
+                <Skeleton className="h-12 w-12 rounded-md" />
+                <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
                 </div>
-            </Card>
+            </div>
         ))}
     </div>
   );
@@ -81,41 +106,49 @@ export default function InstitutesPage() {
           </p>
         </div>
 
-        <div className="relative mb-8 max-w-2xl mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-                placeholder="Search by institute name..."
-                className="pl-12 h-14 text-lg"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-        </div>
-
-        {loading && searchTerm.length > 0 && <InstitutesSkeleton />}
-
-        {error && (
-            <div className="text-center text-destructive bg-destructive/10 p-6 rounded-lg">
-                <h3 className="font-semibold">Failed to load institutes</h3>
-                <p>{error}</p>
+        <div className="max-w-2xl mx-auto">
+            <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                    placeholder="Search by institute name..."
+                    className="pl-12 h-14 text-lg"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                 {loading && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground animate-spin" />}
             </div>
-        )}
 
-        {!loading && !error && searchTerm.length > 0 && (
-            <>
-                {filteredInstitutes.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredInstitutes.map(institute => (
-                            <InstituteCard key={institute.id} institute={institute} />
-                        ))}
+            {searchTerm.length > 1 && (
+                <div className="mt-4 border rounded-lg bg-card shadow-lg overflow-hidden">
+                    <div className="p-2">
+                        {loading && <InstitutesSkeleton />}
+
+                        {error && (
+                            <div className="text-center text-destructive p-4">
+                                <p>Failed to load results.</p>
+                            </div>
+                        )}
+
+                        {!loading && !error && (
+                            <>
+                                {institutes.length > 0 ? (
+                                    <div className="divide-y">
+                                        {institutes.map(institute => (
+                                            <InstituteListItem key={institute.id} institute={institute} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-muted-foreground p-8">
+                                        <h3 className="font-semibold">No Institutes Found</h3>
+                                        <p className="text-sm">Your search for "{searchTerm}" did not match any institutes.</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
-                ) : (
-                     <div className="text-center text-muted-foreground py-16">
-                        <h3 className="text-xl font-semibold">No Institutes Found</h3>
-                        <p>Your search for "{searchTerm}" did not match any institutes.</p>
-                    </div>
-                )}
-            </>
-        )}
+                </div>
+            )}
+        </div>
       </div>
     </div>
   );
