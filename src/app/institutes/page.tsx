@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Building2 } from 'lucide-react';
+import { slugify } from '@/lib/utils';
 
 
 function InstituteListItem({ institute }: { institute: ApiInstitute }) {
@@ -17,7 +18,7 @@ function InstituteListItem({ institute }: { institute: ApiInstitute }) {
     .join(', ');
 
     return (
-         <Link href="#" className="block hover:bg-accent/50 rounded-lg p-3 transition-colors">
+         <Link href={`/institutes/${slugify(institute.name)}`} className="block hover:bg-accent/50 rounded-lg p-3 transition-colors">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
                      {institute.logo ? (

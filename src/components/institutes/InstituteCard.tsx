@@ -7,7 +7,7 @@ import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { Globe, MapPin, Building2 } from 'lucide-react';
 import type { ApiInstitute } from '@/lib/types';
 import { Badge } from '../ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, slugify } from '@/lib/utils';
 
 
 export default function InstituteCard({ institute }: { institute: ApiInstitute }) {
@@ -68,7 +68,7 @@ export default function InstituteCard({ institute }: { institute: ApiInstitute }
                 {institute.accreditation_status}
             </Badge>
             <Button asChild variant="outline" size="sm">
-                <Link href="#">
+                <Link href={`/institutes/${slugify(institute.name)}`}>
                     View Details
                 </Link>
             </Button>
