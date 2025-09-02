@@ -96,7 +96,7 @@ export function LoginPageClient() {
               <CardHeader>
                 <CardTitle>Welcome Back</CardTitle>
                 <CardDescription>Enter your credentials to access your portal.</CardDescription>
-              </Header>
+              </CardHeader>
               <CardContent>
                 <LoginForm />
               </CardContent>
