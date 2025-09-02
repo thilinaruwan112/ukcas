@@ -40,9 +40,11 @@ export default function InstitutesPage() {
     fetchInstitutes();
   }, []);
   
-  const filteredInstitutes = institutes.filter(institute =>
-    institute.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInstitutes = searchTerm.length > 0 
+    ? institutes.filter(institute =>
+        institute.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   const InstitutesSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -89,14 +91,16 @@ export default function InstitutesPage() {
             />
         </div>
 
-        {loading ? (
-            <InstitutesSkeleton />
-        ) : error ? (
+        {loading && searchTerm.length > 0 && <InstitutesSkeleton />}
+
+        {error && (
             <div className="text-center text-destructive bg-destructive/10 p-6 rounded-lg">
                 <h3 className="font-semibold">Failed to load institutes</h3>
                 <p>{error}</p>
             </div>
-        ) : (
+        )}
+
+        {!loading && !error && searchTerm.length > 0 && (
             <>
                 {filteredInstitutes.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
