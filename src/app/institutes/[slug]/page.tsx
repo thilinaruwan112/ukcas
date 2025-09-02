@@ -48,41 +48,37 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                         ) : (
                             <div className="w-full h-full bg-gradient-to-r from-primary/10 to-accent/10"></div>
                         )}
-                    </div>
-                    <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-20 sm:-mt-24 relative">
-                            <div className="flex-shrink-0">
-                                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
-                                    {institute.logo ? (
-                                        <Image
-                                            src={`https://ukcas-server.payshia.com/${institute.logo}`}
-                                            alt={`${institute.name} logo`}
-                                            width={160}
-                                            height={160}
-                                            className="rounded-full object-contain p-2"
-                                        />
-                                    ) : (
-                                        <Building2 className="w-16 h-16 text-muted-foreground" />
-                                    )}
-                                </div>
+                         <div className="absolute -bottom-16 left-6">
+                            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
+                                {institute.logo ? (
+                                    <Image
+                                        src={`https://ukcas-server.payshia.com/${institute.logo}`}
+                                        alt={`${institute.name} logo`}
+                                        width={160}
+                                        height={160}
+                                        className="rounded-full object-contain p-2"
+                                    />
+                                ) : (
+                                    <Building2 className="w-16 h-16 text-muted-foreground" />
+                                )}
                             </div>
-                            <div className="w-full pt-4 sm:pt-16">
-                                <div className="flex flex-col sm:flex-row justify-between sm:items-end">
-                                    <div className="flex-1">
-                                        <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
-                                        <p className="text-muted-foreground mt-1">{fullAddress}</p>
-                                    </div>
-                                    <div className="mt-4 sm:mt-0">
-                                        {institute.website && (
-                                            <Button asChild>
-                                                <a href={institute.website} target="_blank" rel="noopener noreferrer">
-                                                    <LinkIcon className="mr-2 h-4 w-4" />
-                                                    Visit Website
-                                                </a>
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                    <CardContent className="pt-24 px-6 pb-6">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-end">
+                            <div className="flex-1">
+                                <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
+                                <p className="text-muted-foreground mt-1">{fullAddress}</p>
+                            </div>
+                            <div className="mt-4 sm:mt-0">
+                                {institute.website && (
+                                    <Button asChild>
+                                        <a href={institute.website} target="_blank" rel="noopener noreferrer">
+                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                            Visit Website
+                                        </a>
+                                    </Button>
+                                )}
                             </div>
                         </div>
 
@@ -113,3 +109,4 @@ function InfoItem({ label, value, icon }: { label: string, value: string, icon?:
         </div>
     )
 }
+
