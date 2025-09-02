@@ -1,9 +1,10 @@
 
+
 import { notFound } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import type { ApiInstitute } from '@/lib/types';
 import Image from 'next/image';
-import { Building2 } from 'lucide-react';
+import { Building2, Globe, LinkIcon, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
@@ -38,19 +39,21 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
         <div className="py-16 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
                  <Card className="overflow-hidden">
-                    <div className="relative h-48 w-full bg-muted">
-                        {institute.cover_image && (
+                    <div className="relative h-48 md:h-64 w-full bg-muted">
+                        {institute.cover_image ? (
                             <Image
                                 src={`https://ukcas-server.payshia.com/${institute.cover_image}`}
                                 alt={`${institute.name} cover image`}
-                                layout="fill"
+                                fill
                                 className="object-cover"
                             />
+                        ) : (
+                            <div className="w-full h-full bg-gradient-to-r from-primary/10 to-accent/10"></div>
                         )}
                     </div>
                     <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-20">
-                            <div className="relative flex-shrink-0">
+                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-24 relative">
+                            <div className="flex-shrink-0">
                                 <div className="w-32 h-32 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
                                     {institute.logo ? (
                                         <Image
@@ -65,27 +68,29 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                                     )}
                                 </div>
                             </div>
-                            <div className="flex-1 pt-20 sm:pt-0">
+                            <div className="flex-1 pt-4 sm:pt-14">
                                 <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
                                 <p className="text-muted-foreground">{fullAddress}</p>
-                                {institute.website && (
-                                    <a href={institute.website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline mt-1 block">
-                                        Visit Website
-                                    </a>
-                                )}
                             </div>
-                            <div className="w-full sm:w-auto">
-                                <Button size="lg" className="w-full">View Courses</Button>
+                            <div className="w-full sm:w-auto pt-4 sm:pt-14">
+                                 {institute.website && (
+                                    <Button asChild>
+                                        <a href={institute.website} target="_blank" rel="noopener noreferrer">
+                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                            Visit Website
+                                        </a>
+                                    </Button>
+                                )}
                             </div>
                         </div>
 
                         <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
                             <InfoItem label="Accreditation Status" value={institute.accreditation_status} />
-                            <InfoItem label="Valid Until" value={new Date(institute.accreditation_valid_until).toLocaleDateString()} />
+                            <InfoItem label="Valid Until" value={new Date(institute.accreditation_valid_until).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })} />
                             <InfoItem label="Institute Type" value={institute.type} />
-                            <InfoItem label="Email" value={institute.email} />
-                            <InfoItem label="Phone" value={institute.phone} />
-                            <InfoItem label="Country" value={institute.country} />
+                            <InfoItem label="Email" value={institute.email} icon={<Mail className="w-4 h-4 text-muted-foreground" />}/>
+                            <InfoItem label="Phone" value={institute.phone} icon={<Phone className="w-4 h-4 text-muted-foreground" />} />
+                            <InfoItem label="Country" value={institute.country} icon={<Globe className="w-4 h-4 text-muted-foreground" />} />
                         </div>
                     </CardContent>
                 </Card>
@@ -94,11 +99,16 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
     );
 }
 
-function InfoItem({ label, value }: { label: string, value: string }) {
+function InfoItem({ label, value, icon }: { label: string, value: string, icon?: React.ReactNode }) {
+    if (!value) return null;
     return (
         <div className="p-4 bg-secondary/30 rounded-lg">
-            <p className="text-muted-foreground">{label}</p>
-            <p className="font-semibold">{value}</p>
+            <p className="text-muted-foreground text-xs">{label}</p>
+            <div className="flex items-center gap-2 mt-1">
+                {icon}
+                <p className="font-semibold">{value}</p>
+            </div>
         </div>
     )
 }
+
