@@ -52,7 +52,7 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                         )}
                     </div>
                     <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-24 relative">
+                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-20 relative">
                             <div className="flex-shrink-0">
                                 <div className="w-32 h-32 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
                                     {institute.logo ? (
@@ -68,11 +68,11 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                                     )}
                                 </div>
                             </div>
-                            <div className="flex-1 pt-4 sm:pt-14">
+                            <div className="flex-1 pt-4 sm:pt-16">
                                 <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
                                 <p className="text-muted-foreground">{fullAddress}</p>
                             </div>
-                            <div className="w-full sm:w-auto pt-4 sm:pt-14">
+                            <div className="w-full sm:w-auto pt-4 sm:pt-16">
                                  {institute.website && (
                                     <Button asChild>
                                         <a href={institute.website} target="_blank" rel="noopener noreferrer">
