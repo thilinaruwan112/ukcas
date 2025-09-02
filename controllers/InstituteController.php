@@ -29,6 +29,18 @@ class InstituteController
         }
     }
 
+    // Get institute by slug
+    public function getRecordBySlug($slug)
+    {
+        $record = $this->model->getBySlug($slug);
+        if ($record) {
+            echo json_encode($record);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Institute not found']);
+        }
+    }
+
     // Create new institute
     public function createRecord()
     {

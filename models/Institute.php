@@ -26,14 +26,22 @@ class Institute
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Get institute by slug
+    public function getBySlug($slug)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE slug = ?");
+        $stmt->execute([$slug]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Create new institute
     public function create($data)
     {
         $stmt = $this->pdo->prepare("
             INSERT INTO {$this->table}
             (name, code, type, accreditation_status, accreditation_valid_until, email, phone, website,
-             address_line1, address_line2, city, state, country, postal_code, created_at, updated_at, created_by, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             address_line1, address_line2, city, state, country, postal_code, created_at, updated_at, created_by, status, slug)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['name'],
@@ -53,7 +61,8 @@ class Institute
             $data['created_at'],
             $data['updated_at'],
             $data['created_by'],
-            $data['status']
+            $data['status'],
+            $data['slug']
         ]);
 
         return $this->pdo->lastInsertId();
@@ -81,7 +90,8 @@ class Institute
                 created_at = ?,
                 updated_at = ?,
                 created_by = ?,
-                status = ?
+                status = ?,
+                slug = ?
             WHERE id = ?
         ");
         $stmt->execute([
@@ -103,6 +113,7 @@ class Institute
             $data['updated_at'],
             $data['created_by'],
             $data['status'],
+            $data['slug'],
             $id
         ]);
     }

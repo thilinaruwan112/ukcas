@@ -16,6 +16,11 @@ return [
         $instituteController->getRecordById($id);
     },
 
+    // Get institute by slug
+    'GET /institutes/slug/{slug}/' => function ($slug) use ($instituteController) {
+        $instituteController->getRecordBySlug($slug);
+    },
+
     // Create new institute
     'POST /institutes/' => function () use ($instituteController) {
         $instituteController->createRecord();
