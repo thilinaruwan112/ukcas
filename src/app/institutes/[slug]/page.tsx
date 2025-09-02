@@ -1,22 +1,21 @@
 
 
+
 import { notFound } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import type { ApiInstitute } from '@/lib/types';
 import Image from 'next/image';
-import { Building2, Globe, LinkIcon, Mail, Phone } from 'lucide-react';
+import { Building2, Globe, Link as LinkIcon, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
     try {
-        const response = await fetch(`https://ukcas-server.payshia.com/institutes?search=${slug.replace(/-/g, ' ')}`);
+        const response = await fetch(`https://ukcas-server.payshia.com/institutes/${slug}`);
         if (!response.ok) {
             return null;
         }
         const data = await response.json();
-        // Assuming the first result is the most relevant one.
-        // A more robust solution might require a dedicated API endpoint to fetch by slug.
-        return data.length > 0 ? data[0] : null;
+        return data;
     } catch (error) {
         console.error('Failed to fetch institute:', error);
         return null;
@@ -52,15 +51,15 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                         )}
                     </div>
                     <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-20 relative">
+                        <div className="flex flex-col sm:flex-row items-start gap-6 -mt-20 sm:-mt-24 relative">
                             <div className="flex-shrink-0">
-                                <div className="w-32 h-32 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
+                                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
                                     {institute.logo ? (
                                         <Image
                                             src={`https://ukcas-server.payshia.com/${institute.logo}`}
                                             alt={`${institute.name} logo`}
-                                            width={128}
-                                            height={128}
+                                            width={160}
+                                            height={160}
                                             className="rounded-full object-contain p-2"
                                         />
                                     ) : (
@@ -68,19 +67,23 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                                     )}
                                 </div>
                             </div>
-                            <div className="flex-1 pt-4 sm:pt-16">
-                                <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
-                                <p className="text-muted-foreground">{fullAddress}</p>
-                            </div>
-                            <div className="w-full sm:w-auto pt-4 sm:pt-16">
-                                 {institute.website && (
-                                    <Button asChild>
-                                        <a href={institute.website} target="_blank" rel="noopener noreferrer">
-                                            <LinkIcon className="mr-2 h-4 w-4" />
-                                            Visit Website
-                                        </a>
-                                    </Button>
-                                )}
+                            <div className="w-full sm:pt-16">
+                                <div className="flex flex-col sm:flex-row justify-between sm:items-end">
+                                    <div className="flex-1">
+                                        <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
+                                        <p className="text-muted-foreground mt-1">{fullAddress}</p>
+                                    </div>
+                                    <div className="mt-4 sm:mt-0">
+                                        {institute.website && (
+                                            <Button asChild>
+                                                <a href={institute.website} target="_blank" rel="noopener noreferrer">
+                                                    <LinkIcon className="mr-2 h-4 w-4" />
+                                                    Visit Website
+                                                </a>
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -111,4 +114,3 @@ function InfoItem({ label, value, icon }: { label: string, value: string, icon?:
         </div>
     )
 }
-

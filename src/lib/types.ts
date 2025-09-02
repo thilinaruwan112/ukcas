@@ -1,3 +1,4 @@
+
 export interface Institute {
   id: string;
   name: string;
@@ -31,6 +32,7 @@ export interface ApiInstitute {
     created_at: string;
     updated_at: string;
     created_by: string;
+    slug: string;
 }
 
 export interface BlogPost {

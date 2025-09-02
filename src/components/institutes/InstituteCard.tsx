@@ -1,4 +1,5 @@
 
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from "@/components/ui/card";
@@ -68,7 +69,7 @@ export default function InstituteCard({ institute }: { institute: ApiInstitute }
                 {institute.accreditation_status}
             </Badge>
             <Button asChild variant="outline" size="sm">
-                <Link href={`/institutes/${slugify(institute.name)}`}>
+                <Link href={`/institutes/${institute.slug}`}>
                     View Details
                 </Link>
             </Button>
