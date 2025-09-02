@@ -1,11 +1,10 @@
-
-
 import { notFound } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import type { ApiInstitute } from '@/lib/types';
 import Image from 'next/image';
 import { Building2, Globe, Link as LinkIcon, Mail, Phone, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import type { Metadata } from 'next';
 
 async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
     try {
@@ -19,6 +18,41 @@ async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
         console.error('Failed to fetch institute:', error);
         return null;
     }
+}
+
+type Props = {
+  params: { slug: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const institute = await getInstituteBySlug(params.slug);
+
+  if (!institute) {
+    return {
+      title: 'Institute Not Found'
+    }
+  }
+
+  const fullAddress = [institute.address_line1, institute.address_line2, institute.city, institute.state, institute.country]
+    .filter(Boolean)
+    .join(', ');
+
+  return {
+    title: institute.name,
+    description: `View accreditation details for ${institute.name}, located in ${fullAddress}. Status: ${institute.accreditation_status}.`,
+     openGraph: {
+      title: institute.name,
+      description: `Accreditation details for ${institute.name}.`,
+      images: institute.logo ? [
+        {
+          url: `https://ukcas-server.payshia.com/${institute.logo}`,
+          width: 200,
+          height: 200,
+          alt: `${institute.name} Logo`,
+        },
+      ] : [],
+    },
+  }
 }
 
 
@@ -110,5 +144,3 @@ function InfoItem({ label, value, icon }: { label: string, value: string, icon?:
         </div>
     )
 }
-
-

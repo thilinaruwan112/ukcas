@@ -1,5 +1,11 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BadgeCheck, SearchCheck, MessageSquare, ShieldCheck, Globe, BookOpen } from "lucide-react";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Our Services',
+  description: 'Explore the services offered by UKCAS, including institutional accreditation, certificate verification, educational consultation, and quality assurance workshops.',
+};
 
 const services = [
   {

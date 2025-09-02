@@ -10,6 +10,12 @@ import { useI18n } from "@/context/i18n-provider";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useToast } from '@/hooks/use-toast';
 import { mockAdminUsers } from '@/lib/mock-data';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Portal Login',
+    description: 'Access your UKCAS dashboard. Login for institutes to manage certificates and for administrators to manage the platform.',
+};
 
 export default function LoginPage() {
   const { t } = useI18n();

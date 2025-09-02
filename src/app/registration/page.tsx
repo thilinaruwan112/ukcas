@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { BadgeCheck } from "lucide-react";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Institute Accreditation Application',
+  description: 'Apply for UKCAS accreditation. Complete the form to begin the accreditation process for your institution and join our network of globally recognized schools.',
+};
 
 export default function RegistrationPage() {
   return (

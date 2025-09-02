@@ -1,5 +1,12 @@
 import Image from "next/image";
 import { BadgeCheck, Globe, Scale } from "lucide-react";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn about the mission, vision, and values of the United Kingdom College of Advanced Studies (UKCAS). Discover our commitment to fostering educational excellence worldwide.',
+};
+
 
 export default function AboutPage() {
   return (

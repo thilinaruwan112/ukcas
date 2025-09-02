@@ -8,6 +8,13 @@ import { FileSearch, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { mockCertificates, mockInstitutes } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import type { Certificate, Institute } from "@/lib/types";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Verify Certificate',
+    description: 'Use the UKCAS official verification tool to instantly check the authenticity of a certificate using its unique ID.',
+};
+
 
 interface VerificationResult {
     certificate: Certificate;

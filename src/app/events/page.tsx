@@ -3,6 +3,13 @@ import { mockEvents } from "@/lib/mock-data";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Upcoming Events",
+  description: "Join UKCAS at leading educational events, conferences, and workshops. Network with peers, learn about the latest trends, and collaborate with experts.",
+};
+
 
 export default function EventsPage() {
   return (

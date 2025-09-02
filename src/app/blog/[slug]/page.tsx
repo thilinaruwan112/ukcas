@@ -3,6 +3,39 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import type { Metadata } from "next";
+
+type Props = {
+  params: { slug: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = mockBlogPosts.find((p) => p.slug === params.slug);
+
+  if (!post) {
+    return {
+      title: 'Post Not Found'
+    }
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: [
+        {
+          url: post.imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+  }
+}
+
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = mockBlogPosts.find((p) => p.slug === params.slug);

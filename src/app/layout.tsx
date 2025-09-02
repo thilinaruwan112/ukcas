@@ -10,8 +10,12 @@ import Preloader from '@/components/layout/Preloader';
 import AppShell from '@/components/layout/AppShell';
 
 export const metadata: Metadata = {
-  title: 'UKCAS Accreditation Platform',
-  description: 'Official platform for the United Kingdom College of Advanced Studies accreditation.',
+  title: {
+    default: 'UKCAS - Global Accreditation & Certificate Verification',
+    template: '%s | UKCAS',
+  },
+  description: 'The United Kingdom College of Advanced Studies (UKCAS) provides prestigious accreditation for educational institutions and a secure platform for certificate verification worldwide.',
+  keywords: ['UKCAS', 'accreditation', 'higher education', 'certificate verification', 'institutional accreditation', 'global education standards'],
   icons: {
     icon: [
         { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon.ico', type: 'image/x-icon' },
