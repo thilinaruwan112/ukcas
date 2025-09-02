@@ -1,6 +1,5 @@
 
 
-
 import { notFound } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import type { ApiInstitute } from '@/lib/types';
@@ -10,7 +9,7 @@ import { Button } from '@/components/ui/button';
 
 async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
     try {
-        const response = await fetch(`https://ukcas-server.payshia.com/institutes/${slug}`);
+        const response = await fetch(`https://ukcas-server.payshia.com/institutes/slug/${slug}`);
         if (!response.ok) {
             return null;
         }
@@ -67,7 +66,7 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                                     )}
                                 </div>
                             </div>
-                            <div className="w-full sm:pt-16">
+                            <div className="w-full pt-4 sm:pt-16">
                                 <div className="flex flex-col sm:flex-row justify-between sm:items-end">
                                     <div className="flex-1">
                                         <h1 className="text-2xl md:text-3xl font-bold font-headline">{institute.name}</h1>
