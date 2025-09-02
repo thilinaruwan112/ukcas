@@ -3,11 +3,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Globe, MapPin, CheckBadgeIcon } from '@heroicons/react/24/solid';
+import { CheckBadgeIcon } from '@heroicons/react/24/solid';
+import { Globe, MapPin, Building2 } from 'lucide-react';
 import type { ApiInstitute } from '@/lib/types';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
-import { Building2 } from 'lucide-react';
 
 
 export default function InstituteCard({ institute }: { institute: ApiInstitute }) {
