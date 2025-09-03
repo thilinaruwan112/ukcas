@@ -145,9 +145,7 @@ export default function PrintLetterPage() {
                             </div>
                         </div>
                         
-                        <div className="flex-grow"></div>
-
-                         <div className="pt-4">
+                         <div className="pt-8">
                             <div className="relative h-28 w-80">
                                 <Image 
                                     src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign.png" 
@@ -161,6 +159,8 @@ export default function PrintLetterPage() {
                                 <p>United Kingdom College of Advanced Studies</p>
                             </div>
                         </div>
+
+                        <div className="flex-grow"></div>
 
                     </div>
                 </div>
