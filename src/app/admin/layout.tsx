@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { LogOut, Building2, Settings, UserCircle } from "lucide-react";
+import { LogOut, Building2, Settings, UserCircle, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AdminHeader from "@/components/layout/AdminHeader";
 
@@ -33,6 +33,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <SidebarMenuButton href="/admin/users" isActive={pathname.startsWith('/admin/users')}>
                   <UserCircle />
                   User Maintenance
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton href="/admin/accreditation" isActive={pathname.startsWith('/admin/accreditation')}>
+                  <Award />
+                  Accreditation
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
