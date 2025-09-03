@@ -36,22 +36,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const fullAddress = [institute.address_line1, institute.address_line2, institute.city, institute.state, institute.country]
     .filter(Boolean)
     .join(', ');
+  
+  const description = `View accreditation details for ${institute.name}, located in ${fullAddress}. Status: ${institute.accreditation_status}.`;
+  
+  const imageUrl = institute.cover_image 
+    ? `https://ukcas-server.payshia.com/${institute.cover_image}`
+    : institute.logo 
+    ? `https://ukcas-server.payshia.com/${institute.logo}`
+    : undefined;
 
   return {
     title: institute.name,
-    description: `View accreditation details for ${institute.name}, located in ${fullAddress}. Status: ${institute.accreditation_status}.`,
+    description: description,
      openGraph: {
-      title: institute.name,
-      description: `Accreditation details for ${institute.name}.`,
-      images: institute.logo ? [
+      title: `${institute.name} | UKCAS Accredited`,
+      description: description,
+      images: imageUrl ? [
         {
-          url: `https://ukcas-server.payshia.com/${institute.logo}`,
-          width: 200,
-          height: 200,
-          alt: `${institute.name} Logo`,
+          url: imageUrl,
+          alt: `${institute.name} Image`,
         },
       ] : [],
     },
+     twitter: {
+      card: 'summary_large_image',
+      title: `${institute.name} | UKCAS Accredited`,
+      description: description,
+      images: imageUrl ? [imageUrl] : [],
+    }
   }
 }
 

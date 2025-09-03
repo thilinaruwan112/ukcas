@@ -8,6 +8,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Upcoming Events",
   description: "Join UKCAS at leading educational events, conferences, and workshops. Network with peers, learn about the latest trends, and collaborate with experts.",
+  openGraph: {
+    title: 'Upcoming Events | UKCAS',
+    description: 'Join UKCAS at leading educational events, conferences, and workshops.',
+  },
 };
 
 

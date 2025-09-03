@@ -5,6 +5,18 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About Us',
   description: 'Learn about the mission, vision, and values of the United Kingdom College of Advanced Studies (UKCAS). Discover our commitment to fostering educational excellence worldwide.',
+  openGraph: {
+    title: 'About Us | UKCAS',
+    description: 'Learn about the mission, vision, and values of the United Kingdom College of Advanced Studies (UKCAS).',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1558989292-769fbc427975?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxvdXIlMjBtaXNzaW9ufGVufDB8fHx8MTc1Mzc4NjEwOXww&ixlib=rb-4.1.0&q=80&w=1080',
+        width: 1200,
+        height: 630,
+        alt: 'Our Mission at UKCAS',
+      },
+    ],
+  },
 };
 
 

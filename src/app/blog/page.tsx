@@ -9,6 +9,10 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Blog - UKCAS Insights',
   description: 'Stay informed with the latest news, trends, and discussions in higher education and accreditation from the experts at UKCAS.',
+  openGraph: {
+    title: 'Blog - UKCAS Insights',
+    description: 'Stay informed with the latest news, trends, and discussions in higher education and accreditation from the experts at UKCAS.',
+  },
 };
 
 export default function BlogPage() {

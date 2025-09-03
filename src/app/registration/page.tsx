@@ -9,6 +9,10 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Institute Accreditation Application',
   description: 'Apply for UKCAS accreditation. Complete the form to begin the accreditation process for your institution and join our network of globally recognized schools.',
+  openGraph: {
+    title: 'Institute Accreditation Application | UKCAS',
+    description: 'Apply for UKCAS accreditation and join our network of globally recognized schools.',
+  },
 };
 
 export default function RegistrationPage() {

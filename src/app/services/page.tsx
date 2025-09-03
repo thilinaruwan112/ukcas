@@ -5,6 +5,10 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Our Services',
   description: 'Explore the services offered by UKCAS, including institutional accreditation, certificate verification, educational consultation, and quality assurance workshops.',
+  openGraph: {
+    title: 'Our Services | UKCAS',
+    description: 'Explore the services offered by UKCAS, including institutional accreditation, certificate verification, educational consultation, and quality assurance workshops.',
+  },
 };
 
 const services = [
