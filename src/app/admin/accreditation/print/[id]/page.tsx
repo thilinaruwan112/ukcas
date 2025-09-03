@@ -5,27 +5,38 @@ import { useEffect, useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Printer, Loader2 } from 'lucide-react';
-import { mockAdminUsers } from '@/lib/mock-data';
-import type { AdminUser } from '@/lib/types';
+import { Printer } from 'lucide-react';
+import type { ApiInstitute } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+
+
+async function getInstituteById(id: string): Promise<ApiInstitute | null> {
+    try {
+        const response = await fetch(`https://ukcas-server.payshia.com/institutes/id/${id}`);
+        if (!response.ok) {
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch institute:', error);
+        return null;
+    }
+}
 
 export default function PrintLetterPage() {
     const params = useParams();
     const { id } = params;
-    const [institute, setInstitute] = useState<AdminUser | null>(null);
+    const [institute, setInstitute] = useState<ApiInstitute | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (id) {
-            // Simulate fetching data
-            const foundInstitute = mockAdminUsers.find(u => u.id === id);
-            setTimeout(() => {
-                if (foundInstitute) {
-                    setInstitute(foundInstitute);
+        if (typeof id === 'string') {
+            getInstituteById(id).then(data => {
+                if (data) {
+                    setInstitute(data);
                 }
                 setLoading(false);
-            }, 300);
+            })
         } else {
             setLoading(false);
         }
@@ -59,6 +70,10 @@ export default function PrintLetterPage() {
         day: 'numeric', month: 'long', year: 'numeric'
     });
 
+    const fullAddress = [institute.address_line1, institute.address_line2, institute.city, institute.state, institute.country]
+    .filter(Boolean)
+    .join(', ');
+
     return (
         <>
             <div className="fixed top-4 right-4 z-50 print:hidden">
@@ -82,8 +97,8 @@ export default function PrintLetterPage() {
                         <p className="text-sm mb-8 text-right">{today}</p>
                         
                         <div className="space-y-1 mb-8">
-                            <p className="font-bold text-base">{institute.instituteName}</p>
-                            <p className="text-sm">{institute.instituteAddress}</p>
+                            <p className="font-bold text-base">{institute.name}</p>
+                            <p className="text-sm">{fullAddress}</p>
                         </div>
                         
                         <p className="mb-4 text-sm">Dear Sir/Madam,</p>
@@ -92,13 +107,13 @@ export default function PrintLetterPage() {
 
                         <div className="space-y-4 text-sm leading-relaxed">
                             <p>
-                                We are pleased to inform you that following a comprehensive review of your institution's standards, curriculum, and quality assurance policies, the board of the United Kingdom College of Advanced Studies (UKCAS) has granted full accreditation to <span className="font-bold">{institute.instituteName}</span>.
+                                We are pleased to inform you that following a comprehensive review of your institution's standards, curriculum, and quality assurance policies, the board of the United Kingdom College of Advanced Studies (UKCAS) has granted full accreditation to <span className="font-bold">{institute.name}</span>.
                             </p>
                             <p>
                                 This accreditation is a testament to your institution's commitment to excellence in education and its alignment with global standards. UKCAS recognizes your dedication to providing outstanding learning opportunities and upholding the highest levels of academic integrity.
                             </p>
                              <p>
-                                Your UKCAS accreditation is valid until <span className="font-bold">{new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>.
+                                Your UKCAS accreditation is valid until <span className="font-bold">{new Date(institute.accreditation_valid_until).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>.
                             </p>
                             <p>
                                 We congratulate you on this significant achievement and look forward to a continued partnership in advancing educational quality.
