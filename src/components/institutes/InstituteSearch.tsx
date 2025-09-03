@@ -19,9 +19,9 @@ function InstituteListItem({ institute }: { institute: ApiInstitute }) {
          <Link href={`/institutes/${institute.slug}`} className="block hover:bg-accent/50 rounded-lg p-3 transition-colors">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
-                     {institute.logo ? (
+                     {institute.logo_path ? (
                         <Image
-                            src={`https://ukcas-server.payshia.com/${institute.logo}`}
+                            src={institute.logo_path}
                             alt={`${institute.name} logo`}
                             width={48}
                             height={48}
@@ -41,18 +41,18 @@ function InstituteListItem({ institute }: { institute: ApiInstitute }) {
 }
 
 export default function InstituteSearch() {
-  const [institutes, setInstitutes] = useState<ApiInstitute[]>([]);
+  const [allInstitutes, setAllInstitutes] = useState<ApiInstitute[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const filteredInstitutes = institutes.filter(institute => 
+  const filteredInstitutes = allInstitutes.filter(institute => 
     institute.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
     if (searchTerm.length < 2) {
-        setInstitutes([]);
+        setAllInstitutes([]);
         setLoading(false);
         return;
     }
@@ -66,7 +66,7 @@ export default function InstituteSearch() {
               throw new Error('Failed to fetch institutes');
             }
             const data = await response.json();
-            setInstitutes(data);
+            setAllInstitutes(data);
             setError(null);
           } catch (err) {
             if (err instanceof Error) {
