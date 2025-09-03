@@ -127,9 +127,9 @@ export default function PrintLetterPage() {
                             quality={100}
                         />
                     </div>
-                    <div className="relative z-10 flex flex-col flex-grow pt-[180px] text-center">
+                    <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
                         
-                        <div className="flex-grow flex flex-col items-center justify-center space-y-6">
+                        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-6">
                             <h1 className="font-bold text-lg">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
                             <p className="font-bold text-xl">{institute.name} {institute.country}</p>
@@ -145,6 +145,21 @@ export default function PrintLetterPage() {
                                 <p>
                                     <span className="font-semibold">Valid until:</span> {validUntilDate}
                                 </p>
+                            </div>
+                        </div>
+
+                         <div className="pt-16">
+                            <div className="relative h-24 w-64">
+                                <Image 
+                                    src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign.png" 
+                                    alt="Signature"
+                                    layout="fill"
+                                    objectFit="contain"
+                                />
+                            </div>
+                            <div className="border-t-2 border-black w-64 pt-2 mt-2">
+                                <p className="font-bold">Director of Accreditation</p>
+                                <p>United Kingdom College of Advanced Studies</p>
                             </div>
                         </div>
 
