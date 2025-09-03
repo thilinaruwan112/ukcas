@@ -52,6 +52,7 @@ function PrintLetterSkeleton() {
     )
 }
 
+
 export default function PrintLetterPage() {
     const params = useParams();
     const { id } = params;
@@ -145,16 +146,16 @@ export default function PrintLetterPage() {
                             </div>
                         </div>
                         
-                         <div className="pt-8">
-                            <div className="relative h-28 w-80">
+                         <div className="pt-8 space-y-4">
+                            <div className="relative h-20 w-64">
                                 <Image 
-                                    src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign.png" 
+                                    src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png" 
                                     alt="Signature"
                                     layout="fill"
                                     objectFit="contain"
                                 />
                             </div>
-                            <div className="border-t-2 border-black w-64 pt-2 mt-2">
+                            <div className="border-t-2 border-black w-64 pt-2">
                                 <p className="font-bold">Director of Accreditation</p>
                                 <p>United Kingdom College of Advanced Studies</p>
                             </div>
@@ -165,10 +166,16 @@ export default function PrintLetterPage() {
             </div>
             <style jsx global>{`
                 @media print {
-                    body, html {
+                    .print-container {
+                        visibility: visible;
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        height: auto;
+                    }
+                    body > *:not(.print-container) {
                         visibility: hidden;
-                        margin: 0;
-                        padding: 0;
                     }
                     .letter-container, .letter-container * {
                         visibility: visible;
@@ -184,6 +191,10 @@ export default function PrintLetterPage() {
                         border: none;
                         box-sizing: border-box;
                     }
+                }
+                 @page {
+                    size: A4;
+                    margin: 0;
                 }
             `}</style>
         </>
