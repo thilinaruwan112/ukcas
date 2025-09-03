@@ -129,7 +129,7 @@ export default function PrintLetterPage() {
                     </div>
                     <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
                         
-                        <div className="flex-grow flex flex-col items-center justify-center text-center space-y-6">
+                        <div className="flex-grow flex flex-col items-center justify-start text-center space-y-6 pt-12">
                             <h1 className="font-bold text-lg">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
                             <p className="font-bold text-xl">{institute.name} {institute.country}</p>
