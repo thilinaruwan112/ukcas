@@ -166,30 +166,23 @@ export default function PrintLetterPage() {
             </div>
             <style jsx global>{`
                 @media print {
-                    .print-container {
+                    body > *:not(.print-container) {
+                        visibility: hidden;
+                    }
+                    .print-container, .print-container * {
+                        visibility: visible;
+                    }
+                    .letter-container {
                         visibility: visible;
                         position: absolute;
                         left: 0;
                         top: 0;
                         width: 100%;
                         height: auto;
-                    }
-                    body > *:not(.print-container) {
-                        visibility: hidden;
-                    }
-                    .letter-container, .letter-container * {
-                        visibility: visible;
-                    }
-                    .letter-container {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100vw;
-                        height: 100vh;
                         margin: 0;
                         padding: 1in;
                         border: none;
-                        box-sizing: border-box;
+                        box-shadow: none;
                     }
                 }
                  @page {
