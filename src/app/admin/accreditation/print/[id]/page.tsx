@@ -121,7 +121,7 @@ export default function PrintLetterPage() {
                 </Button>
             </div>
             <div className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
-                <div className="relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black">
+                <div className="letter-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black">
                      <div className="absolute inset-0 z-0">
                         <Image 
                             src="https://content-provider.payshia.com/ukcas/institutes/1/docs/ukcas-letter-head.jpg" 
@@ -167,6 +167,26 @@ export default function PrintLetterPage() {
                     </div>
                 </div>
             </div>
+            <style jsx global>{`
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    .letter-container, .letter-container * {
+                        visibility: visible;
+                    }
+                    .letter-container {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        border: none;
+                    }
+                }
+            `}</style>
         </>
     );
 }
