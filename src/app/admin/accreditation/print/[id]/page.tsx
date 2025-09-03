@@ -127,26 +127,26 @@ export default function PrintLetterPage() {
                     <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
                         
                         <div className="flex-grow flex flex-col items-start justify-start space-y-6 pt-12">
-                            <h1 className="font-bold text-lg">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
+                            <h1 className="font-bold text-lg text-left">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
-                            <p className="font-bold text-xl">{institute.name} {institute.country}</p>
+                            <p className="font-bold text-xl text-left">{institute.name} {institute.country}</p>
 
                             <p className="max-w-2xl text-base leading-relaxed text-justify">
                                 Has successfully fulfilled the UKCAS accreditation requirements, demonstrating compliance with internationally recognised standards. In achieving this milestone, it has been formally recognised as part of the UKCAS global network of accredited institutions.
                             </p>
 
-                            <div className="space-y-2 pt-4 text-base">
+                            <div className="space-y-2 pt-4 text-base text-left">
                                  <p>
                                     <span className="font-semibold">Learning Partnership Code:</span> {institute.code}
-                                </p>
+                                 </p>
                                 <p>
                                     <span className="font-semibold">Valid until:</span> {validUntilDate}
                                 </p>
                             </div>
                         </div>
 
-                         <div className="pt-16">
-                            <div className="relative h-24 w-64">
+                         <div className="pt-8">
+                            <div className="relative h-28 w-80">
                                 <Image 
                                     src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign.png" 
                                     alt="Signature"
