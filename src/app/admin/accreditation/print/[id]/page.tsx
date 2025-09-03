@@ -28,15 +28,12 @@ function PrintLetterSkeleton() {
         <div className="bg-gray-100 min-h-screen flex items-center justify-center p-8">
             <div className="w-full max-w-4xl bg-white p-12 shadow-lg">
                 <Skeleton className="h-[150px] w-full mb-12" />
-                <div className="flex justify-end mb-8">
-                    <Skeleton className="h-4 w-32" />
-                </div>
                 <div className="space-y-2 mb-8">
                     <Skeleton className="h-6 w-1/2" />
                     <Skeleton className="h-4 w-3/4" />
                 </div>
                 <Skeleton className="h-4 w-1/4 mb-4" />
-                <Skeleton className="h-8 w-1/2 mx-auto mb-6" />
+                <Skeleton className="h-8 w-1/2 mb-6" />
                 <div className="space-y-4">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-full" />
@@ -129,16 +126,16 @@ export default function PrintLetterPage() {
                     </div>
                     <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
                         
-                        <div className="flex-grow flex flex-col items-center justify-start space-y-6 pt-12">
-                            <h1 className="font-bold text-lg text-center">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
+                        <div className="flex-grow flex flex-col items-start justify-start space-y-6 pt-12">
+                            <h1 className="font-bold text-lg">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
-                            <p className="font-bold text-xl text-center">{institute.name} {institute.country}</p>
+                            <p className="font-bold text-xl">{institute.name} {institute.country}</p>
 
                             <p className="max-w-2xl text-base leading-relaxed text-justify">
                                 Has successfully fulfilled the UKCAS accreditation requirements, demonstrating compliance with internationally recognised standards. In achieving this milestone, it has been formally recognised as part of the UKCAS global network of accredited institutions.
                             </p>
 
-                            <div className="space-y-2 pt-4 text-base text-center">
+                            <div className="space-y-2 pt-4 text-base">
                                  <p>
                                     <span className="font-semibold">Learning Partnership Code:</span> {institute.code}
                                 </p>
@@ -192,4 +189,3 @@ export default function PrintLetterPage() {
         </>
     );
 }
-
