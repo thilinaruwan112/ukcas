@@ -104,13 +104,9 @@ export default function PrintLetterPage() {
         );
     }
 
-    const today = new Date().toLocaleDateString('en-GB', {
+    const validUntilDate = new Date(institute.accreditation_valid_until).toLocaleDateString('en-GB', {
         day: 'numeric', month: 'long', year: 'numeric'
     });
-
-    const fullAddress = [institute.address_line1, institute.address_line2, institute.city, institute.state, institute.country]
-    .filter(Boolean)
-    .join(', ');
 
     return (
         <>
@@ -121,7 +117,7 @@ export default function PrintLetterPage() {
                 </Button>
             </div>
             <div className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
-                <div className="letter-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black">
+                <div className="letter-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black flex flex-col">
                      <div className="absolute inset-0 z-0">
                         <Image 
                             src="https://content-provider.payshia.com/ukcas/institutes/1/docs/ukcas-letter-head.jpg" 
@@ -131,37 +127,25 @@ export default function PrintLetterPage() {
                             quality={100}
                         />
                     </div>
-                    <div className="relative z-10 pt-[150px]">
-                        <p className="text-sm mb-8 text-right">{today}</p>
+                    <div className="relative z-10 flex flex-col flex-grow pt-[180px] text-center">
                         
-                        <div className="space-y-1 mb-8">
-                            <p className="font-bold text-base">{institute.name}</p>
-                            <p className="text-sm">{fullAddress}</p>
-                        </div>
-                        
-                        <p className="mb-4 text-sm">Dear Sir/Madam,</p>
-                        
-                        <h1 className="text-center font-bold text-lg underline mb-6">LETTER OF ACCREDITATION</h1>
+                        <div className="flex-grow flex flex-col items-center justify-center space-y-6">
+                            <h1 className="font-bold text-lg">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
+                            
+                            <p className="font-bold text-xl">{institute.name} {institute.country}</p>
 
-                        <div className="space-y-4 text-sm leading-relaxed">
-                            <p>
-                                We are pleased to inform you that following a comprehensive review of your institution's standards, curriculum, and quality assurance policies, the board of the United Kingdom College of Advanced Studies (UKCAS) has granted full accreditation to <span className="font-bold">{institute.name}</span>.
+                            <p className="max-w-2xl text-base leading-relaxed">
+                                Has successfully fulfilled the UKCAS accreditation requirements, demonstrating compliance with internationally recognised standards. In achieving this milestone, it has been formally recognised as part of the UKCAS global network of accredited institutions.
                             </p>
-                            <p>
-                                This accreditation is a testament to your institution's commitment to excellence in education and its alignment with global standards. UKCAS recognizes your dedication to providing outstanding learning opportunities and upholding the highest levels of academic integrity.
-                            </p>
-                             <p>
-                                Your UKCAS accreditation is valid until <span className="font-bold">{new Date(institute.accreditation_valid_until).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>.
-                            </p>
-                            <p>
-                                We congratulate you on this significant achievement and look forward to a continued partnership in advancing educational quality.
-                            </p>
-                        </div>
 
-                         <div className="mt-16 text-sm">
-                            <p>Sincerely,</p>
-                            <p className="mt-8 font-bold">Director of Accreditation</p>
-                            <p>United Kingdom College of Advanced Studies</p>
+                            <div className="space-y-2 pt-4 text-base">
+                                 <p>
+                                    <span className="font-semibold">Learning Partnership Code:</span> {institute.code}
+                                </p>
+                                <p>
+                                    <span className="font-semibold">Valid until:</span> {validUntilDate}
+                                </p>
+                            </div>
                         </div>
 
                     </div>
@@ -169,8 +153,10 @@ export default function PrintLetterPage() {
             </div>
             <style jsx global>{`
                 @media print {
-                    body * {
+                    body, html {
                         visibility: hidden;
+                        margin: 0;
+                        padding: 0;
                     }
                     .letter-container, .letter-container * {
                         visibility: visible;
@@ -179,11 +165,12 @@ export default function PrintLetterPage() {
                         position: absolute;
                         left: 0;
                         top: 0;
-                        width: 100%;
-                        height: 100%;
+                        width: 100vw;
+                        height: 100vh;
                         margin: 0;
-                        padding: 0;
+                        padding: 1in;
                         border: none;
+                        box-sizing: border-box;
                     }
                 }
             `}</style>
