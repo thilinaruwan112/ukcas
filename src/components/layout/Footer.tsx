@@ -1,3 +1,4 @@
+
 import { Logo } from "@/components/Logo";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
 import Link from "next/link";
@@ -37,11 +38,20 @@ export default function Footer() {
           </div>
           <div>
             <h4 className="font-semibold mb-4">Contact Us</h4>
-            <p className="text-sm">
-              2nd Floor, College House, 17 King Edwards Road, Ruislip, London, HA4 7AE, United Kingdom<br />
-              Email: <a href="mailto:info@ukcas.co.uk" className="hover:text-primary">info@ukcas.co.uk</a><br />
-              Register Number: 16348189
-            </p>
+            <div className="text-sm space-y-2">
+              <p>
+                2nd Floor, College House, 17 King Edwards Road, Ruislip, London, HA4 7AE, United Kingdom<br />
+                Email: <a href="mailto:info@ukcas.co.uk" className="hover:text-primary">info@ukcas.co.uk</a><br />
+                Register Number: 16348189
+              </p>
+              <p>
+                <a href="https://www.ukrlp.co.uk/" target="_blank" rel="noopener noreferrer" className="hover:text-primary underline">
+                  Verify us at UK Register of Learning Providers.
+                </a>
+                <br/>
+                Our UKPRN is 10099298
+              </p>
+            </div>
           </div>
         </div>
         <div className="border-t mt-8 pt-6 text-center text-sm text-muted-foreground">
