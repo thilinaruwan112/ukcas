@@ -42,20 +42,20 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-        { url: '/favicon.ico', type: 'image/x-icon' },
-        { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon.ico', type: 'image/x-icon', sizes: 'any' },
+        { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { url: 'https://content-provider.pharmacollege.lk/ukcas/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
-    apple: '/apple-touch-icon.png',
+    apple: 'https://content-provider.pharmacollege.lk/ukcas/apple-touch-icon.png',
     other: [
         {
             rel: 'icon',
-            url: '/android-chrome-192x192.png',
+            url: 'https://content-provider.pharmacollege.lk/ukcas/android-chrome-192x192.png',
             sizes: '192x192'
         },
         {
             rel: 'icon',
-            url: '/android-chrome-512x512.png',
+            url: 'https://content-provider.pharmacollege.lk/ukcas/android-chrome-512x512.png',
             sizes: '512x512'
         }
     ]
