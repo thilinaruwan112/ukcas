@@ -115,7 +115,7 @@ export default function PrintLetterPage() {
                 </Button>
             </div>
             <div className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
-                <div className="letter-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black flex flex-col">
+                <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-sans text-black flex flex-col">
                      <div className="absolute inset-0 z-0">
                         <Image 
                             src="https://content-provider.payshia.com/ukcas/institutes/1/docs/ukcas-letter-head.jpg" 
@@ -126,7 +126,6 @@ export default function PrintLetterPage() {
                         />
                     </div>
                     <div className="relative z-10 flex flex-col pt-[180px]">
-                        
                         <div className="flex flex-col items-start space-y-6 pt-12">
                             <h1 className="font-bold text-lg text-left">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
@@ -146,8 +145,8 @@ export default function PrintLetterPage() {
                             </div>
                         </div>
                         
-                         <div className="pt-8 space-y-4">
-                            <div className="relative h-20 w-64">
+                         <div className="pt-12 space-y-4">
+                            <div className="relative h-20 w-52">
                                 <Image 
                                     src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png" 
                                     alt="Signature"
@@ -155,7 +154,7 @@ export default function PrintLetterPage() {
                                     objectFit="contain"
                                 />
                             </div>
-                            <div className="border-t-2 border-black w-64 pt-2">
+                            <div className="border-t-2 border-black w-52 pt-2">
                                 <p className="font-bold">Director of Accreditation</p>
                                 <p>United Kingdom College of Advanced Studies</p>
                             </div>
@@ -167,20 +166,17 @@ export default function PrintLetterPage() {
             <style jsx global>{`
                 @media print {
                     body > *:not(.print-container) {
-                        visibility: hidden;
+                        display: none !important;
                     }
-                    .print-container, .print-container * {
-                        visibility: visible;
-                    }
-                    .letter-container {
-                        visibility: visible;
+                    .print-container {
+                        visibility: visible !important;
                         position: absolute;
                         left: 0;
                         top: 0;
                         width: 100%;
                         height: auto;
                         margin: 0;
-                        padding: 1in;
+                        padding: 0;
                         border: none;
                         box-shadow: none;
                     }
