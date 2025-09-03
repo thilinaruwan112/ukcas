@@ -46,6 +46,10 @@ export default function InstituteSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const filteredInstitutes = institutes.filter(institute => 
+    institute.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
     if (searchTerm.length < 2) {
         setInstitutes([]);
@@ -130,9 +134,9 @@ export default function InstituteSearch() {
 
                         {!loading && !error && (
                             <>
-                                {institutes.length > 0 ? (
+                                {filteredInstitutes.length > 0 ? (
                                     <div className="divide-y">
-                                        {institutes.map(institute => (
+                                        {filteredInstitutes.map(institute => (
                                             <InstituteListItem key={institute.id} institute={institute} />
                                         ))}
                                     </div>
