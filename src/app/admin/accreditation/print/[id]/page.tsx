@@ -126,7 +126,7 @@ export default function PrintLetterPage() {
                     </div>
                     <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
                         
-                        <div className="flex-grow flex flex-col items-start justify-start space-y-6 pt-12">
+                        <div className="flex flex-col items-start space-y-6 pt-12">
                             <h1 className="font-bold text-lg text-left">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
                             <p className="font-bold text-xl text-left">{institute.name} {institute.country}</p>
@@ -144,8 +144,10 @@ export default function PrintLetterPage() {
                                 </p>
                             </div>
                         </div>
+                        
+                        <div className="flex-grow"></div>
 
-                         <div className="pt-8">
+                         <div className="pt-4">
                             <div className="relative h-28 w-80">
                                 <Image 
                                     src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign.png" 
