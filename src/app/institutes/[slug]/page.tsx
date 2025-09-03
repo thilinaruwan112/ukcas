@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const imageUrl = institute.cover_image_path || institute.logo_path;
 
   return {
-    title: institute.name,
+    title: `${institute.name} | UKCAS Accredited`,
     description: description,
      openGraph: {
       title: `${institute.name} | UKCAS Accredited`,
@@ -52,13 +52,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: imageUrl,
           alt: `${institute.name} Image`,
         },
-      ] : [],
+      ] : [{ url: 'https://content-provider.pharmacollege.lk/ukcas/logo-long-1.png' }],
     },
      twitter: {
       card: 'summary_large_image',
       title: `${institute.name} | UKCAS Accredited`,
       description: description,
-      images: imageUrl ? [imageUrl] : [],
+      images: imageUrl ? [imageUrl] : ['https://content-provider.pharmacollege.lk/ukcas/logo-long-1.png'],
     }
   }
 }
