@@ -114,7 +114,7 @@ export default function PrintLetterPage() {
                     Print Letter
                 </Button>
             </div>
-            <div className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
+            <div id="print-area" className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
                 <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-sans text-black flex flex-col">
                      <div className="absolute inset-0 z-0">
                         <Image 
@@ -165,10 +165,11 @@ export default function PrintLetterPage() {
             </div>
             <style jsx global>{`
                 @media print {
-                    body > *:not(.print-container) {
+                    body > *:not(#print-area) {
                         display: none !important;
                     }
-                    .print-container {
+                    #print-area {
+                        display: block !important;
                         visibility: visible !important;
                         position: absolute;
                         left: 0;
