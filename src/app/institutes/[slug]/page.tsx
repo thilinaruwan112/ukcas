@@ -39,11 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const description = `View accreditation details for ${institute.name}, located in ${fullAddress}. Status: ${institute.accreditation_status}.`;
   
-  const imageUrl = institute.cover_image 
-    ? `https://ukcas-server.payshia.com/${institute.cover_image}`
-    : institute.logo 
-    ? `https://ukcas-server.payshia.com/${institute.logo}`
-    : undefined;
+  const imageUrl = institute.cover_image_path || institute.logo_path;
 
   return {
     title: institute.name,
@@ -84,9 +80,9 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
             <div className="container mx-auto px-4 md:px-6">
                  <Card className="overflow-hidden">
                     <div className="relative h-48 md:h-64 w-full bg-muted">
-                        {institute.cover_image ? (
+                        {institute.cover_image_path ? (
                             <Image
-                                src={`https://ukcas-server.payshia.com/${institute.cover_image}`}
+                                src={institute.cover_image_path}
                                 alt={`${institute.name} cover image`}
                                 fill
                                 className="object-cover"
@@ -96,9 +92,9 @@ export default async function InstituteDetailPage({ params }: { params: { slug: 
                         )}
                          <div className="absolute -bottom-16 left-6">
                             <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-background flex items-center justify-center border-4 border-background shadow-lg">
-                                {institute.logo ? (
+                                {institute.logo_path ? (
                                     <Image
-                                        src={`https://ukcas-server.payshia.com/${institute.logo}`}
+                                        src={institute.logo_path}
                                         alt={`${institute.name} logo`}
                                         width={160}
                                         height={160}

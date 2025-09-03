@@ -27,7 +27,9 @@ export interface ApiInstitute {
     country: string;
     postal_code: string;
     logo?: string;
+    logo_path?: string;
     cover_image?: string;
+    cover_image_path?: string;
     status: 'Active' | 'Inactive';
     created_at: string;
     updated_at: string;
