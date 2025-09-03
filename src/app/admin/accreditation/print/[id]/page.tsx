@@ -124,7 +124,7 @@ export default function PrintLetterPage() {
                             quality={100}
                         />
                     </div>
-                    <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
+                    <div className="relative z-10 flex flex-col pt-[180px]">
                         
                         <div className="flex flex-col items-start space-y-6 pt-12">
                             <h1 className="font-bold text-lg text-left">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
@@ -159,8 +159,6 @@ export default function PrintLetterPage() {
                                 <p>United Kingdom College of Advanced Studies</p>
                             </div>
                         </div>
-
-                        <div className="flex-grow"></div>
 
                     </div>
                 </div>
