@@ -129,16 +129,16 @@ export default function PrintLetterPage() {
                     </div>
                     <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
                         
-                        <div className="flex-grow flex flex-col items-center justify-start text-center space-y-6 pt-12">
-                            <h1 className="font-bold text-lg">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
+                        <div className="flex-grow flex flex-col items-center justify-start space-y-6 pt-12">
+                            <h1 className="font-bold text-lg text-center">UNITED KINGDOM COLLEGE OF ADVANCED STUDIES PARTNERSHIP (UKCAS)</h1>
                             
-                            <p className="font-bold text-xl">{institute.name} {institute.country}</p>
+                            <p className="font-bold text-xl text-center">{institute.name} {institute.country}</p>
 
-                            <p className="max-w-2xl text-base leading-relaxed">
+                            <p className="max-w-2xl text-base leading-relaxed text-justify">
                                 Has successfully fulfilled the UKCAS accreditation requirements, demonstrating compliance with internationally recognised standards. In achieving this milestone, it has been formally recognised as part of the UKCAS global network of accredited institutions.
                             </p>
 
-                            <div className="space-y-2 pt-4 text-base">
+                            <div className="space-y-2 pt-4 text-base text-center">
                                  <p>
                                     <span className="font-semibold">Learning Partnership Code:</span> {institute.code}
                                 </p>
@@ -192,3 +192,4 @@ export default function PrintLetterPage() {
         </>
     );
 }
+
