@@ -12,7 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 async function getInstituteById(id: string): Promise<ApiInstitute | null> {
     try {
-        const response = await fetch(`https://ukcas-server.payshia.com/institutes/id/${id}`);
+        const response = await fetch(`https://ukcas-server.payshia.com/institutes/${id}`);
         if (!response.ok) {
             return null;
         }
