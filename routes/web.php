@@ -17,11 +17,63 @@ error_reporting(E_ALL);
 // Display errors in the browser (for development)
 ini_set('display_errors', 1);
 
+// Load environment variables from .env using Dotenv
+require_once __DIR__ . '/../vendor/autoload.php';
+$envDir = __DIR__ . '/../';
+if (file_exists($envDir . '.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable($envDir);
+    $dotenv->load();
+}
 
-$InstituteRoutes = require './routes/InstituteRoutes.php';     //MasterSupplierRoutes
+// JWT and API Key Middleware
+require_once './utils/JwtHelper.php';
+function requireJwt()
+{
+    $headers = getallheaders();
+    $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : null;
+    if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Missing or invalid Authorization header']);
+        exit();
+    }
+    $token = $matches[1];
+    $jwtPayload = JwtHelper::validateToken($token);
+    if (!$jwtPayload) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid or expired token']);
+        exit();
+    }
+    $GLOBALS['jwtPayload'] = $jwtPayload;
+}
+function requireApiKey()
+{
+    $headers = getallheaders();
+    $apiKey = isset($headers['X-API-KEY']) ? $headers['X-API-KEY'] : null;
+    $validKey = getenv('API_KEY') ?: (isset($_ENV['API_KEY']) ? $_ENV['API_KEY'] : null);
+    if (!$apiKey || $apiKey !== $validKey) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Missing or invalid API key']);
+        exit();
+    }
+}
+
+// Load routes
+$InstituteRoutes = require './routes/InstituteRoutes.php';
+$InstituteCourseRoutes = require './routes/InstituteCourseRoutes.php';
+$InstitutePaymentRoutes = require './routes/InstitutePaymentRoutes.php';
+$RegisteredStudentRoutes = require './routes/RegisteredStudentRoutes.php';
+$StudentCertificateRoutes = require './routes/StudentCertificateRoutes.php';
+$UserRoutes = require './routes/UserRoutes.php';
+$UserInstituteRoutes = require './routes/UserInstituteRoutes.php';
 // Combine all routes
 $routes = array_merge(
     $InstituteRoutes,
+    $InstituteCourseRoutes,
+    $InstitutePaymentRoutes,
+    $RegisteredStudentRoutes,
+    $StudentCertificateRoutes,
+    $UserRoutes,
+    $UserInstituteRoutes,
 );
 
 // Define the home route with trailing slash
@@ -74,6 +126,15 @@ foreach ($routes as $route => $handler) {
     if ($method === $routeMethod && preg_match($routeRegex, $uri, $matches)) {
         array_shift($matches); // Remove the full match
         error_log("Route matched: $route");
+
+
+        // Global JWT and API key enforcement
+        $isLoginRoute = ($method === 'POST' && preg_match('#^/users/login/?$#', $uri));
+        if ($method === 'GET') {
+            requireApiKey();
+        } elseif (!$isLoginRoute) {
+            requireJwt();
+        }
 
         // Call the route handler with dynamic parameters
         call_user_func_array($handler, $matches);
