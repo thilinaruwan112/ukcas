@@ -2,54 +2,68 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { LogIn } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 import { useI18n } from "@/context/i18n-provider";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useToast } from '@/hooks/use-toast';
-import { mockAdminUsers } from '@/lib/mock-data';
 
 export function LoginPageClient() {
   const { t } = useI18n();
   const router = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     const formData = new FormData(e.currentTarget);
     const identifier = formData.get('identifier') as string;
     const password = formData.get('password') as string;
 
-    // Check for institute login
-    if (identifier === 'institute@test.com' && password === 'password123') {
-      router.push('/dashboard');
-      return;
-    }
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Api-Key': process.env.NEXT_PUBLIC_API_KEY || '',
+        },
+        body: JSON.stringify({ identifier, password }),
+      });
 
-    // Check for admin login (hardcoded admin)
-    if (identifier.toLowerCase() === 'admin' && password === 'admin123') {
-      router.push('/admin/select-institute');
-      return;
-    }
+      const data = await response.json();
 
-    // Check for other admin users from mock data
-    const user = mockAdminUsers.find(
-      u => u.email.toLowerCase() === identifier.toLowerCase() && u.password === password
-    );
-    if (user) {
-      router.push('/admin/select-institute');
-      return;
-    }
+      if (data.status === 'success') {
+        localStorage.setItem('ukcas_token', data.token);
+        localStorage.setItem('ukcas_user', JSON.stringify(data.data));
 
-    // If no match is found
-    toast({
-      variant: 'destructive',
-      title: 'Login Failed',
-      description: 'Invalid credentials. Please try again.',
-    });
+        toast({
+          title: 'Login Successful',
+          description: 'Welcome back!',
+        });
+
+        if (data.data.acc_type === 'admin') {
+          router.push('/admin/institutes');
+        } else {
+          router.push('/dashboard');
+        }
+      } else {
+        throw new Error(data.message || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const LoginForm = () => (
@@ -64,13 +78,15 @@ export function LoginPageClient() {
           type="text"
           placeholder="Enter your username or email"
           required
+          disabled={isLoading}
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">{t('Login.passwordLabel')}</Label>
-        <Input id="password" name="password" type="password" required />
+        <Input id="password" name="password" type="password" required disabled={isLoading} />
       </div>
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
         Login
       </Button>
     </form>
