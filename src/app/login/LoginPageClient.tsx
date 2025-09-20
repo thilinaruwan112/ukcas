@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -30,7 +29,7 @@ export function LoginPageClient() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Api-Key': process.env.NEXT_PUBLIC_API_KEY || '',
+          'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
         },
         body: JSON.stringify({ identifier, password }),
       });
