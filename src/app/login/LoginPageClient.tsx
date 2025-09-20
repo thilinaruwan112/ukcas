@@ -33,8 +33,11 @@ export function LoginPageClient() {
         },
         body: JSON.stringify({ identifier, password }),
       });
+      
+      console.log('API Response:', response);
 
       const data = await response.json();
+      console.log('API Response Data:', data);
 
       if (data.status === 'success') {
         localStorage.setItem('ukcas_token', data.token);
@@ -54,6 +57,7 @@ export function LoginPageClient() {
         throw new Error(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
+      console.error('Login Error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
         variant: 'destructive',
