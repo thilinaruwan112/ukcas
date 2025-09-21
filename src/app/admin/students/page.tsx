@@ -1,24 +1,31 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, FileDown } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, FileDown, Loader2 } from "lucide-react";
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
-import { mockStudents } from '@/lib/mock-data';
 import type { Student } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function StudentListPage() {
     const { toast } = useToast();
-    const [students, setStudents] = useState<Student[]>(mockStudents);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+
+    // TODO: Implement API call to fetch students
+    useEffect(() => {
+        // Simulating API call finished
+        setLoading(false);
+    }, []);
 
     const filteredStudents = students.filter(student =>
         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,6 +38,7 @@ export default function StudentListPage() {
 
     const handleDeleteConfirm = () => {
         if (studentToDelete) {
+            // TODO: API call to delete student
             setStudents(students.filter(student => student.id !== studentToDelete.id));
             toast({
                 title: "Student Removed",
@@ -41,6 +49,15 @@ export default function StudentListPage() {
     };
 
     const handleExport = () => {
+        if (filteredStudents.length === 0) {
+            toast({
+                variant: 'destructive',
+                title: 'No Data to Export',
+                description: 'There are no students to export.',
+            });
+            return;
+        }
+
         const headers = ["ID", "Name", "Course", "Joined Date"];
         const csvContent = "data:text/csv;charset=utf-8," 
             + headers.join(",") + "\n" 
@@ -59,6 +76,19 @@ export default function StudentListPage() {
             description: "The student list has been exported as a CSV file.",
         })
     };
+    
+    const StudentsSkeleton = () => (
+         <TableBody>
+            {[...Array(5)].map((_, i) => (
+                 <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-64" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                </TableRow>
+            ))}
+        </TableBody>
+    );
 
 
     return (
@@ -99,51 +129,54 @@ export default function StudentListPage() {
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
-                            {filteredStudents.length > 0 ? (
-                                filteredStudents.map((student) => (
-                                <TableRow key={student.id}>
-                                    <TableCell className="font-medium">{student.name}</TableCell>
-                                    <TableCell>{student.course}</TableCell>
-                                    <TableCell>{new Date(student.joinedDate).toLocaleDateString()}</TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>
-                                                    <UserCog className="mr-2 h-4 w-4" />
-                                                    <span>Edit Details</span>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    className="text-red-500 focus:text-red-500"
-                                                    onClick={() => handleDeleteClick(student)}
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    <span>Remove Student</span>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-4">
-                                            <p className="text-muted-foreground">
-                                                {searchTerm ? `No students found for "${searchTerm}".` : "No students have been registered yet."}
-                                            </p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
+                       
+                        {loading ? <StudentsSkeleton /> : (
+                             <TableBody>
+                                {filteredStudents.length > 0 ? (
+                                    filteredStudents.map((student) => (
+                                    <TableRow key={student.id}>
+                                        <TableCell className="font-medium">{student.name}</TableCell>
+                                        <TableCell>{student.course}</TableCell>
+                                        <TableCell>{new Date(student.joinedDate).toLocaleDateString()}</TableCell>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <span className="sr-only">Open menu</span>
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem>
+                                                        <UserCog className="mr-2 h-4 w-4" />
+                                                        <span>Edit Details</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        className="text-red-500 focus:text-red-500"
+                                                        onClick={() => handleDeleteClick(student)}
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        <span>Remove Student</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-48 text-center">
+                                            <div className="flex flex-col items-center justify-center gap-4">
+                                                <p className="text-muted-foreground">
+                                                    {searchTerm ? `No students found for "${searchTerm}".` : "No students have been registered yet."}
+                                                </p>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        )}
                     </Table>
                 </CardContent>
             </Card>
@@ -170,4 +203,3 @@ export default function StudentListPage() {
         </>
     );
 }
-
