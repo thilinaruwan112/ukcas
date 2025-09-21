@@ -7,9 +7,10 @@ class InstituteCourse
     {
         $this->pdo = $pdo;
     }
-    public function getAll()
+    public function getAll($institute_id)
     {
-        $stmt = $this->pdo->query("SELECT id, institute_id, course_code, course_name, created_at, created_by, active_status FROM institute_courses");
+        $stmt = $this->pdo->prepare("SELECT id, institute_id, course_code, course_name, created_at, created_by, active_status FROM institute_courses WHERE institute_id = ?");
+        $stmt->execute([$institute_id]);
         return $stmt->fetchAll();
     }
     public function getById($id)
