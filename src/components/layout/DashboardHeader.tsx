@@ -1,6 +1,8 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search, LogOut, Settings, Building } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,12 +10,44 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from "../ui/button";
 import Link from 'next/link';
 
+interface UserData {
+    email: string;
+    user_name: string;
+    first_name?: string;
+    last_name?: string;
+    img_path?: string;
+}
+
 export default function DashboardHeader() {
     const router = useRouter();
+    const [user, setUser] = useState<UserData | null>(null);
+
+    useEffect(() => {
+        const userDataString = sessionStorage.getItem('ukcas_user');
+        if (userDataString) {
+            setUser(JSON.parse(userDataString));
+        }
+    }, []);
 
     const handleLogout = () => {
+        sessionStorage.removeItem('ukcas_user');
+        sessionStorage.removeItem('ukcas_token');
         router.push('/login');
     };
+
+    const getInitials = () => {
+        if (!user) return 'U';
+        const firstNameInitial = user.first_name ? user.first_name[0] : '';
+        const lastNameInitial = user.last_name ? user.last_name[0] : '';
+        const userNameInitial = user.user_name ? user.user_name[0] : '';
+        return (firstNameInitial + lastNameInitial) || userNameInitial.toUpperCase() || 'U';
+    }
+
+    const getFullName = () => {
+        if (!user) return "Institute User";
+        return [user.first_name, user.last_name].filter(Boolean).join(' ') || user.user_name;
+    }
+
 
     return (
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-end border-b bg-background px-6">
@@ -26,13 +60,13 @@ export default function DashboardHeader() {
                   <DropdownMenuTrigger asChild>
                      <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                         <Avatar className="h-9 w-9 cursor-pointer">
-                        <AvatarImage src="https://placehold.co/100x100.png" alt="Institute Logo" />
-                        <AvatarFallback>GT</AvatarFallback>
+                          {user?.img_path ? <AvatarImage src={user.img_path} alt={user.user_name} /> : <AvatarImage src="https://placehold.co/100x100.png" alt="Institute Logo" />}
+                          <AvatarFallback>{getInitials()}</AvatarFallback>
                         </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Global Tech University</DropdownMenuLabel>
+                    <DropdownMenuLabel>{getFullName()}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                        <Link href="/admin/select-institute">

@@ -39,8 +39,9 @@ export function LoginPageClient() {
       console.log('API Response:', data);
 
       if (response.ok && data.status === 'success') {
-         // In a real app, you'd save the token securely (e.g., in an httpOnly cookie)
-        // For this example, we'll just use it for redirection logic.
+        sessionStorage.setItem('ukcas_token', data.token);
+        sessionStorage.setItem('ukcas_user', JSON.stringify(data.data));
+
         toast({
           title: 'Login Successful',
           description: 'Redirecting to your dashboard...',
