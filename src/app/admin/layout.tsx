@@ -3,7 +3,7 @@
 
 import type { ReactNode } from "react";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { LogOut, Building2, Settings, UserCircle, Award, Users, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,16 +16,33 @@ interface UserData {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const userDataString = sessionStorage.getItem('ukcas_user');
     if (userDataString) {
-        setUser(JSON.parse(userDataString));
+        const parsedUser = JSON.parse(userDataString);
+        setUser(parsedUser);
+        
+        // Redirect logic
+        const activeInstitute = sessionStorage.getItem('ukcas_active_institute_id');
+        if (parsedUser.acc_type !== 'admin' && !activeInstitute && pathname !== '/admin/select-institute') {
+            router.replace('/admin/select-institute');
+        }
+
+    } else {
+        router.replace('/login');
     }
-  }, []);
+    setLoading(false);
+  }, [pathname, router]);
 
   const isAdmin = user?.acc_type === 'admin';
+  
+  if(loading) {
+      return <div>Loading...</div>; // Or a proper skeleton loader
+  }
 
   return (
     <SidebarProvider>
