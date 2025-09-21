@@ -4,6 +4,7 @@ require_once './models/UserInstitute.php';
 
 class UserInstituteController
 {
+
     private $model;
     public function __construct($pdo)
     {
@@ -49,6 +50,15 @@ class UserInstituteController
         echo json_encode([
             'status' => $deleted ? 'success' : 'error',
             'message' => $deleted ? 'Record deleted successfully.' : 'Record not found.'
+        ]);
+    }
+
+    // Duplicate property and constructor removed
+    public function getByUserAccount($user_account)
+    {
+        echo json_encode([
+            'status' => 'success',
+            'data' => $this->model->getByUserAccount($user_account)
         ]);
     }
 }

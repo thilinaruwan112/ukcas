@@ -12,6 +12,9 @@ return [
     'GET /user-institutes/{id}' => function ($id) use ($controller) {
         $controller->getById($id);
     },
+    'GET /user-institutes/by-account/{user_account}' => function ($user_account) use ($controller) {
+        $controller->getByUserAccount($user_account);
+    },
     'POST /user-institutes/' => function () use ($controller) {
         $controller->create();
     },
