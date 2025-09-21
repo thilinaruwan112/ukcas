@@ -11,18 +11,16 @@ import { Building, AlertTriangle } from "lucide-react";
 import type { ApiInstitute } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
-async function getInstitutes(apiKey: string): Promise<ApiInstitute[]> {
+async function getInstitutes(): Promise<ApiInstitute[]> {
     try {
-        const response = await fetch(`https://ukcas-server.payshia.com/institutes`, {
-            headers: {
-                'X-API-KEY': apiKey,
-            },
-        });
+        const response = await fetch(`/api/institutes`);
         if (!response.ok) {
             console.error("Failed to fetch institutes:", response.statusText);
             return [];
         }
-        return await response.json();
+        const data = await response.json();
+        // The server route already returns the data array
+        return data; 
     } catch (error) {
         console.error('Failed to fetch institutes:', error);
         return [];
@@ -35,21 +33,16 @@ export default function AdminInstitutesPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
-        if (!apiKey) {
-            setError("API Key is not configured.");
-            setLoading(false);
-            return;
-        }
-
-        getInstitutes(apiKey)
+        getInstitutes()
             .then(data => {
                 setInstitutes(data);
-                setLoading(false);
             })
             .catch(err => {
-                setError(err.message || "An unknown error occurred.");
-                setLoading(false);
+                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+                setError(errorMessage);
+            })
+            .finally(() => {
+                 setLoading(false);
             });
     }, []);
 
