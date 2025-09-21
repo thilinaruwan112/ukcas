@@ -33,12 +33,8 @@ export default function UserMaintenancePage() {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || ''
-                    }
-                });
+                // Fetch from the internal API route
+                const response = await fetch('/api/users');
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({ message: response.statusText }));
