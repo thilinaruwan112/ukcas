@@ -7,15 +7,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building } from "lucide-react";
 import Link from 'next/link';
-import { AdminUser } from '@/lib/types';
+import { AdminUser, ApiInstitute } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Checkbox } from '@/components/ui/checkbox';
+
 
 export default function UserMaintenancePage() {
     const router = useRouter();
@@ -27,6 +30,12 @@ export default function UserMaintenancePage() {
     const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
     const [userToTopUp, setUserToTopUp] = useState<AdminUser | null>(null);
     const [topUpAmount, setTopUpAmount] = useState(0);
+
+    const [userToAssign, setUserToAssign] = useState<AdminUser | null>(null);
+    const [allInstitutes, setAllInstitutes] = useState<ApiInstitute[]>([]);
+    const [assignedInstitutes, setAssignedInstitutes] = useState<string[]>([]);
+    const [loadingInstitutes, setLoadingInstitutes] = useState(false);
+
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -52,6 +61,7 @@ export default function UserMaintenancePage() {
                         registeredDate: user.created_at,
                         email: user.email,
                         balance: user.balance || 0, // Assuming balance is available
+                        assignedInstitutes: user.institutes || [], // Assume API returns this
                     }));
                     setUsers(formattedUsers);
                 } else {
@@ -71,7 +81,21 @@ export default function UserMaintenancePage() {
             }
         };
 
+        const fetchInstitutes = async () => {
+             try {
+                const response = await fetch('/api/institutes');
+                 if (!response.ok) {
+                    throw new Error('Failed to fetch institutes');
+                }
+                const data = await response.json();
+                setAllInstitutes(Array.isArray(data) ? data : []);
+             } catch (e) {
+                console.error("Failed to load institutes for assignment");
+             }
+        }
+
         fetchUsers();
+        fetchInstitutes();
     }, [toast]);
 
 
@@ -119,6 +143,32 @@ export default function UserMaintenancePage() {
             setUserToTopUp(null);
             setTopUpAmount(0);
         }
+    };
+
+    const handleAssignClick = (user: AdminUser) => {
+        setUserToAssign(user);
+        // This is a mock. In a real app, you would fetch this from the server for the specific user.
+        setAssignedInstitutes(user.assignedInstitutes?.map(i => i.id) || []);
+    };
+    
+    const handleAssignmentSave = () => {
+        if (!userToAssign) return;
+        
+        console.log(`Saving assignments for ${userToAssign.instituteName}:`, assignedInstitutes);
+        // API call to update user assignments would go here
+
+        // Update local state for immediate feedback
+        setUsers(users.map(u => u.id === userToAssign.id ? {
+            ...u,
+            assignedInstitutes: allInstitutes.filter(i => assignedInstitutes.includes(i.id))
+        } : u));
+
+        toast({
+            title: "Assignments Updated",
+            description: `Institute assignments for ${userToAssign.instituteName} have been saved.`,
+        });
+
+        setUserToAssign(null);
     };
     
     const UserTableSkeleton = () => (
@@ -206,6 +256,10 @@ export default function UserMaintenancePage() {
                                                     <DropdownMenuItem onClick={() => handleTopUpClick(user)}>
                                                         <Wallet className="mr-2 h-4 w-4" />
                                                         <span>Top-up Balance</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleAssignClick(user)}>
+                                                        <Building className="mr-2 h-4 w-4" />
+                                                        <span>Assign Institutes</span>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
@@ -295,6 +349,53 @@ export default function UserMaintenancePage() {
                   <Button onClick={handleTopUpConfirm} disabled={topUpAmount <= 0}>Confirm Top-up</Button>
                 </DialogFooter>
               </DialogContent>
+            </Dialog>
+
+            <Dialog open={!!userToAssign} onOpenChange={() => setUserToAssign(null)}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Assign Institutes</DialogTitle>
+                         <DialogDescription>
+                            Manage institute assignments for <span className="font-semibold">{userToAssign?.instituteName}</span>.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <Command className="border rounded-lg">
+                        <CommandInput placeholder="Search institutes..." />
+                        <CommandList>
+                             <CommandEmpty>No institutes found.</CommandEmpty>
+                             <CommandGroup>
+                                {allInstitutes.map((institute) => (
+                                    <CommandItem
+                                        key={institute.id}
+                                        onSelect={() => {
+                                            const isSelected = assignedInstitutes.includes(institute.id);
+                                            if (isSelected) {
+                                                setAssignedInstitutes(assignedInstitutes.filter(id => id !== institute.id));
+                                            } else {
+                                                setAssignedInstitutes([...assignedInstitutes, institute.id]);
+                                            }
+                                        }}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <Checkbox
+                                            checked={assignedInstitutes.includes(institute.id)}
+                                            id={`inst-${institute.id}`}
+                                        />
+                                        <label htmlFor={`inst-${institute.id}`} className="cursor-pointer">
+                                            {institute.name}
+                                        </label>
+                                    </CommandItem>
+                                ))}
+                             </CommandGroup>
+                        </CommandList>
+                    </Command>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                           <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button onClick={handleAssignmentSave}>Save Assignments</Button>
+                    </DialogFooter>
+                </DialogContent>
             </Dialog>
         </>
     );

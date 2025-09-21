@@ -1,4 +1,5 @@
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -73,6 +74,7 @@ export interface AdminUser {
   email: string;
   password?: string;
   balance: number;
+  assignedInstitutes?: ApiInstitute[];
 }
 
 export interface Student {
