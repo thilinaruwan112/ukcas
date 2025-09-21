@@ -33,25 +33,26 @@ export function LoginPageClient() {
           'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
         },
         body: JSON.stringify({ email: identifier, pass: password }),
-        mode: 'no-cors', // Bypass CORS for development, response will be opaque
       });
       
-      console.log('API Response:', response);
+      const data = await response.json();
+      console.log('API Response:', data);
 
-      // With 'no-cors', we cannot access the response body. 
-      // This is a temporary measure. For full functionality, the server needs to be configured to handle CORS.
-      // We will assume success for now to test redirection.
-      if (response.ok || response.type === 'opaque') {
-         toast({
-          title: 'Login Request Sent',
-          description: 'Assuming success due to CORS policy. Redirecting...',
+      if (response.ok && data.status === 'success') {
+         // In a real app, you'd save the token securely (e.g., in an httpOnly cookie)
+        // For this example, we'll just use it for redirection logic.
+        toast({
+          title: 'Login Successful',
+          description: 'Redirecting to your dashboard...',
         });
 
-        // Since we can't read `acc_type`, we'll have to pick a default redirect for now.
-        router.push('/dashboard');
+        if (data.data.acc_type === 'admin') {
+            router.push('/admin/institutes');
+        } else {
+            router.push('/dashboard');
+        }
       } else {
-        const errorText = await response.text(); // This might fail with no-cors
-        throw new Error(errorText || 'Login failed due to network policy.');
+        throw new Error(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
       console.error('Login Error:', error);
@@ -59,7 +60,7 @@ export function LoginPageClient() {
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: "Failed to fetch. This is likely a CORS issue. The server needs to allow requests from this origin.",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
