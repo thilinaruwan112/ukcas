@@ -96,7 +96,7 @@ export default function EditInstitutePage() {
           description: `The details for "${instituteName}" have been successfully saved.`,
       });
 
-      router.push('/admin/institutes');
+      router.push('/admin/admin-institutes');
   };
 
   if (loading) {
@@ -111,7 +111,7 @@ export default function EditInstitutePage() {
                         <AlertTriangle className="h-12 w-12 text-destructive mx-auto" />
                         <h1 className="text-2xl font-bold">Error Loading Institute</h1>
                         <p className="text-muted-foreground">{error || "The institute data could not be loaded."}</p>
-                        <Button onClick={() => router.push('/admin/institutes')}>Go Back</Button>
+                        <Button onClick={() => router.push('/admin/admin-institutes')}>Go Back</Button>
                     </CardContent>
                 </Card>
             </div>
@@ -120,7 +120,7 @@ export default function EditInstitutePage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-        <Link href="/admin/institutes" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/admin/admin-institutes" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
             Back to Institute Management
         </Link>

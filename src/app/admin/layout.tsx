@@ -17,14 +17,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen w-full">
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
-            <Link href="/admin/institutes">
+            <Link href="/admin/admin-institutes">
               <span className="text-xl font-bold text-sidebar-foreground px-2">UKCAS Admin</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/institutes" isActive={pathname.startsWith('/admin/institutes')}>
+                <SidebarMenuButton href="/admin/admin-institutes" isActive={pathname.startsWith('/admin/admin-institutes')}>
                   <Building2 />
                   Institutes
                 </SidebarMenuButton>

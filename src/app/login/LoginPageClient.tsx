@@ -48,7 +48,7 @@ export function LoginPageClient() {
         });
 
         if (data.data.acc_type === 'admin') {
-            router.push('/admin/institutes');
+            router.push('/admin/admin-institutes');
         } else {
             router.push('/dashboard');
         }

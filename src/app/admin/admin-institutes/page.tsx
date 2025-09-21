@@ -68,7 +68,7 @@ export default function AdminInstitutesPage() {
                     <p className="text-muted-foreground">Manage accreditation applications and create new institutes.</p>
                 </div>
                  <Button asChild>
-                    <Link href="/admin/institutes/new">
+                    <Link href="/admin/admin-institutes/new">
                         <Building className="mr-2 h-4 w-4" />
                         Create Institute
                     </Link>
@@ -121,7 +121,7 @@ export default function AdminInstitutesPage() {
                                                     <Link href={`/institutes/${app.slug}`}>View</Link>
                                                 </Button>
                                                 <Button asChild variant="default" size="sm">
-                                                    <Link href={`/admin/institutes/edit/${app.id}`}>
+                                                    <Link href={`/admin/admin-institutes/edit/${app.id}`}>
                                                         Approve/Edit
                                                     </Link>
                                                 </Button>

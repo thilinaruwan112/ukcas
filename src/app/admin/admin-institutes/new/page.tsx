@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -34,12 +35,12 @@ export default function NewInstitutePage() {
           description: `The institute "${instituteName}" has been successfully created.`,
       });
 
-      router.push('/admin/institutes');
+      router.push('/admin/admin-institutes');
   };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-        <Link href="/admin/institutes" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/admin/admin-institutes" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
             Back to Institute Management
         </Link>
