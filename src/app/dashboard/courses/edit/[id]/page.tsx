@@ -151,7 +151,7 @@ export default function EditCoursePage() {
             </div>
              <div className="space-y-2">
               <Label htmlFor="courseCode">Course Code (Optional)</Label>
-              <Input id="courseCode" name="courseCode" defaultValue={course.course_code} disabled={isLoading} />
+              <Input id="courseCode" name="courseCode" defaultValue={course.course_code || ''} disabled={isLoading} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="duration">Course Duration</Label>
