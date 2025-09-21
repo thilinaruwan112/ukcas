@@ -28,7 +28,7 @@ export function LoginPageClient() {
         if (userData.acc_type === 'admin') {
           router.replace('/admin/admin-institutes');
         } else {
-          router.replace('/dashboard');
+          router.replace('/admin/select-institute');
         }
       } catch (error) {
         // If parsing fails, clear session and let them log in again
@@ -70,7 +70,7 @@ export function LoginPageClient() {
         if (data.data.acc_type === 'admin') {
             router.push('/admin/admin-institutes');
         } else {
-            router.push('/dashboard');
+            router.push('/admin/select-institute');
         }
       } else {
         throw new Error(data.message || 'Login failed. Please check your credentials.');
