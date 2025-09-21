@@ -20,8 +20,7 @@ async function getInstitutes(): Promise<ApiInstitute[]> {
             return [];
         }
         const data = await response.json();
-        // The server route already returns the data array
-        return data; 
+        return Array.isArray(data) ? data : [];
     } catch (error) {
         console.error('Failed to fetch institutes:', error);
         return [];
@@ -117,20 +116,17 @@ export default function AdminInstitutesPage() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            {app.accreditation_status === 'Pending' && (
-                                                <div className="space-x-2">
-                                                    <Button asChild variant="outline" size="sm">
-                                                        <Link href={`/institutes/${app.slug}`}>View</Link>
-                                                    </Button>
-                                                    <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">Approve</Button>
-                                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Deny</Button>
-                                                </div>
-                                            )}
-                                            {app.accreditation_status !== 'Pending' && (
-                                                    <Button asChild variant="outline" size="sm">
-                                                        <Link href={`/institutes/${app.slug}`}>View Details</Link>
-                                                    </Button>
-                                            )}
+                                            <div className="space-x-2">
+                                                <Button asChild variant="outline" size="sm">
+                                                    <Link href={`/institutes/${app.slug}`}>View</Link>
+                                                </Button>
+                                                <Button asChild variant="default" size="sm">
+                                                    <Link href={`/admin/institutes/edit/${app.id}`}>
+                                                        Approve/Edit
+                                                    </Link>
+                                                </Button>
+                                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Deny</Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                     ))
