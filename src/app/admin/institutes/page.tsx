@@ -118,13 +118,17 @@ export default function AdminInstitutesPage() {
                                         <TableCell className="text-right">
                                             {app.accreditation_status === 'Pending' && (
                                                 <div className="space-x-2">
-                                                    <Button variant="outline" size="sm">View</Button>
+                                                    <Button asChild variant="outline" size="sm">
+                                                        <Link href={`/institutes/${app.slug}`}>View</Link>
+                                                    </Button>
                                                     <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">Approve</Button>
                                                     <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Deny</Button>
                                                 </div>
                                             )}
                                             {app.accreditation_status !== 'Pending' && (
-                                                    <Button variant="outline" size="sm">View Details</Button>
+                                                    <Button asChild variant="outline" size="sm">
+                                                        <Link href={`/institutes/${app.slug}`}>View Details</Link>
+                                                    </Button>
                                             )}
                                         </TableCell>
                                     </TableRow>
