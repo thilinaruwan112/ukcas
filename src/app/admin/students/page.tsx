@@ -21,8 +21,16 @@ export default function StudentListPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 
-    // TODO: Implement API call to fetch students
+    // TODO: Implement API call to fetch students for the selected institute
     useEffect(() => {
+        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        if (instituteId) {
+            // Placeholder for fetching students for the institute
+            // getStudentsByInstitute(instituteId).then(data => {
+            //     setStudents(data);
+            //     setLoading(false);
+            // });
+        }
         // Simulating API call finished
         setLoading(false);
     }, []);
@@ -111,7 +119,7 @@ export default function StudentListPage() {
                         Export CSV
                     </Button>
                     <Button asChild>
-                       <Link href="/dashboard/students/new">
+                       <Link href="/admin/students/new">
                            <UserPlus className="mr-2 h-4 w-4" />
                            Add New Student
                        </Link>

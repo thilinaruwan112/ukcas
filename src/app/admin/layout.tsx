@@ -26,7 +26,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         const parsedUser = JSON.parse(userDataString);
         setUser(parsedUser);
         
-        // Redirect logic
         const activeInstitute = sessionStorage.getItem('ukcas_active_institute_id');
         if (parsedUser.acc_type !== 'admin' && !activeInstitute && pathname !== '/admin/select-institute') {
             router.replace('/admin/select-institute');
