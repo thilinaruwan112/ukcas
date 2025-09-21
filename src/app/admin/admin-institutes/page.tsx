@@ -118,7 +118,7 @@ export default function AdminInstitutesPage() {
                                         <TableCell className="text-right">
                                             <div className="space-x-2">
                                                 <Button asChild variant="outline" size="sm">
-                                                    <Link href={`/institutes/${app.slug}`}>View</Link>
+                                                    <Link href={`/institutes/${app.slug}`} target="_blank">View</Link>
                                                 </Button>
                                                 <Button asChild variant="default" size="sm">
                                                     <Link href={`/admin/admin-institutes/edit/${app.id}`}>
