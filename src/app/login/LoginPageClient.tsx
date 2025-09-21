@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,7 @@ export function LoginPageClient() {
           'Content-Type': 'application/json',
           'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
         },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ email: identifier, pass: password }),
       });
       
       console.log('API Response:', response);
