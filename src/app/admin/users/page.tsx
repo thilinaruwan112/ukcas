@@ -172,7 +172,7 @@ export default function UserMaintenancePage() {
             const token = sessionStorage.getItem('ukcas_token');
             const payload = {
                 institute_id: parseInt(selectedInstituteId),
-                user_account: userToAssign.userName,
+                user_account: userToAssign.id,
                 role: 'admin',
                 created_by: 'system',
                 is_active: 1
@@ -424,3 +424,5 @@ export default function UserMaintenancePage() {
         </>
     );
 }
+
+    
