@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+async function handleRequest(request: Request) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -19,27 +19,61 @@ export async function POST(request: Request) {
         'X-API-KEY': apiKey,
         'Authorization': `Bearer ${token}`
     };
-    
+
     try {
         const body = await request.json();
         const fetchUrl = `${apiUrl}/user-institutes`;
 
-        const response = await fetch(fetchUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(body),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            return NextResponse.json({ status: 'error', message: data.message || 'An error occurred while assigning the institute.' }, { status: response.status });
+        if (request.method === 'POST') {
+            const response = await fetch(fetchUrl, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            return NextResponse.json(data, { status: response.status });
         }
         
-        return NextResponse.json(data, { status: response.status });
+        if (request.method === 'DELETE') {
+            const { user_account, institute_id } = body;
+            if (!user_account || !institute_id) {
+                return NextResponse.json({ status: 'error', message: 'User account and institute ID are required.' }, { status: 400 });
+            }
+            // The external API might expect these as query params or in the body for a DELETE.
+            // Assuming it's in the body for now, which is less common but possible.
+            // A more RESTful API might be DELETE /user-institutes/user/{userId}/institute/{instituteId}
+            const deleteUrl = `${fetchUrl}?user_account=${user_account}&institute_id=${institute_id}`;
+
+            const response = await fetch(deleteUrl, {
+                method: 'DELETE',
+                headers,
+            });
+
+            // Handle no-content response
+            if (response.status === 204 || response.status === 200) {
+                return NextResponse.json({ status: 'success', message: 'Unassignment successful' }, { status: 200 });
+            }
+
+            const data = await response.json();
+            return NextResponse.json(data, { status: response.status });
+        }
+
 
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
+
+    return NextResponse.json({ status: 'error', message: 'Method Not Allowed' }, { status: 405 });
 }
+
+
+export async function POST(request: Request) {
+    return handleRequest(request);
+}
+
+export async function DELETE(request: Request) {
+    return handleRequest(request);
+}
+
+    

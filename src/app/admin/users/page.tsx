@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building, Eye, X } from "lucide-react";
 import Link from 'next/link';
 import { AdminUser, ApiInstitute } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -32,44 +32,45 @@ export default function UserMaintenancePage() {
     const [topUpAmount, setTopUpAmount] = useState(0);
     
     const [userToAssign, setUserToAssign] = useState<AdminUser | null>(null);
+    const [userToViewAssignments, setUserToViewAssignments] = useState<AdminUser | null>(null);
     const [allInstitutes, setAllInstitutes] = useState<ApiInstitute[]>([]);
     const [selectedInstituteId, setSelectedInstituteId] = useState<string | null>(null);
     const [isAssigning, setIsAssigning] = useState(false);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await fetch('/api/users');
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                    throw new Error(errorData.message || `Failed to fetch users`);
-                }
-                const data = await response.json();
-                if (data.status === 'success' && Array.isArray(data.data)) {
-                    const formattedUsers: AdminUser[] = data.data.map((user: any) => ({
-                        id: user.id,
-                        userName: user.user_name,
-                        instituteName: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.user_name,
-                        instituteAddress: [user.addressl1, user.addressl2, user.city].filter(Boolean).join(', '),
-                        registeredDate: user.created_at,
-                        email: user.email,
-                        balance: user.balance || 0,
-                        assignedInstitutes: user.institutes || [],
-                    }));
-                    setUsers(formattedUsers);
-                } else {
-                    throw new Error(data.message || "Invalid data structure received from server.");
-                }
-            } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-                setError(errorMessage);
-            } finally {
-                setLoading(false);
+    const fetchUsers = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch('/api/users');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(errorData.message || `Failed to fetch users`);
             }
-        };
-
+            const data = await response.json();
+            if (data.status === 'success' && Array.isArray(data.data)) {
+                const formattedUsers: AdminUser[] = data.data.map((user: any) => ({
+                    id: user.id,
+                    userName: user.user_name,
+                    instituteName: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.user_name,
+                    instituteAddress: [user.addressl1, user.addressl2, user.city].filter(Boolean).join(', '),
+                    registeredDate: user.created_at,
+                    email: user.email,
+                    balance: user.balance || 0,
+                    assignedInstitutes: user.institutes || [],
+                }));
+                setUsers(formattedUsers);
+            } else {
+                throw new Error(data.message || "Invalid data structure received from server.");
+            }
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    useEffect(() => {
         const fetchInstitutes = async () => {
              try {
                 const response = await fetch('/api/institutes');
@@ -97,6 +98,7 @@ export default function UserMaintenancePage() {
     const handleEditClick = (userId: string) => router.push(`/admin/users/edit/${userId}`);
     const handleTopUpClick = (user: AdminUser) => setUserToTopUp(user);
     const handleAssignClick = (user: AdminUser) => setUserToAssign(user);
+    const handleViewAssignmentsClick = (user: AdminUser) => setUserToViewAssignments(user);
 
     const handleDeleteConfirm = async () => {
         if (!userToDelete) return;
@@ -189,15 +191,10 @@ export default function UserMaintenancePage() {
                 throw new Error(result.message || 'Failed to assign institute.');
             }
 
-            // Optimistically update UI
-            const assignedInstitute = allInstitutes.find(inst => inst.id === selectedInstituteId);
-            if (assignedInstitute) {
-                setUsers(users.map(u => u.id === userToAssign.id ? {
-                    ...u,
-                    assignedInstitutes: [...(u.assignedInstitutes || []), assignedInstitute]
-                } : u));
-            }
+            // Refetch users to get the latest assignments
+            await fetchUsers();
             
+            const assignedInstitute = allInstitutes.find(inst => inst.id === selectedInstituteId);
             toast({
                 title: 'Institute Assigned',
                 description: `${assignedInstitute?.name} has been assigned to ${userToAssign.instituteName}.`,
@@ -212,15 +209,53 @@ export default function UserMaintenancePage() {
         }
     };
     
+    const handleUnassignInstitute = async (user: AdminUser, instituteId: string) => {
+        try {
+            const token = sessionStorage.getItem('ukcas_token');
+            const response = await fetch('/api/user-institutes', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ user_account: user.id, institute_id: instituteId }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to unassign institute.');
+            }
+
+            // Optimistically update UI
+            const updatedUsers = users.map(u => {
+                if (u.id === user.id) {
+                    return {
+                        ...u,
+                        assignedInstitutes: u.assignedInstitutes?.filter(inst => inst.id !== instituteId)
+                    };
+                }
+                return u;
+            });
+            setUsers(updatedUsers);
+            setUserToViewAssignments(updatedUsers.find(u => u.id === user.id) || null);
+
+
+            toast({
+                title: 'Institute Unassigned',
+                description: 'The institute has been successfully unassigned from the user.',
+            });
+
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+            toast({ variant: 'destructive', title: 'Unassignment Failed', description: errorMessage });
+        }
+    };
+
     const UserTableSkeleton = () => (
         <TableBody>
             {[...Array(5)].map((_, i) => (
                 <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-40" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                     <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
                 </TableRow>
             ))}
@@ -256,7 +291,6 @@ export default function UserMaintenancePage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>User/Institute Name</TableHead>
-                                <TableHead>Assigned Institutes</TableHead>
                                 <TableHead>Balance</TableHead>
                                 <TableHead>Registered Date</TableHead>
                                 <TableHead>Email</TableHead>
@@ -267,7 +301,7 @@ export default function UserMaintenancePage() {
                             <TableBody>
                                 {error && (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="h-48 text-center">
+                                        <TableCell colSpan={5} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <AlertTriangle className="h-8 w-8 text-destructive" />
                                                 <p className="text-destructive font-medium">Failed to load users.</p>
@@ -280,17 +314,6 @@ export default function UserMaintenancePage() {
                                     filteredUsers.map((user) => (
                                     <TableRow key={user.id}>
                                         <TableCell className="font-medium">{user.instituteName}</TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-wrap gap-1">
-                                                {user.assignedInstitutes && user.assignedInstitutes.length > 0 ? (
-                                                    user.assignedInstitutes.map(inst => (
-                                                        <Badge key={inst.id} variant="secondary">{inst.name}</Badge>
-                                                    ))
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">None</span>
-                                                )}
-                                            </div>
-                                        </TableCell>
                                         <TableCell>${user.balance.toFixed(2)}</TableCell>
                                         <TableCell>{new Date(user.registeredDate).toLocaleDateString()}</TableCell>
                                         <TableCell>{user.email}</TableCell>
@@ -311,7 +334,11 @@ export default function UserMaintenancePage() {
                                                         <Wallet className="mr-2 h-4 w-4" />
                                                         <span>Top-up Balance</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleAssignClick(user)}>
+                                                    <DropdownMenuItem onClick={() => handleViewAssignmentsClick(user)}>
+                                                        <Eye className="mr-2 h-4 w-4" />
+                                                        <span>View Assignments</span>
+                                                    </DropdownMenuItem>
+                                                     <DropdownMenuItem onClick={() => handleAssignClick(user)}>
                                                         <Building className="mr-2 h-4 w-4" />
                                                         <span>Assign Institute</span>
                                                     </DropdownMenuItem>
@@ -331,7 +358,7 @@ export default function UserMaintenancePage() {
                                 ) : (
                                     !error && (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="h-48 text-center">
+                                            <TableCell colSpan={5} className="h-48 text-center">
                                                 <p className="text-muted-foreground">
                                                     {searchTerm ? `No users found for "${searchTerm}".` : "No users have been created yet."}
                                                 </p>
@@ -421,6 +448,35 @@ export default function UserMaintenancePage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            
+             <Dialog open={!!userToViewAssignments} onOpenChange={() => setUserToViewAssignments(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Assigned Institutes</DialogTitle>
+                        <DialogDescription>
+                            Showing institutes assigned to <span className="font-semibold">{userToViewAssignments?.instituteName}</span>.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-2">
+                        {userToViewAssignments?.assignedInstitutes && userToViewAssignments.assignedInstitutes.length > 0 ? (
+                            userToViewAssignments.assignedInstitutes.map(inst => (
+                                <div key={inst.id} className="flex items-center justify-between p-2 rounded-md border">
+                                    <span className="text-sm font-medium">{inst.name}</span>
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => userToViewAssignments && handleUnassignInstitute(userToViewAssignments, inst.id)}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground text-center py-4">No institutes are assigned to this user.</p>
+                        )}
+                    </div>
+                     <DialogFooter>
+                        <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
         </>
     );
 }
