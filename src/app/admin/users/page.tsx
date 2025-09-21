@@ -33,15 +33,10 @@ export default function UserMaintenancePage() {
             setLoading(true);
             setError(null);
             try {
-                const token = sessionStorage.getItem('ukcas_token');
-                if (!token) {
-                    throw new Error('Authentication token not found.');
-                }
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
-                        'Authorization': `Bearer ${token}`
+                        'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || ''
                     }
                 });
 
@@ -114,7 +109,7 @@ export default function UserMaintenancePage() {
 
     const handleTopUpConfirm = () => {
         if (userToTopUp && topUpAmount > 0) {
-            // Add API call to top-up balance here
+            // Add API call to top-up balance here, using JWT token for POST
             setUsers(users.map(user => 
                 user.id === userToTopUp.id 
                     ? { ...user, balance: user.balance + topUpAmount } 
