@@ -68,6 +68,7 @@ export interface Certificate {
 
 export interface AdminUser {
   id: string;
+  userName: string;
   instituteName: string;
   instituteAddress: string;
   registeredDate: string;
