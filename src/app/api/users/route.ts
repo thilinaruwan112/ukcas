@@ -8,9 +8,14 @@ export async function GET(request: Request) {
     if (!apiUrl || !apiKey) {
         return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured on the server.' }, { status: 500 });
     }
+    
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('id');
+    
+    const fetchUrl = userId ? `${apiUrl}/users/${userId}` : `${apiUrl}/users`;
 
     try {
-        const response = await fetch(`${apiUrl}/users`, {
+        const response = await fetch(fetchUrl, {
             headers: {
                 'Content-Type': 'application/json',
                 'X-API-KEY': apiKey,

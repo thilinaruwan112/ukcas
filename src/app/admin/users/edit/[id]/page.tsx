@@ -6,31 +6,78 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { UserCog, ArrowLeft } from "lucide-react";
-import { mockAdminUsers } from '@/lib/mock-data';
-import type { AdminUser } from '@/lib/types';
+import type { AdminUser, ApiInstitute } from '@/lib/types';
 import { notFound, useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+async function getInstitutes(): Promise<ApiInstitute[]> {
+    try {
+        const response = await fetch(`https://ukcas-server.payshia.com/institutes`, {
+             headers: {
+                'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
+            },
+        });
+        if (!response.ok) {
+            return [];
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch institutes:', error);
+        return [];
+    }
+}
+
+async function getUserById(id: string): Promise<AdminUser | null> {
+    try {
+        const response = await fetch(`/api/users?id=${id}`);
+        if (!response.ok) {
+            return null;
+        }
+        const data = await response.json();
+        if (data.status === 'success') {
+             const user = data.data;
+             return {
+                id: user.id,
+                instituteName: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.user_name,
+                instituteAddress: [user.addressl1, user.addressl2, user.city].filter(Boolean).join(', '),
+                registeredDate: user.created_at,
+                email: user.email,
+                balance: user.balance || 0,
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Failed to fetch user:', error);
+        return null;
+    }
+}
+
 
 export default function EditUserPage() {
     const { toast } = useToast();
     const router = useRouter();
     const params = useParams();
     const { id } = params;
-    const [user, setUser] = useState<AdminUser | undefined>(undefined);
+    const [user, setUser] = useState<AdminUser | null>(null);
+    const [institutes, setInstitutes] = useState<ApiInstitute[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedInstitute, setSelectedInstitute] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        if (id) {
-            // Simulate fetching data
-            const foundUser = mockAdminUsers.find(u => u.id === id);
-            setTimeout(() => {
-                if (foundUser) {
-                    setUser(foundUser);
+        if (typeof id === 'string') {
+            Promise.all([
+                getUserById(id),
+                getInstitutes()
+            ]).then(([userData, instituteData]) => {
+                if (userData) {
+                    setUser(userData);
                 }
+                setInstitutes(instituteData);
                 setIsLoading(false);
-            }, 500);
+            });
         } else {
             setIsLoading(false);
         }
@@ -39,6 +86,7 @@ export default function EditUserPage() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // Here you would typically handle form submission, e.g., API call
+        console.log("Saving data...", { selectedInstitute });
         toast({
             title: "User Updated",
             description: `Details for ${user?.instituteName} have been saved.`,
@@ -75,14 +123,31 @@ export default function EditUserPage() {
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="instituteName">Institute Name</Label>
+                                <Label htmlFor="instituteName">User/Institute Name</Label>
                                 <Input id="instituteName" placeholder="e.g., Global Tech University" defaultValue={user.instituteName} />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="country">Country</Label>
-                                <Input id="country" placeholder="e.g., United Kingdom" defaultValue={user.instituteAddress.split(',').pop()?.trim() || ''} />
+                           <div className="space-y-2">
+                                <Label htmlFor="institute">Assign Institute</Label>
+                                 <Select onValueChange={setSelectedInstitute} value={selectedInstitute}>
+                                    <SelectTrigger id="institute">
+                                        <SelectValue placeholder="Select an institute" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {institutes.map(inst => (
+                                            <SelectItem key={inst.id} value={inst.id}>
+                                                {inst.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
+
+                         <div className="space-y-2">
+                            <Label htmlFor="country">Country</Label>
+                            <Input id="country" placeholder="e.g., United Kingdom" defaultValue={user.instituteAddress.split(',').pop()?.trim() || ''} />
+                        </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="address">Full Address</Label>
                             <Input id="address" placeholder="123 University Avenue, London" defaultValue={user.instituteAddress} />
