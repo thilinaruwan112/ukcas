@@ -52,7 +52,7 @@ function requireApiKey()
     $validKey = getenv('API_KEY') ?: (isset($_ENV['API_KEY']) ? $_ENV['API_KEY'] : null);
     if (!$apiKey || $apiKey !== $validKey) {
         http_response_code(401);
-        echo json_encode(['status' => 'error', 'message' => 'Missing or invalid API key']);
+        echo json_encode(['status' => 'error', 'message' => 'Missing or invalid API key', 'data' => $apiKey]);
         exit();
     }
 }
