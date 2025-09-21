@@ -41,7 +41,7 @@ export default function NewCoursePage() {
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
           created_by: user.user_name || 'system',
-          is_active: 1
+          active_status: 1
       };
 
       try {

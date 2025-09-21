@@ -1,4 +1,5 @@
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -17,7 +18,7 @@ export interface Course {
     course_code: string;
     description: string;
     duration: string;
-    is_active: string | number;
+    active_status: string | number;
     created_at: string;
     updated_at: string;
     created_by: string;
