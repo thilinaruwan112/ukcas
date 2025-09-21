@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -7,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { UserPlus } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export default function NewUserPage() {
   const router = useRouter();
@@ -16,66 +19,54 @@ export default function NewUserPage() {
       e.preventDefault();
       // Here you would typically handle form submission, e.g., API call
       const formData = new FormData(e.currentTarget);
-      const instituteName = formData.get('instituteName') as string;
+      const email = formData.get('email') as string;
 
       toast({
           title: "User Created",
-          description: `A new user account for ${instituteName} has been successfully created.`,
+          description: `A new user account for ${email} has been successfully created.`,
       });
 
       router.push('/admin/users');
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto space-y-6">
+        <Link href="/admin/users" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" />
+            Back to User Maintenance
+        </Link>
+
         <Card className="shadow-lg">
           <CardHeader className="text-center">
              <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
               <UserPlus className="h-8 w-8" />
             </div>
-            <CardTitle className="text-2xl font-headline">Create New Institute User</CardTitle>
+            <CardTitle className="text-2xl font-headline">Create New User</CardTitle>
             <CardDescription>
-              Fill out the form below to create a new user account for an institute.
+              Create a new user account. You can assign an institute to this user later.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="instituteName">Institute Name</Label>
-                  <Input id="instituteName" name="instituteName" placeholder="e.g., Global Tech University" required />
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input id="firstName" name="firstName" placeholder="e.g., John" required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input id="country" name="country" placeholder="e.g., United Kingdom" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="address">Full Address</Label>
-                <Input id="address" name="address" placeholder="123 University Avenue, London" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                  <Label htmlFor="email">Contact Email</Label>
-                  <Input id="email" name="email" type="email" placeholder="e.g., contact@university.com" required />
-                </div>
-                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" name="password" type="password" required />
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input id="lastName" name="lastName" placeholder="e.g., Doe" />
                 </div>
               </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                    <Label htmlFor="logo">Institute Logo</Label>
-                    <Input id="logo" name="logo" type="file" accept="image/*" />
-                    <p className="text-xs text-muted-foreground">Upload the institute's official logo.</p>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="coverImage">Cover Image</Label>
-                    <Input id="coverImage" name="coverImage" type="file" accept="image/*" />
-                     <p className="text-xs text-muted-foreground">Upload a cover or banner image.</p>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Contact Email</Label>
+                <Input id="email" name="email" type="email" placeholder="e.g., john.doe@example.com" required />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" name="password" type="password" required />
               </div>
               
               <Button type="submit" className="w-full h-12 text-base" size="lg">
