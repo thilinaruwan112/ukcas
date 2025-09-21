@@ -41,7 +41,8 @@ export default function UserMaintenancePage() {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch users: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                    throw new Error(errorData.message || `Failed to fetch users`);
                 }
 
                 const data = await response.json();
@@ -50,7 +51,7 @@ export default function UserMaintenancePage() {
                      // Assuming API data structure matches AdminUser partially. Adapt as needed.
                     const formattedUsers: AdminUser[] = data.data.map((user: any) => ({
                         id: user.id,
-                        instituteName: user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.user_name,
+                        instituteName: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.user_name,
                         instituteAddress: [user.addressl1, user.addressl2, user.city].filter(Boolean).join(', '),
                         registeredDate: user.created_at,
                         email: user.email,
@@ -302,5 +303,3 @@ export default function UserMaintenancePage() {
         </>
     );
 }
-
-    
