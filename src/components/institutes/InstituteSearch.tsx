@@ -61,7 +61,11 @@ export default function InstituteSearch() {
     const timerId = setTimeout(() => {
         async function fetchInstitutes() {
           try {
-            const response = await fetch(`https://ukcas-server.payshia.com/institutes?search=${searchTerm}`);
+            const response = await fetch(`https://ukcas-server.payshia.com/institutes?search=${searchTerm}`, {
+                headers: {
+                    'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY || '',
+                }
+            });
             if (!response.ok) {
               throw new Error('Failed to fetch institutes');
             }
