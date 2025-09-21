@@ -17,32 +17,45 @@ async function handleRequest(request: Request) {
                 return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
             }
             const { searchParams } = new URL(request.url);
-            const instituteId = searchParams.get('institute_id');
             const courseId = searchParams.get('id');
 
-            let fetchUrl = `${apiUrl}/institute-courses`;
             if (courseId) {
-                fetchUrl = `${apiUrl}/institute-courses/${courseId}`;
-            } else if (instituteId) {
-                fetchUrl = `${apiUrl}/institute-courses?institute_id=${instituteId}`;
+                let fetchUrl = `${apiUrl}/institute-courses/${courseId}`;
+                const response = await fetch(fetchUrl, { headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                return NextResponse.json(data, { status: response.status });
             }
-            
-            const response = await fetch(fetchUrl, { headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` } });
-            const data = await response.json();
-            return NextResponse.json(data, { status: response.status });
-        }
-
-        if (!token) {
-            return NextResponse.json({ status: 'error', message: 'Authentication is required for this action.' }, { status: 401 });
         }
         
-        const headers: HeadersInit = { 'Content-Type': 'application/json', 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` };
+        const headers: HeadersInit = { 'Content-Type': 'application/json', 'X-API-KEY': apiKey };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
         const body = await request.json();
 
         if (request.method === 'POST') {
-            const response = await fetch(`${apiUrl}/institute-courses`, { method: 'POST', headers, body: JSON.stringify(body) });
-            const data = await response.json();
-            return NextResponse.json(data, { status: response.status });
+            // This now handles both creating a new course and fetching courses for an institute.
+            if (body.institute_id && !body.course_name) {
+                // Fetching courses for an institute
+                const response = await fetch(`${apiUrl}/institute-courses?institute_id=${body.institute_id}`, { 
+                    method: 'GET', // The external API still uses GET
+                    headers 
+                });
+                const data = await response.json();
+                return NextResponse.json(data, { status: response.status });
+            } else {
+                // Creating a new course
+                 if (!token) {
+                    return NextResponse.json({ status: 'error', message: 'Authentication is required for this action.' }, { status: 401 });
+                }
+                const response = await fetch(`${apiUrl}/institute-courses`, { method: 'POST', headers, body: JSON.stringify(body) });
+                const data = await response.json();
+                return NextResponse.json(data, { status: response.status });
+            }
+        }
+        
+         if (!token) {
+            return NextResponse.json({ status: 'error', message: 'Authentication is required for this action.' }, { status: 401 });
         }
         
         if (request.method === 'PATCH') {

@@ -15,8 +15,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 async function getCourses(instituteId: string, token: string): Promise<Course[]> {
     try {
-        const response = await fetch(`/api/courses?institute_id=${instituteId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`/api/courses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ institute_id: instituteId }),
         });
         if (!response.ok) {
             throw new Error('Failed to fetch courses');
