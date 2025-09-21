@@ -1,19 +1,72 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Building, UserPlus } from "lucide-react";
+import { Building, AlertTriangle } from "lucide-react";
+import type { ApiInstitute } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const applications = [
-  { id: 1, name: "International University of Science", country: "Canada", date: "2024-07-20", status: "Pending" },
-  { id: 2, name: "Art & Design College of Paris", country: "France", date: "2024-07-18", status: "Pending" },
-  { id: 3, name: "Sydney Business School", country: "Australia", date: "2024-07-15", status: "Approved" },
-  { id: 4, name: "Tokyo Institute of Animation", country: "Japan", date: "2024-07-12", status: "Denied" },
-];
+async function getInstitutes(apiKey: string): Promise<ApiInstitute[]> {
+    try {
+        const response = await fetch(`https://ukcas-server.payshia.com/institutes`, {
+            headers: {
+                'X-API-KEY': apiKey,
+            },
+        });
+        if (!response.ok) {
+            console.error("Failed to fetch institutes:", response.statusText);
+            return [];
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch institutes:', error);
+        return [];
+    }
+}
 
 export default function AdminInstitutesPage() {
+    const [institutes, setInstitutes] = useState<ApiInstitute[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+        if (!apiKey) {
+            setError("API Key is not configured.");
+            setLoading(false);
+            return;
+        }
+
+        getInstitutes(apiKey)
+            .then(data => {
+                setInstitutes(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err.message || "An unknown error occurred.");
+                setLoading(false);
+            });
+    }, []);
+
+    const InstitutesSkeleton = () => (
+        <TableBody>
+            {[...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-36 ml-auto" /></TableCell>
+                </TableRow>
+            ))}
+        </TableBody>
+    );
+
     return (
         <>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -44,32 +97,54 @@ export default function AdminInstitutesPage() {
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
-                            {applications.map((app) => (
-                                <TableRow key={app.id}>
-                                    <TableCell className="font-medium">{app.name}</TableCell>
-                                    <TableCell>{app.country}</TableCell>
-                                    <TableCell>{app.date}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={app.status === 'Pending' ? 'secondary' : app.status === 'Approved' ? 'default' : 'destructive'}>
-                                            {app.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {app.status === 'Pending' && (
-                                            <div className="space-x-2">
-                                                <Button variant="outline" size="sm">View</Button>
-                                                <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">Approve</Button>
-                                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Deny</Button>
-                                            </div>
-                                        )}
-                                        {app.status !== 'Pending' && (
-                                                <Button variant="outline" size="sm">View Details</Button>
-                                        )}
+                        {loading ? <InstitutesSkeleton /> : error ? (
+                             <TableBody>
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-48 text-center">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <AlertTriangle className="h-8 w-8 text-destructive" />
+                                            <p className="text-destructive font-medium">Failed to load institutes.</p>
+                                            <p className="text-muted-foreground text-sm">{error}</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
+                            </TableBody>
+                        ) : (
+                            <TableBody>
+                                {institutes.length > 0 ? (
+                                    institutes.map((app) => (
+                                    <TableRow key={app.id}>
+                                        <TableCell className="font-medium">{app.name}</TableCell>
+                                        <TableCell>{app.country}</TableCell>
+                                        <TableCell>{new Date(app.created_at).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={app.accreditation_status === 'Pending' ? 'secondary' : app.accreditation_status === 'Accredited' ? 'default' : 'destructive'}>
+                                                {app.accreditation_status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {app.accreditation_status === 'Pending' && (
+                                                <div className="space-x-2">
+                                                    <Button variant="outline" size="sm">View</Button>
+                                                    <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">Approve</Button>
+                                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Deny</Button>
+                                                </div>
+                                            )}
+                                            {app.accreditation_status !== 'Pending' && (
+                                                    <Button variant="outline" size="sm">View Details</Button>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-48 text-center">
+                                            <p className="text-muted-foreground">No institutes found.</p>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        )}
                     </Table>
                 </CardContent>
             </Card>
