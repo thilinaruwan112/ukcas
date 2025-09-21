@@ -14,9 +14,9 @@ export interface Course {
     id: string;
     institute_id: string;
     course_name: string;
-    course_code: string;
-    description: string;
-    duration: string;
+    course_code: string | null;
+    description: string | null;
+    duration: string | null;
     active_status: string | number;
     created_at: string;
     updated_at: string;

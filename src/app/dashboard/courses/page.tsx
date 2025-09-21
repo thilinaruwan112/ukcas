@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -21,37 +22,43 @@ async function getCourses(instituteId: string, token: string): Promise<Course[]>
             body: JSON.stringify({ institute_id: instituteId }),
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch courses');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch courses');
         }
         const data = await response.json();
         return data.status === 'success' && Array.isArray(data.data) ? data.data : [];
     } catch (error) {
         console.error(error);
-        return [];
+        throw error; // Re-throw to be caught by the caller
     }
 }
 
 export default function CoursesPage() {
+    const router = useRouter();
     const { toast } = useToast();
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
-    const [instituteId, setInstituteId] = useState<string | null>('1'); // Hardcoded for now
 
     useEffect(() => {
         const token = sessionStorage.getItem('ukcas_token');
+        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        
         if (!token || !instituteId) {
-            setError('Authentication error or missing institute ID.');
-            setLoading(false);
+            toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in and have an institute selected.' });
+            router.push('/login');
             return;
         }
 
         getCourses(instituteId, token)
             .then(data => setCourses(data))
-            .catch(err => setError(err.message))
+            .catch(err => {
+                const msg = err instanceof Error ? err.message : 'An unknown error occurred.';
+                setError(msg);
+            })
             .finally(() => setLoading(false));
-    }, [instituteId]);
+    }, [router, toast]);
 
     const handleDeleteClick = (course: Course) => {
         setCourseToDelete(course);
@@ -90,6 +97,7 @@ export default function CoursesPage() {
             {[...Array(3)].map((_, i) => (
                  <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
                     <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
                 </TableRow>
