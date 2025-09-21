@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,26 @@ export function LoginPageClient() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const userToken = sessionStorage.getItem('ukcas_token');
+    const userDataString = sessionStorage.getItem('ukcas_user');
+    
+    if (userToken && userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        if (userData.acc_type === 'admin') {
+          router.replace('/admin/admin-institutes');
+        } else {
+          router.replace('/dashboard');
+        }
+      } catch (error) {
+        // If parsing fails, clear session and let them log in again
+        sessionStorage.clear();
+      }
+    }
+  }, [router]);
+
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
