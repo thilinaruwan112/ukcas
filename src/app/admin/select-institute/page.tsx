@@ -8,7 +8,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Building, ArrowRight, AlertTriangle } from "lucide-react";
-import type { UserInstituteAssignment } from '@/lib/types';
+import type { UserInstituteAssignment, ApiInstitute } from '@/lib/types';
+
+async function getInstituteById(id: string): Promise<ApiInstitute | null> {
+    try {
+        const response = await fetch(`/api/institutes?id=${id}`);
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to fetch institute ${id}:`, error);
+        return null;
+    }
+}
 
 async function getAssignedInstitutes(userId: string, token: string): Promise<UserInstituteAssignment[]> {
     if (!userId || !token) return [];
@@ -18,7 +29,19 @@ async function getAssignedInstitutes(userId: string, token: string): Promise<Use
         });
         if (!response.ok) return [];
         const data = await response.json();
-        return (data.status === 'success' && Array.isArray(data.data)) ? data.data : [];
+        
+        if (data.status === 'success' && Array.isArray(data.data)) {
+            const assignments = data.data;
+            // Fetch full institute details for each assignment
+            const detailedAssignments = await Promise.all(
+                assignments.map(async (assignment: UserInstituteAssignment) => {
+                    const instituteDetails = await getInstituteById(assignment.institute_id);
+                    return { ...assignment, institute: instituteDetails };
+                })
+            );
+            return detailedAssignments.filter(a => a.institute !== null) as UserInstituteAssignment[];
+        }
+        return [];
     } catch (error) {
         console.error('Failed to fetch assignments:', error);
         return [];
