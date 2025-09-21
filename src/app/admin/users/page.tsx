@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building, Eye, X } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building, Eye, X, BookUser } from "lucide-react";
 import Link from 'next/link';
 import { AdminUser, ApiInstitute } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -30,12 +30,6 @@ export default function UserMaintenancePage() {
     const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
     const [userToTopUp, setUserToTopUp] = useState<AdminUser | null>(null);
     const [topUpAmount, setTopUpAmount] = useState(0);
-    
-    const [userToAssign, setUserToAssign] = useState<AdminUser | null>(null);
-    const [userToViewAssignments, setUserToViewAssignments] = useState<AdminUser | null>(null);
-    const [allInstitutes, setAllInstitutes] = useState<ApiInstitute[]>([]);
-    const [selectedInstituteId, setSelectedInstituteId] = useState<string | null>(null);
-    const [isAssigning, setIsAssigning] = useState(false);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -71,21 +65,7 @@ export default function UserMaintenancePage() {
     };
     
     useEffect(() => {
-        const fetchInstitutes = async () => {
-             try {
-                const response = await fetch('/api/institutes');
-                 if (!response.ok) {
-                    throw new Error('Failed to fetch institutes');
-                }
-                const data = await response.json();
-                setAllInstitutes(Array.isArray(data) ? data : []);
-             } catch (e) {
-                console.error("Failed to load institutes for assignment");
-             }
-        }
-
         fetchUsers();
-        fetchInstitutes();
     }, []);
 
 
@@ -97,8 +77,6 @@ export default function UserMaintenancePage() {
     const handleDeleteClick = (user: AdminUser) => setUserToDelete(user);
     const handleEditClick = (userId: string) => router.push(`/admin/users/edit/${userId}`);
     const handleTopUpClick = (user: AdminUser) => setUserToTopUp(user);
-    const handleAssignClick = (user: AdminUser) => setUserToAssign(user);
-    const handleViewAssignmentsClick = (user: AdminUser) => setUserToViewAssignments(user);
 
     const handleDeleteConfirm = async () => {
         if (!userToDelete) return;
@@ -160,91 +138,6 @@ export default function UserMaintenancePage() {
         } finally {
              setUserToTopUp(null);
              setTopUpAmount(0);
-        }
-    };
-
-    const handleAssignmentConfirm = async () => {
-        if (!userToAssign || !selectedInstituteId) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Please select an institute to assign.' });
-            return;
-        }
-
-        setIsAssigning(true);
-        try {
-            const token = sessionStorage.getItem('ukcas_token');
-            const payload = {
-                institute_id: parseInt(selectedInstituteId),
-                user_account: userToAssign.id,
-                role: 'admin',
-                created_by: 'system',
-                is_active: 1
-            };
-            
-            const response = await fetch('/api/user-institutes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(payload),
-            });
-            
-            const result = await response.json();
-            if (!response.ok || result.status !== 'success') {
-                throw new Error(result.message || 'Failed to assign institute.');
-            }
-
-            // Refetch users to get the latest assignments
-            await fetchUsers();
-            
-            const assignedInstitute = allInstitutes.find(inst => inst.id === selectedInstituteId);
-            toast({
-                title: 'Institute Assigned',
-                description: `${assignedInstitute?.name} has been assigned to ${userToAssign.instituteName}.`,
-            });
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-            toast({ variant: 'destructive', title: 'Assignment Failed', description: errorMessage });
-        } finally {
-            setIsAssigning(false);
-            setUserToAssign(null);
-            setSelectedInstituteId(null);
-        }
-    };
-    
-    const handleUnassignInstitute = async (user: AdminUser, instituteId: string) => {
-        try {
-            const token = sessionStorage.getItem('ukcas_token');
-            const response = await fetch('/api/user-institutes', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ user_account: user.id, institute_id: instituteId }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to unassign institute.');
-            }
-
-            // Optimistically update UI
-            const updatedUsers = users.map(u => {
-                if (u.id === user.id) {
-                    return {
-                        ...u,
-                        assignedInstitutes: u.assignedInstitutes?.filter(inst => inst.id !== instituteId)
-                    };
-                }
-                return u;
-            });
-            setUsers(updatedUsers);
-            setUserToViewAssignments(updatedUsers.find(u => u.id === user.id) || null);
-
-
-            toast({
-                title: 'Institute Unassigned',
-                description: 'The institute has been successfully unassigned from the user.',
-            });
-
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-            toast({ variant: 'destructive', title: 'Unassignment Failed', description: errorMessage });
         }
     };
 
@@ -334,13 +227,11 @@ export default function UserMaintenancePage() {
                                                         <Wallet className="mr-2 h-4 w-4" />
                                                         <span>Top-up Balance</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleViewAssignmentsClick(user)}>
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        <span>View Assignments</span>
-                                                    </DropdownMenuItem>
-                                                     <DropdownMenuItem onClick={() => handleAssignClick(user)}>
-                                                        <Building className="mr-2 h-4 w-4" />
-                                                        <span>Assign Institute</span>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/admin/users/assignments/${user.id}`}>
+                                                            <BookUser className="mr-2 h-4 w-4" />
+                                                            <span>Manage Assignments</span>
+                                                        </Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
@@ -412,73 +303,6 @@ export default function UserMaintenancePage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-
-            <Dialog open={!!userToAssign} onOpenChange={() => { setUserToAssign(null); setSelectedInstituteId(null); }}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Assign Institute</DialogTitle>
-                        <DialogDescription>
-                            Select an institute to assign to <span className="font-semibold">{userToAssign?.instituteName}</span>.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                         <Select onValueChange={setSelectedInstituteId} value={selectedInstituteId || undefined}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select an institute to assign" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {allInstitutes.map(inst => (
-                                    <SelectItem 
-                                        key={inst.id} 
-                                        value={inst.id} 
-                                        disabled={userToAssign?.assignedInstitutes?.some(assigned => assigned.id === inst.id)}
-                                    >
-                                        {inst.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <DialogFooter>
-                        <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
-                        <Button onClick={handleAssignmentConfirm} disabled={!selectedInstituteId || isAssigning}>
-                             {isAssigning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Confirm Assignment
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-            
-             <Dialog open={!!userToViewAssignments} onOpenChange={() => setUserToViewAssignments(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Assigned Institutes</DialogTitle>
-                        <DialogDescription>
-                            Showing institutes assigned to <span className="font-semibold">{userToViewAssignments?.instituteName}</span>.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 space-y-2">
-                        {userToViewAssignments?.assignedInstitutes && userToViewAssignments.assignedInstitutes.length > 0 ? (
-                            userToViewAssignments.assignedInstitutes.map(inst => (
-                                <div key={inst.id} className="flex items-center justify-between p-2 rounded-md border">
-                                    <span className="text-sm font-medium">{inst.name}</span>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => userToViewAssignments && handleUnassignInstitute(userToViewAssignments, inst.id)}>
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-sm text-muted-foreground text-center py-4">No institutes are assigned to this user.</p>
-                        )}
-                    </div>
-                     <DialogFooter>
-                        <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
         </>
     );
 }
-
-    

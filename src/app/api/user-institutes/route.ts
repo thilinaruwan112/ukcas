@@ -21,6 +21,19 @@ async function handleRequest(request: Request) {
     };
 
     try {
+        if (request.method === 'GET') {
+            const { searchParams } = new URL(request.url);
+            const userId = searchParams.get('userId');
+            if (!userId) {
+                return NextResponse.json({ status: 'error', message: 'User ID is required.' }, { status: 400 });
+            }
+            const fetchUrl = `${apiUrl}/user-institutes/${userId}`;
+            const response = await fetch(fetchUrl, { headers });
+            const data = await response.json();
+            return NextResponse.json(data, { status: response.status });
+        }
+
+
         const body = await request.json();
         const fetchUrl = `${apiUrl}/user-institutes`;
 
@@ -39,9 +52,6 @@ async function handleRequest(request: Request) {
             if (!user_account || !institute_id) {
                 return NextResponse.json({ status: 'error', message: 'User account and institute ID are required.' }, { status: 400 });
             }
-            // The external API might expect these as query params or in the body for a DELETE.
-            // Assuming it's in the body for now, which is less common but possible.
-            // A more RESTful API might be DELETE /user-institutes/user/{userId}/institute/{instituteId}
             const deleteUrl = `${fetchUrl}?user_account=${user_account}&institute_id=${institute_id}`;
 
             const response = await fetch(deleteUrl, {
@@ -49,7 +59,6 @@ async function handleRequest(request: Request) {
                 headers,
             });
 
-            // Handle no-content response
             if (response.status === 204 || response.status === 200) {
                 return NextResponse.json({ status: 'success', message: 'Unassignment successful' }, { status: 200 });
             }
@@ -76,4 +85,6 @@ export async function DELETE(request: Request) {
     return handleRequest(request);
 }
 
-    
+export async function GET(request: Request) {
+    return handleRequest(request);
+}

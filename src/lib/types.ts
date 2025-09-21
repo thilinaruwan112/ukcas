@@ -38,6 +38,13 @@ export interface ApiInstitute {
     slug: string;
 }
 
+export interface UserInstituteAssignment {
+    id: string;
+    institute: ApiInstitute;
+    role: string;
+    created_at: string;
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
