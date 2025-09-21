@@ -44,7 +44,7 @@ async function getAssignments(userId: string, token: string): Promise<UserInstit
         });
         if (!response.ok) return [];
         const data = await response.json();
-        return data.status === 'success' ? data.data : [];
+        return (data.status === 'success' && Array.isArray(data.data)) ? data.data : [];
     } catch (error) {
         console.error('Failed to fetch assignments:', error);
         return [];
@@ -337,3 +337,5 @@ function PageSkeleton() {
     );
 }
 
+
+    
