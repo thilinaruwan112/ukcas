@@ -81,8 +81,9 @@ export default function SelectInstitutePage() {
             });
     }, [router]);
 
-    const handleSelectInstitute = (instituteId: string) => {
-        sessionStorage.setItem('ukcas_active_institute_id', instituteId);
+    const handleSelectInstitute = (institute: ApiInstitute) => {
+        sessionStorage.setItem('ukcas_active_institute', JSON.stringify(institute));
+        sessionStorage.setItem('ukcas_active_institute_id', institute.id);
         router.push('/dashboard');
     };
 
@@ -136,7 +137,7 @@ export default function SelectInstitutePage() {
                                             </div>
                                             <h3 className="text-lg font-semibold">{assignment.institute.name}</h3>
                                             <p className="text-sm text-muted-foreground mb-4">{assignment.institute.country}</p>
-                                            <Button className="w-full" onClick={() => handleSelectInstitute(assignment.institute.id)}>
+                                            <Button className="w-full" onClick={() => handleSelectInstitute(assignment.institute)}>
                                                 Manage
                                                 <ArrowRight className="ml-2 h-4 w-4" />
                                             </Button>
