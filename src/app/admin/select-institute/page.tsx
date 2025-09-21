@@ -100,25 +100,27 @@ export default function SelectInstitutePage() {
                     ) : assignments.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            {assignments.map((assignment) => (
-                                <Card key={assignment.institute.id} className="hover:shadow-lg transition-shadow">
-                                    <CardContent className="p-6 flex flex-col items-center text-center">
-                                        <div className="relative w-20 h-20 mb-4">
-                                            {assignment.institute.logo_path ? (
-                                                <Image src={assignment.institute.logo_path} alt={`${assignment.institute.name} logo`} layout="fill" className="rounded-full object-contain" />
-                                            ) : (
-                                                 <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center border">
-                                                    <Building className="w-10 h-10 text-muted-foreground" />
-                                                 </div>
-                                            )}
-                                        </div>
-                                        <h3 className="text-lg font-semibold">{assignment.institute.name}</h3>
-                                        <p className="text-sm text-muted-foreground mb-4">{assignment.institute.country}</p>
-                                        <Button className="w-full" onClick={() => handleSelectInstitute(assignment.institute.id)}>
-                                            Manage
-                                            <ArrowRight className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    </CardContent>
-                                </Card>
+                                assignment.institute && (
+                                    <Card key={assignment.institute.id} className="hover:shadow-lg transition-shadow">
+                                        <CardContent className="p-6 flex flex-col items-center text-center">
+                                            <div className="relative w-20 h-20 mb-4">
+                                                {assignment.institute.logo_path ? (
+                                                    <Image src={assignment.institute.logo_path} alt={`${assignment.institute.name} logo`} layout="fill" className="rounded-full object-contain" />
+                                                ) : (
+                                                     <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center border">
+                                                        <Building className="w-10 h-10 text-muted-foreground" />
+                                                     </div>
+                                                )}
+                                            </div>
+                                            <h3 className="text-lg font-semibold">{assignment.institute.name}</h3>
+                                            <p className="text-sm text-muted-foreground mb-4">{assignment.institute.country}</p>
+                                            <Button className="w-full" onClick={() => handleSelectInstitute(assignment.institute.id)}>
+                                                Manage
+                                                <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
                             ))}
                         </div>
                     ) : (
