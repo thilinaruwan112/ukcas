@@ -11,8 +11,15 @@ export async function GET(request: Request) {
     
     const { searchParams } = new URL(request.url);
     const instituteId = searchParams.get('id');
+    const searchTerm = searchParams.get('search');
     
-    const fetchUrl = instituteId ? `${apiUrl}/institutes/${instituteId}` : `${apiUrl}/institutes`;
+    let fetchUrl = `${apiUrl}/institutes`;
+
+    if (instituteId) {
+        fetchUrl = `${apiUrl}/institutes/${instituteId}`;
+    } else if (searchTerm) {
+        fetchUrl = `${apiUrl}/institutes?search=${searchTerm}`;
+    }
 
     try {
         const response = await fetch(fetchUrl, {
