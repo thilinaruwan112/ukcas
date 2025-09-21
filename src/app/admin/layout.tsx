@@ -5,42 +5,76 @@ import type { ReactNode } from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { LogOut, Building2, Settings, UserCircle, Award } from "lucide-react";
+import { LogOut, Building2, Settings, UserCircle, Award, Users, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AdminHeader from "@/components/layout/AdminHeader";
+import { useState, useEffect } from "react";
+
+interface UserData {
+    acc_type: string;
+}
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const [user, setUser] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const userDataString = sessionStorage.getItem('ukcas_user');
+    if (userDataString) {
+        setUser(JSON.parse(userDataString));
+    }
+  }, []);
+
+  const isAdmin = user?.acc_type === 'admin';
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
-            <Link href="/admin/admin-institutes">
+            <Link href={isAdmin ? "/admin/admin-institutes" : "/admin/select-institute"}>
               <span className="text-xl font-bold text-sidebar-foreground px-2">UKCAS Admin</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/admin-institutes" isActive={pathname.startsWith('/admin/admin-institutes')}>
-                  <Building2 />
-                  Institutes
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/users" isActive={pathname.startsWith('/admin/users')}>
-                  <UserCircle />
-                  User Maintenance
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton href="/admin/accreditation" isActive={pathname.startsWith('/admin/accreditation')}>
-                  <Award />
-                  Accreditation
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {isAdmin ? (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/admin-institutes" isActive={pathname.startsWith('/admin/admin-institutes')}>
+                      <Building2 />
+                      Institutes
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/users" isActive={pathname.startsWith('/admin/users')}>
+                      <UserCircle />
+                      User Maintenance
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/accreditation" isActive={pathname.startsWith('/admin/accreditation')}>
+                      <Award />
+                      Accreditation
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              ) : (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/select-institute" isActive={pathname.startsWith('/admin/select-institute')}>
+                      <Library />
+                      Select Institute
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/students" isActive={pathname.startsWith('/admin/students')}>
+                      <Users />
+                      Students
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              )}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
