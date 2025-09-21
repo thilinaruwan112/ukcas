@@ -1,14 +1,26 @@
 
-
 export interface Institute {
   id: string;
   name: string;
   logoUrl: string;
   country: string;
   description: string;
-  courses: string[];
+  courses: Course[];
   status: 'Accredited' | 'Pending Review' | 'Denied';
   balance: number;
+}
+
+export interface Course {
+    id: string;
+    institute_id: string;
+    course_name: string;
+    course_code: string;
+    description: string;
+    duration: string;
+    is_active: string | number;
+    created_at: string;
+    updated_at: string;
+    created_by: string;
 }
 
 export interface ApiInstitute {

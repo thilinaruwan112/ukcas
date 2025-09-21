@@ -1,49 +1,99 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { PlusCircle, MoreHorizontal, FilePenLine, Trash2 } from "lucide-react";
-import { mockInstitutes } from '@/lib/mock-data';
+import { PlusCircle, MoreHorizontal, FilePenLine, Trash2, AlertTriangle, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
+import type { Course } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// In a real app, this would come from a user session or context.
-const instituteId = '1';
+async function getCourses(instituteId: string, token: string): Promise<Course[]> {
+    try {
+        const response = await fetch(`/api/courses?institute_id=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch courses');
+        }
+        const data = await response.json();
+        return data.status === 'success' && Array.isArray(data.data) ? data.data : [];
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
 
 export default function CoursesPage() {
     const { toast } = useToast();
-    const [institute, setInstitute] = useState(() => mockInstitutes.find(i => i.id === instituteId));
-    const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+    const [instituteId, setInstituteId] = useState<string | null>('1'); // Hardcoded for now
 
-    const handleDeleteClick = (courseName: string) => {
-        setCourseToDelete(courseName);
+    useEffect(() => {
+        const token = sessionStorage.getItem('ukcas_token');
+        if (!token || !instituteId) {
+            setError('Authentication error or missing institute ID.');
+            setLoading(false);
+            return;
+        }
+
+        getCourses(instituteId, token)
+            .then(data => setCourses(data))
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+    }, [instituteId]);
+
+    const handleDeleteClick = (course: Course) => {
+        setCourseToDelete(course);
     };
 
-    const handleDeleteConfirm = () => {
-        if (courseToDelete && institute) {
-            const updatedCourses = institute.courses.filter(course => course !== courseToDelete);
-            setInstitute({ ...institute, courses: updatedCourses });
-            
+    const handleDeleteConfirm = async () => {
+        if (!courseToDelete) return;
+        const token = sessionStorage.getItem('ukcas_token');
+        if (!token) return;
+
+        try {
+            const response = await fetch(`/api/courses`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ id: courseToDelete.id }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete course');
+            }
+            setCourses(courses.filter(c => c.id !== courseToDelete.id));
             toast({
                 title: "Course Deleted",
-                description: `The course "${courseToDelete}" has been successfully removed.`,
+                description: `The course "${courseToDelete.course_name}" has been removed.`,
             });
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : 'An unknown error occurred';
+            toast({ variant: 'destructive', title: "Deletion Failed", description: msg });
+        } finally {
             setCourseToDelete(null);
         }
     };
-
-    if (!institute) {
-        return (
-            <div className="text-center text-muted-foreground">
-                <p>Institute data could not be loaded.</p>
-            </div>
-        );
-    }
+    
+    const CoursesSkeleton = () => (
+         <TableBody>
+            {[...Array(3)].map((_, i) => (
+                 <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                </TableRow>
+            ))}
+        </TableBody>
+    );
 
     return (
         <>
@@ -65,56 +115,76 @@ export default function CoursesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Course Name</TableHead>
+                                <TableHead>Course Code</TableHead>
+                                <TableHead>Duration</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
-                            {institute.courses.length > 0 ? (
-                                institute.courses.map((course, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell className="font-medium">{course}</TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
-                                                        <FilePenLine className="mr-2 h-4 w-4" />
-                                                        <span>Edit</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        className="text-red-500 focus:text-red-500"
-                                                        onClick={() => handleDeleteClick(course)}
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        <span>Delete</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
+                        {loading ? <CoursesSkeleton /> : error ? (
+                            <TableBody>
                                 <TableRow>
-                                    <TableCell colSpan={2} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-4">
-                                            <p className="text-muted-foreground">No courses have been added yet.</p>
-                                            <Button asChild size="sm">
-                                                <Link href="/dashboard/courses/new">
-                                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                                    Add Your First Course
-                                                </Link>
-                                            </Button>
+                                    <TableCell colSpan={4} className="h-48 text-center">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <AlertTriangle className="h-8 w-8 text-destructive" />
+                                            <p className="text-destructive font-medium">Failed to load courses.</p>
+                                            <p className="text-muted-foreground text-sm">{error}</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
+                            </TableBody>
+                        ) : (
+                            <TableBody>
+                                {courses.length > 0 ? (
+                                    courses.map((course) => (
+                                        <TableRow key={course.id}>
+                                            <TableCell className="font-medium">{course.course_name}</TableCell>
+                                            <TableCell>{course.course_code}</TableCell>
+                                            <TableCell>{course.duration}</TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/dashboard/courses/edit/${course.id}`}>
+                                                                <FilePenLine className="mr-2 h-4 w-4" />
+                                                                <span>Edit</span>
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            className="text-red-500 focus:text-red-500"
+                                                            onClick={() => handleDeleteClick(course)}
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            <span>Delete</span>
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-48 text-center">
+                                            <div className="flex flex-col items-center justify-center gap-4">
+                                                <p className="text-muted-foreground">No courses have been added yet.</p>
+                                                <Button asChild size="sm">
+                                                    <Link href="/dashboard/courses/new">
+                                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                                        Add Your First Course
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        )}
                     </Table>
                 </CardContent>
             </Card>
@@ -124,11 +194,11 @@ export default function CoursesPage() {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently delete the course <span className="font-semibold">"{courseToDelete}"</span> from your list. This action cannot be undone.
+                            This will permanently delete the course <span className="font-semibold">"{courseToDelete?.course_name}"</span>. This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setCourseToDelete(null)}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

@@ -7,29 +7,68 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { BookOpen, ArrowLeft } from "lucide-react";
+import { BookOpen, ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function NewCoursePage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setIsLoading(true);
+      
       const formData = new FormData(e.currentTarget);
-      const courseName = formData.get('courseName') as string;
+      const token = sessionStorage.getItem('ukcas_token');
+      const userData = sessionStorage.getItem('ukcas_user');
+      const user = userData ? JSON.parse(userData) : null;
+      
+      if (!token || !user) {
+          toast({ variant: 'destructive', title: "Authentication Error", description: "You must be logged in to create a course." });
+          setIsLoading(false);
+          return;
+      }
+      
+      const instituteId = 1; // Hardcoded for now, should come from user session/context
 
-      // In a real app, you would save this data to your database
-      console.log({
-          name: courseName,
-      });
+      const payload = {
+          institute_id: instituteId,
+          course_name: formData.get('courseName') as string,
+          course_code: formData.get('courseCode') as string,
+          description: formData.get('description') as string,
+          duration: formData.get('duration') as string,
+          created_by: user.user_name || 'system',
+          is_active: 1
+      };
 
-      toast({
-          title: "Course Added",
-          description: `The course "${courseName}" has been successfully added to your programs.`,
-      });
+      try {
+        const response = await fetch('/api/courses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+            body: JSON.stringify(payload),
+        });
 
-      router.push('/dashboard/courses');
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to create course.');
+        }
+
+        toast({
+            title: "Course Added",
+            description: `The course "${payload.course_name}" has been successfully added.`,
+        });
+
+        router.push('/dashboard/courses');
+
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "An unknown error occurred.";
+        toast({ variant: 'destructive', title: "Creation Failed", description: msg });
+        setIsLoading(false);
+      }
   };
 
   return (
@@ -52,17 +91,22 @@ export default function NewCoursePage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="courseName">Course Name</Label>
-              <Input id="courseName" name="courseName" placeholder="e.g., Bachelor of Science in Information Technology" required />
+              <Input id="courseName" name="courseName" placeholder="e.g., Bachelor of Science in Information Technology" required disabled={isLoading} />
             </div>
              <div className="space-y-2">
               <Label htmlFor="courseCode">Course Code (Optional)</Label>
-              <Input id="courseCode" name="courseCode" placeholder="e.g., BSIT-01" />
+              <Input id="courseCode" name="courseCode" placeholder="e.g., BSIT-01" disabled={isLoading} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="duration">Course Duration</Label>
-              <Input id="duration" name="duration" placeholder="e.g., 4 Years" required />
+              <Input id="duration" name="duration" placeholder="e.g., 4 Years" required disabled={isLoading} />
             </div>
-            <Button type="submit" className="w-full h-12 text-base" size="lg">
+             <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea id="description" name="description" placeholder="A brief description of the course." disabled={isLoading} />
+            </div>
+            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Add Course
             </Button>
           </form>
