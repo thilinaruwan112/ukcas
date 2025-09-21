@@ -12,7 +12,6 @@ class UserController
     }
     public function getAll()
     {
-        if (!$this->validateApiKey()) return;
         echo json_encode([
             'status' => 'success',
             'data' => $this->model->getAll()
@@ -20,7 +19,6 @@ class UserController
     }
     public function getById($id)
     {
-        if (!$this->validateApiKey()) return;
         echo json_encode([
             'status' => 'success',
             'data' => $this->model->getById($id)
@@ -28,7 +26,6 @@ class UserController
     }
     public function create()
     {
-        if (!$this->validateApiKey()) return;
         $data = json_decode(file_get_contents("php://input"), true);
         $user = $this->model->create($data);
         echo json_encode([
@@ -39,7 +36,6 @@ class UserController
     }
     public function update($id)
     {
-        if (!$this->validateApiKey()) return;
         $data = json_decode(file_get_contents("php://input"), true);
         $user = $this->model->update($id, $data);
         echo json_encode([
@@ -50,7 +46,6 @@ class UserController
     }
     public function delete($id)
     {
-        if (!$this->validateApiKey()) return;
         $deleted = $this->model->delete($id);
         echo json_encode([
             'status' => $deleted ? 'success' : 'error',
