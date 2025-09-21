@@ -40,7 +40,9 @@ export interface ApiInstitute {
 
 export interface UserInstituteAssignment {
     id: string;
-    institute: ApiInstitute;
+    institute_id: string;
+    user_account: string;
+    institute: ApiInstitute; // Can be partial until fully loaded
     role: string;
     created_at: string;
 }

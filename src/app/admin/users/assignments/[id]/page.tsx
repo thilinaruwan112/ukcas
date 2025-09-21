@@ -99,6 +99,14 @@ export default function ManageAssignmentsPage() {
         ]);
         setUser(userData);
         setAssignments(assignmentData);
+        
+        // Match full institute details from allInstitutes
+        const detailedAssignments = assignmentData.map(assignment => {
+            const instituteDetails = instituteData.find(inst => inst.id === assignment.institute_id);
+            return { ...assignment, institute: instituteDetails || assignment.institute };
+        }).filter(a => a.institute);
+        setAssignments(detailedAssignments);
+
         setAllInstitutes(instituteData);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to load assignment data.' });
@@ -336,6 +344,3 @@ function PageSkeleton() {
         </div>
     );
 }
-
-
-    

@@ -27,7 +27,7 @@ async function handleRequest(request: Request) {
             if (!userId) {
                 return NextResponse.json({ status: 'error', message: 'User ID is required.' }, { status: 400 });
             }
-            const fetchUrl = `${apiUrl}/user-institutes/${userId}`;
+            const fetchUrl = `${apiUrl}/user-institutes/by-account/${userId}`;
             const response = await fetch(fetchUrl, { headers });
             const data = await response.json();
             return NextResponse.json(data, { status: response.status });
