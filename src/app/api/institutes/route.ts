@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -12,6 +11,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const instituteId = searchParams.get('id');
     const searchTerm = searchParams.get('search');
+    const slug = searchParams.get('slug');
     
     let fetchUrl = `${apiUrl}/institutes`;
 
@@ -19,7 +19,10 @@ export async function GET(request: Request) {
         fetchUrl = `${apiUrl}/institutes/${instituteId}`;
     } else if (searchTerm) {
         fetchUrl = `${apiUrl}/institutes?search=${searchTerm}`;
+    } else if (slug) {
+        fetchUrl = `${apiUrl}/institutes/slug/${slug}`;
     }
+
 
     try {
         const response = await fetch(fetchUrl, {
@@ -35,7 +38,6 @@ export async function GET(request: Request) {
             return NextResponse.json({ status: 'error', message: data.message || 'An error occurred while fetching institutes from the external API.' }, { status: response.status });
         }
         
-        // The external API returns the array directly, so we just pass it on
         return NextResponse.json(data);
 
     } catch (error) {

@@ -7,13 +7,16 @@ import { Button } from '@/components/ui/button';
 import type { Metadata } from 'next';
 
 async function getInstituteBySlug(slug: string): Promise<ApiInstitute | null> {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
     try {
-        const response = await fetch(`https://ukcas-server.payshia.com/institutes/slug/${slug}`);
+        // Use the internal API route to securely fetch data
+        const response = await fetch(`${siteUrl}/api/institutes?slug=${slug}`);
         if (!response.ok) {
             return null;
         }
         const data = await response.json();
-        return data;
+        // The API might return an array if it finds by slug, so take the first result.
+        return Array.isArray(data) ? data[0] : data;
     } catch (error) {
         console.error('Failed to fetch institute:', error);
         return null;
