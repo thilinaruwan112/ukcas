@@ -1,6 +1,7 @@
 <?php
 // models/StudentCertificate.php
 class StudentCertificate
+
 {
     private $pdo;
     public function __construct($pdo)
@@ -72,5 +73,13 @@ class StudentCertificate
         $stmt = $this->pdo->prepare("SELECT sc.id, sc.institute_id, sc.course_id, sc.certificate_id, sc.student_id, sc.from_date, sc.to_date, sc.created_at, sc.created_by, sc.is_active, sc.approved_status, rs.name AS student_name FROM students_certificates sc LEFT JOIN registered_students rs ON sc.student_id = rs.id WHERE sc.institute_id = ?");
         $stmt->execute([$institute_id]);
         return $stmt->fetchAll();
+    }
+
+    // Update only the approved_status column
+    public function updateApprovedStatus($id, $status)
+    {
+        $stmt = $this->pdo->prepare("UPDATE students_certificates SET approved_status = ? WHERE id = ?");
+        $stmt->execute([$status, $id]);
+        return $stmt->rowCount() > 0;
     }
 }

@@ -15,6 +15,9 @@ return [
     'GET /students-certificates/institute/{institute_id}' => function ($institute_id) use ($controller) {
         $controller->getByInstituteId($institute_id);
     },
+    'PUT /students-certificates/{id}/approved-status/{status}' => function ($id, $status) use ($controller) {
+        $controller->updateApprovedStatus($id, $status);
+    },
     'POST /students-certificates/' => function () use ($controller) {
         $controller->create();
     },

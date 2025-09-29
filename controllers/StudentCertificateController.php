@@ -9,6 +9,25 @@ class StudentCertificateController
     {
         $this->model = new StudentCertificate($pdo);
     }
+
+    // Update approved_status of a certificate
+    public function updateApprovedStatus($id, $status)
+    {
+        $validStatuses = ['Pending', 'Approved', 'Rejected', 'Suspended'];
+        if (!in_array($status, $validStatuses)) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid approved status value.'
+            ]);
+            return;
+        }
+        $result = $this->model->updateApprovedStatus($id, $status);
+        echo json_encode([
+            'status' => $result ? 'success' : 'error',
+            'message' => $result ? 'Approved status updated.' : 'Update failed.'
+        ]);
+    }
+
     public function getAll()
     {
         echo json_encode([
