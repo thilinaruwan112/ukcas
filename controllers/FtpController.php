@@ -82,8 +82,8 @@ class FtpController
     // Validate image file
     private function validateImage($file)
     {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
+        $allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $maxSize = 10 * 1024 * 1024; // 5MB
 
         if (!in_array($file['type'], $allowedTypes)) {
             return 'Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.';
