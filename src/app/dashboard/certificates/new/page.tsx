@@ -1,11 +1,12 @@
 
+
 'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2, ArrowLeft, GraduationCap, AlertCircle } from "lucide-react";
+import { CalendarIcon, Loader2, ArrowLeft, GraduationCap, AlertCircle, CheckCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -95,6 +96,7 @@ export default function IssueCertificatePage() {
     const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [user, setUser] = useState<any>(null);
     const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
+    const [validationSuccessMessage, setValidationSuccessMessage] = useState<string | null>(null);
     const [isSelectionComplete, setIsSelectionComplete] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -145,13 +147,16 @@ export default function IssueCertificatePage() {
 
             if (existingCertificate) {
                 setDuplicateWarning(`A certificate for this student and course already exists (Status: ${existingCertificate.status}). Applying again is not allowed.`);
+                setValidationSuccessMessage(null);
                 setIsSelectionComplete(false);
             } else {
                 setDuplicateWarning(null);
+                setValidationSuccessMessage("Validation successful. You can now proceed.");
                 setIsSelectionComplete(true);
             }
         } else {
             setDuplicateWarning(null);
+            setValidationSuccessMessage(null);
             setIsSelectionComplete(false);
         }
     }, [watchedStudentId, watchedCourseId, certificates]);
@@ -275,6 +280,13 @@ export default function IssueCertificatePage() {
                                 <div className="flex items-center gap-3 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive dark:bg-destructive/20">
                                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
                                     <p className="font-semibold">{duplicateWarning}</p>
+                                </div>
+                            )}
+
+                             {validationSuccessMessage && (
+                                <div className="flex items-center gap-3 rounded-md border border-green-500/50 bg-green-500/10 p-3 text-sm text-green-700 dark:text-green-400 dark:bg-green-500/20">
+                                    <CheckCircle className="h-5 w-5 flex-shrink-0" />
+                                    <p className="font-semibold">{validationSuccessMessage}</p>
                                 </div>
                             )}
 
@@ -427,5 +439,7 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
+
+    
 
     
