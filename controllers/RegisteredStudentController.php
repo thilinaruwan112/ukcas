@@ -42,31 +42,51 @@ class RegisteredStudentController
             'student_photo'
         ];
 
-        $studentId = isset($data['student_id']) ? $data['student_id'] : (isset($data['id']) ? $data['id'] : null);
+        // Temporarily set file fields to empty before creation
+        foreach ($fileFields as $field) {
+            $data[$field] = '';
+        }
+
+        // Debug: echo initial data before creation
+        echo "<pre>Initial Data Before Create:\n";
+        print_r($data);
+        echo "</pre>";
+
+        // Create student first (without images)
+        $student = $this->model->create($data);
+        $studentId = $student['id'];
+
+        // Now upload images using the new studentId
+        $updateData = [];
         foreach ($fileFields as $field) {
             if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
                 $file = $_FILES[$field];
-                if ($studentId) {
-                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
-                    $safeName = preg_replace('/\s+/', '-', trim($safeName));
-                    $safeName = strtolower($safeName);
-                    $ftpPath = "/students/$studentId/$field-$safeName.$ext";
-                    $result = $ftpController->uploadImage($file, $ftpPath);
-                    if (isset($result['status']) && $result['status'] === 'success') {
-                        $data[$field] = $ftpPath;
-                    } else {
-                        $data[$field] = '';
-                    }
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
+                $safeName = preg_replace('/\s+/', '-', trim($safeName));
+                $safeName = strtolower($safeName);
+                $ftpPath = "/students/$studentId/$field-$safeName.$ext";
+                $result = $ftpController->uploadImage($file, $ftpPath);
+                if (isset($result['status']) && $result['status'] === 'success') {
+                    $updateData[$field] = $ftpPath;
                 } else {
-                    $data[$field] = '';
+                    $updateData[$field] = '';
                 }
             } else {
-                $data[$field] = isset($_POST[$field]) ? $_POST[$field] : '';
+                $updateData[$field] = '';
             }
         }
 
-        $student = $this->model->create($data);
+        // Debug: echo updateData after image upload
+        echo "<pre>Update Data After Image Upload:\n";
+        print_r($updateData);
+        echo "</pre>";
+
+        // Update student record with image paths
+        if (!empty($updateData)) {
+            $student = $this->model->update($studentId, array_merge($student, $updateData));
+        }
+
         echo json_encode([
             'status' => 'success',
             'message' => 'Student registered successfully.',
