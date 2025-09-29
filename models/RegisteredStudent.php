@@ -10,12 +10,12 @@ class RegisteredStudent
 
     public function getAll()
     {
-        $stmt = $this->pdo->query("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status FROM registered_students");
+        $stmt = $this->pdo->query("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status, institute_id FROM registered_students");
         return $stmt->fetchAll();
     }
     public function getById($id)
     {
-        $stmt = $this->pdo->prepare("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status FROM registered_students WHERE id = ?");
+        $stmt = $this->pdo->prepare("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status, institute_id FROM registered_students WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
@@ -72,7 +72,7 @@ class RegisteredStudent
     // Get students by institute_id
     public function getByInstituteId($institute_id)
     {
-        $stmt = $this->pdo->prepare("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status FROM registered_students WHERE institute_id = ?");
+        $stmt = $this->pdo->prepare("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status, institute_id FROM registered_students WHERE institute_id = ?");
         $stmt->execute([$institute_id]);
         return $stmt->fetchAll();
     }

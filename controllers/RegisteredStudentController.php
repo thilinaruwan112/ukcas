@@ -31,6 +31,8 @@ class RegisteredStudentController
     public function create()
     {
         $data = $_POST;
+        // Ensure institute_id is always set
+        $data['institute_id'] = $_POST['institute_id'] ?? '';
         require_once './controllers/FtpController.php';
         $ftpController = new FtpController($GLOBALS['pdo']);
 
@@ -46,11 +48,6 @@ class RegisteredStudentController
         foreach ($fileFields as $field) {
             $data[$field] = '';
         }
-
-        // // Debug: echo initial data before creation
-        // echo "<pre>Initial Data Before Create:\n";
-        // print_r($data);
-        // echo "</pre>";
 
         // Create student first (without images)
         $student = $this->model->create($data);
@@ -77,11 +74,7 @@ class RegisteredStudentController
             }
         }
 
-        // // Debug: echo updateData after image upload
-        // echo "<pre>Update Data After Image Upload:\n";
-        // print_r($updateData);
-        // echo "</pre>";
-
+        // var_dump($updateData);
         // Update student record with image paths
         if (!empty($updateData)) {
             $student = $this->model->update($studentId, array_merge($student, $updateData));
