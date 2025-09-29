@@ -2,6 +2,7 @@
 
 
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -110,5 +111,6 @@ export interface Student {
   phone_number: string;
   created_at: string;
 }
+
 
 
