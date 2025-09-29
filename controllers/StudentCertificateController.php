@@ -26,6 +26,8 @@ class StudentCertificateController
     public function create()
     {
         $data = json_decode(file_get_contents("php://input"), true);
+        // Generate a random 6-digit certificate_id if not provided
+        $data['certificate_id'] = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
         $certificate = $this->model->create($data);
         echo json_encode([
             'status' => 'success',
