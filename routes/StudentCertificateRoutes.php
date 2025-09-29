@@ -15,8 +15,11 @@ return [
     'GET /students-certificates/institute/{institute_id}' => function ($institute_id) use ($controller) {
         $controller->getByInstituteId($institute_id);
     },
-    'PUT /students-certificates/{id}/approved-status/{status}' => function ($id, $status) use ($controller) {
-        $controller->updateApprovedStatus($id, $status);
+    'POST /students-certificates/approved-status' => function () use ($controller) {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $certificate_id = $input['certificate_id'] ?? null;
+        $status = $input['status'] ?? null;
+        $controller->updateApprovedStatus($certificate_id, $status);
     },
     'POST /students-certificates/' => function () use ($controller) {
         $controller->create();

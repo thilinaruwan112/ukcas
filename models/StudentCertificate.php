@@ -76,10 +76,10 @@ class StudentCertificate
     }
 
     // Update only the approved_status column
-    public function updateApprovedStatus($id, $status)
+    public function updateApprovedStatus($certificate_id, $status)
     {
-        $stmt = $this->pdo->prepare("UPDATE students_certificates SET approved_status = ? WHERE id = ?");
-        $stmt->execute([$status, $id]);
+        $stmt = $this->pdo->prepare("UPDATE students_certificates SET approved_status = ? WHERE certificate_id = ?");
+        $stmt->execute([$status, $certificate_id]);
         return $stmt->rowCount() > 0;
     }
 }

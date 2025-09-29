@@ -11,7 +11,7 @@ class StudentCertificateController
     }
 
     // Update approved_status of a certificate
-    public function updateApprovedStatus($id, $status)
+    public function updateApprovedStatus($certificate_id, $status)
     {
         $validStatuses = ['Pending', 'Approved', 'Rejected', 'Suspended'];
         if (!in_array($status, $validStatuses)) {
@@ -21,7 +21,7 @@ class StudentCertificateController
             ]);
             return;
         }
-        $result = $this->model->updateApprovedStatus($id, $status);
+        $result = $this->model->updateApprovedStatus($certificate_id, $status);
         echo json_encode([
             'status' => $result ? 'success' : 'error',
             'message' => $result ? 'Approved status updated.' : 'Update failed.'
