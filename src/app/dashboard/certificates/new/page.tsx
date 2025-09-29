@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2, ArrowLeft, GraduationCap } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -24,14 +24,14 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { mockInstitutes, mockStudents } from "@/lib/mock-data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Student, Course, ApiInstitute } from "@/lib/types";
 
 const CERTIFICATE_COST = 10;
 
 const formSchema = z.object({
   studentId: z.string({ required_error: "Please select a student." }),
-  courseName: z.string({
+  courseId: z.string({
     required_error: "Please select a course.",
   }),
   issueDate: z.date({
@@ -39,22 +39,77 @@ const formSchema = z.object({
   }),
 });
 
+async function getStudents(instituteId: string, token: string): Promise<Student[]> {
+    try {
+        const response = await fetch(`/api/students?instituteId=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.status === 'success' ? data.data : [];
+    } catch {
+        return [];
+    }
+}
+
+async function getCourses(instituteId: string, token: string): Promise<Course[]> {
+    try {
+        const response = await fetch(`/api/courses?instituteId=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.status === 'success' ? data.data : [];
+    } catch {
+        return [];
+    }
+}
+
 export default function IssueCertificatePage() {
     const { toast } = useToast();
     const router = useRouter();
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     
-    // In a real app, this would come from a user session or context.
-    const [institute, setInstitute] = React.useState(mockInstitutes.find(i => i.id === '1')); 
-    const [students, setStudents] = React.useState(mockStudents);
+    const [institute, setInstitute] = useState<ApiInstitute | null>(null);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [courses, setCourses] = useState<Course[]>([]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {},
     });
 
+    useEffect(() => {
+        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        const token = sessionStorage.getItem('ukcas_token');
+        const instituteDataStr = sessionStorage.getItem('ukcas_active_institute');
+
+        if (!instituteId || !token || !instituteDataStr) {
+            toast({ variant: "destructive", title: "Error", description: "You must be logged in and have an institute selected." });
+            router.push('/admin/select-institute');
+            return;
+        }
+
+        setInstitute(JSON.parse(instituteDataStr));
+
+        async function fetchData() {
+            setIsLoading(true);
+            const [studentsData, coursesData] = await Promise.all([
+                getStudents(instituteId, token),
+                getCourses(instituteId, token),
+            ]);
+            setStudents(studentsData);
+            setCourses(coursesData);
+            setIsLoading(false);
+        }
+
+        fetchData();
+    }, [router, toast]);
+
+
     function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsLoading(true);
+        setIsSubmitting(true);
 
         // Simulate API call and balance check
         setTimeout(() => {
@@ -64,23 +119,26 @@ export default function IssueCertificatePage() {
                     title: "Error",
                     description: "Could not identify your institution.",
                 });
-                setIsLoading(false);
+                setIsSubmitting(false);
                 return;
             }
 
-            if (institute.balance < CERTIFICATE_COST) {
+            const currentBalance = Number(institute.balance) || 0;
+            if (currentBalance < CERTIFICATE_COST) {
                 toast({
                     variant: "destructive",
                     title: "Insufficient Balance",
-                    description: `You need at least $${CERTIFICATE_COST.toFixed(2)} to issue a certificate. Your current balance is $${institute.balance.toFixed(2)}.`,
+                    description: `You need at least $${CERTIFICATE_COST.toFixed(2)} to issue a certificate. Your current balance is $${currentBalance.toFixed(2)}.`,
                 });
-                setIsLoading(false);
+                setIsSubmitting(false);
                 return;
             }
             
             // Deduct balance and create pending certificate (simulation)
-            const newBalance = institute.balance - CERTIFICATE_COST;
-            setInstitute({...institute, balance: newBalance });
+            const newBalance = currentBalance - CERTIFICATE_COST;
+            const updatedInstitute = { ...institute, balance: newBalance };
+            sessionStorage.setItem('ukcas_active_institute', JSON.stringify(updatedInstitute));
+            setInstitute(updatedInstitute);
 
             const studentName = students.find(s => s.id === values.studentId)?.name || 'Unknown Student';
             
@@ -124,15 +182,16 @@ export default function IssueCertificatePage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Student's Full Name</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                                             <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select a registered student" />
+                                                <SelectValue placeholder={isLoading ? "Loading students..." : "Select a registered student"} />
                                             </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
+                                                {!isLoading && students.length === 0 && <p className="p-4 text-sm text-muted-foreground">No students found.</p>}
                                                 {students.map(student => (
-                                                    <SelectItem key={student.id} value={student.id}>{student.name}</SelectItem>
+                                                    <SelectItem key={student.id} value={String(student.id)}>{student.name}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -142,19 +201,20 @@ export default function IssueCertificatePage() {
                             />
                             <FormField
                                 control={form.control}
-                                name="courseName"
+                                name="courseId"
                                 render={({ field }) => (
                                     <FormItem>
                                     <FormLabel>Course or Qualification Name</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                                         <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a course from your programs" />
-                                        </SelectTrigger>
+                                            <SelectValue placeholder={isLoading ? "Loading courses..." : "Select a course"} />
+                                        </Trigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {institute?.courses.map(course => (
-                                                <SelectItem key={course} value={course}>{course}</SelectItem>
+                                             {!isLoading && courses.length === 0 && <p className="p-4 text-sm text-muted-foreground">No courses found.</p>}
+                                            {courses.map(course => (
+                                                <SelectItem key={course.id} value={String(course.id)}>{course.course_name}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -203,9 +263,9 @@ export default function IssueCertificatePage() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Submit for Approval
+                            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting || isLoading}>
+                            {(isSubmitting || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
                             </Button>
                         </form>
                     </Form>

@@ -1,6 +1,7 @@
 
 
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -108,7 +109,6 @@ export interface Student {
   email_address: string;
   phone_number: string;
   created_at: string;
-  course?: string; // Kept for mock data compatibility if needed elsewhere
-  joinedDate?: string; // Kept for mock data compatibility if needed elsewhere
 }
+
 
