@@ -49,4 +49,12 @@ class StudentCertificate
         $stmt->execute([$id]);
         return $stmt->rowCount() > 0;
     }
+
+    // Get students by institute_id
+    public function getByInstituteId($institute_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT id, institute_id, course_id, certificate_id, created_at, created_by, is_active FROM students_certificates WHERE institute_id = ?");
+        $stmt->execute([$institute_id]);
+        return $stmt->fetchAll();
+    }
 }

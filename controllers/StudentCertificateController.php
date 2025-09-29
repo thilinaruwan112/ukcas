@@ -51,4 +51,14 @@ class StudentCertificateController
             'message' => $deleted ? 'Certificate deleted successfully.' : 'Certificate not found.'
         ]);
     }
+
+    // Get students by institute_id
+    public function getByInstituteId($institute_id)
+    {
+        $result = $this->model->getByInstituteId($institute_id);
+        echo json_encode([
+            'status' => 'success',
+            'data' => $result
+        ]);
+    }
 }
