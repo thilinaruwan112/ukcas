@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, FileDown, AlertTriangle, Loader2 } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, FileDown, AlertTriangle, Loader2, Mail, Phone, Calendar } from "lucide-react";
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
 
 async function getStudents(instituteId: string, token: string): Promise<Student[]> {
     try {
@@ -65,7 +66,7 @@ export default function StudentListPage() {
 
     const filteredStudents = students.filter(student =>
         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email_address.toLowerCase().includes(searchTerm.toLowerCase())
+        (student.email_address && student.email_address.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const handleDeleteClick = (student: Student) => {
@@ -130,78 +131,146 @@ export default function StudentListPage() {
             </div>
             <Card>
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Student Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Phone</TableHead>
-                                <TableHead>Registered Date</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                       
-                        {loading ? <StudentsSkeleton /> : error ? (
-                             <TableBody>
+                    <div className="hidden md:block">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <AlertTriangle className="h-8 w-8 text-destructive" />
-                                            <p className="text-destructive font-medium">Failed to load students.</p>
-                                            <p className="text-muted-foreground text-sm">{error}</p>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead>Student Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Phone</TableHead>
+                                    <TableHead>Registered Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            </TableBody>
-                        ) : (
-                             <TableBody>
-                                {filteredStudents.length > 0 ? (
-                                    filteredStudents.map((student) => (
-                                    <TableRow key={student.id}>
-                                        <TableCell className="font-medium">{student.name}</TableCell>
-                                        <TableCell>{student.email_address}</TableCell>
-                                        <TableCell>{student.phone_number}</TableCell>
-                                        <TableCell>{new Date(student.created_at).toLocaleDateString()}</TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
-                                                        <UserCog className="mr-2 h-4 w-4" />
-                                                        <span>Edit Details</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        className="text-red-500 focus:text-red-500"
-                                                        onClick={() => handleDeleteClick(student)}
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        <span>Remove Student</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    ))
-                                ) : (
+                            </TableHeader>
+                        
+                            {loading ? <StudentsSkeleton /> : error ? (
+                                <TableBody>
                                     <TableRow>
                                         <TableCell colSpan={5} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-4">
-                                                <p className="text-muted-foreground">
-                                                    {searchTerm ? `No students found for "${searchTerm}".` : "No students have been registered yet."}
-                                                </p>
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                                <p className="text-destructive font-medium">Failed to load students.</p>
+                                                <p className="text-muted-foreground text-sm">{error}</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
+                                </TableBody>
+                            ) : (
+                                <TableBody>
+                                    {filteredStudents.length > 0 ? (
+                                        filteredStudents.map((student) => (
+                                        <TableRow key={student.id}>
+                                            <TableCell className="font-medium">{student.name}</TableCell>
+                                            <TableCell>{student.email_address}</TableCell>
+                                            <TableCell>{student.phone_number}</TableCell>
+                                            <TableCell>{new Date(student.created_at).toLocaleDateString()}</TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem>
+                                                            <UserCog className="mr-2 h-4 w-4" />
+                                                            <span>Edit Details</span>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            className="text-red-500 focus:text-red-500"
+                                                            onClick={() => handleDeleteClick(student)}
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            <span>Remove Student</span>
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-48 text-center">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <p className="text-muted-foreground">
+                                                        {searchTerm ? `No students found for "${searchTerm}".` : "No students have been registered yet."}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            )}
+                        </Table>
+                    </div>
+                    <div className="block md:hidden p-4 space-y-4">
+                        {loading ? (
+                            [...Array(5)].map((_, i) => (
+                                <div key={i} className="rounded-lg border p-4 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <Skeleton className="h-5 w-3/5" />
+                                        <Skeleton className="h-8 w-8" />
+                                    </div>
+                                    <Separator />
+                                    <div className="space-y-2 text-sm">
+                                        <Skeleton className="h-4 w-4/5" />
+                                        <Skeleton className="h-4 w-3/5" />
+                                        <Skeleton className="h-4 w-2/5" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : error ? (
+                             <div className="flex flex-col items-center justify-center gap-2 p-8">
+                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                <p className="text-destructive font-medium">Failed to load students.</p>
+                                <p className="text-muted-foreground text-sm text-center">{error}</p>
+                            </div>
+                        ) : filteredStudents.length > 0 ? (
+                            filteredStudents.map((student) => (
+                                <div key={student.id} className="rounded-lg border p-4 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <h3 className="font-semibold pr-2">{student.name}</h3>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem>
+                                                    <UserCog className="mr-2 h-4 w-4" />
+                                                    <span>Edit Details</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    className="text-red-500 focus:text-red-500"
+                                                    onClick={() => handleDeleteClick(student)}
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    <span>Remove Student</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                    <Separator />
+                                    <div className="space-y-2 text-sm text-muted-foreground">
+                                        {student.email_address && <p className="flex items-center gap-2"><Mail size={14} /> {student.email_address}</p>}
+                                        {student.phone_number && <p className="flex items-center gap-2"><Phone size={14} /> {student.phone_number}</p>}
+                                        <p className="flex items-center gap-2"><Calendar size={14} /> Registered: {new Date(student.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                             <div className="text-center text-muted-foreground py-12">
+                                <p>
+                                    {searchTerm ? `No students found for "${searchTerm}".` : "No students have been registered yet."}
+                                </p>
+                            </div>
                         )}
-                    </Table>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -227,3 +296,5 @@ export default function StudentListPage() {
         </>
     );
 }
+
+    

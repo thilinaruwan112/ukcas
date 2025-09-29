@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2 } from "lucide-react";
+import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2 } from "lucide-react";
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,7 @@ import type { Certificate } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
 
 async function getCertificates(instituteId: string, token: string): Promise<Certificate[]> {
     try {
@@ -116,81 +117,141 @@ export default function CertificateListPage() {
             </div>
             <Card>
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Certificate ID</TableHead>
-                                <TableHead>Student Name</TableHead>
-                                <TableHead>Course</TableHead>
-                                <TableHead>Issue Date</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        {loading ? <CertificatesSkeleton /> : error ? (
-                             <TableBody>
+                    <div className="hidden md:block">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <AlertTriangle className="h-8 w-8 text-destructive" />
-                                            <p className="text-destructive font-medium">Failed to load certificates.</p>
-                                            <p className="text-muted-foreground text-sm">{error}</p>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead>Certificate ID</TableHead>
+                                    <TableHead>Student Name</TableHead>
+                                    <TableHead>Course</TableHead>
+                                    <TableHead>Issue Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            </TableBody>
-                        ) : (
-                            <TableBody>
-                                {filteredCertificates.length > 0 ? (
-                                    filteredCertificates.map((cert) => (
-                                    <TableRow key={cert.id}>
-                                        <TableCell className="font-mono">{cert.id}</TableCell>
-                                        <TableCell className="font-medium">{cert.studentName}</TableCell>
-                                        <TableCell>{cert.courseName}</TableCell>
-                                        <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
-                                        <TableCell>
-                                            <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
-                                                {cert.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
-                                                        <FilePenLine className="mr-2 h-4 w-4" />
-                                                        <span>View/Edit</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-red-500 focus:text-red-500">
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        <span>Revoke</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    ))
-                                ) : (
+                            </TableHeader>
+                            {loading ? <CertificatesSkeleton /> : error ? (
+                                <TableBody>
                                     <TableRow>
                                         <TableCell colSpan={6} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-4">
-                                                <p className="text-muted-foreground">
-                                                    {searchTerm ? `No certificates found for "${searchTerm}".` : "No certificates have been issued yet."}
-                                                </p>
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                                <p className="text-destructive font-medium">Failed to load certificates.</p>
+                                                <p className="text-muted-foreground text-sm">{error}</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
+                                </TableBody>
+                            ) : (
+                                <TableBody>
+                                    {filteredCertificates.length > 0 ? (
+                                        filteredCertificates.map((cert) => (
+                                        <TableRow key={cert.id}>
+                                            <TableCell className="font-mono">{cert.id}</TableCell>
+                                            <TableCell className="font-medium">{cert.studentName}</TableCell>
+                                            <TableCell>{cert.courseName}</TableCell>
+                                            <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
+                                                    {cert.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem>
+                                                            <FilePenLine className="mr-2 h-4 w-4" />
+                                                            <span>View/Edit</span>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-red-500 focus:text-red-500">
+                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            <span>Revoke</span>
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="h-48 text-center">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <p className="text-muted-foreground">
+                                                        {searchTerm ? `No certificates found for "${searchTerm}".` : "No certificates have been issued yet."}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            )}
+                        </Table>
+                    </div>
+
+                     <div className="block md:hidden p-4 space-y-4">
+                        {loading ? (
+                             [...Array(5)].map((_, i) => (
+                                <div key={i} className="rounded-lg border p-4 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1.5">
+                                            <Skeleton className="h-5 w-36" />
+                                            <Skeleton className="h-4 w-48" />
+                                        </div>
+                                         <Skeleton className="h-6 w-20 rounded-full" />
+                                    </div>
+                                    <Separator />
+                                    <div className="space-y-2 text-sm">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-1/2" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : error ? (
+                             <div className="flex flex-col items-center justify-center gap-2 p-8">
+                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                <p className="text-destructive font-medium">Failed to load certificates.</p>
+                                <p className="text-muted-foreground text-sm text-center">{error}</p>
+                            </div>
+                        ) : filteredCertificates.length > 0 ? (
+                            filteredCertificates.map((cert) => (
+                                <div key={cert.id} className="rounded-lg border p-4 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-semibold flex items-center gap-2"><User size={16} />{cert.studentName}</h3>
+                                            <p className="text-sm text-muted-foreground font-mono flex items-center gap-2"><FileCheck2 size={16} />{cert.id}</p>
+                                        </div>
+                                        <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
+                                            {cert.status}
+                                        </Badge>
+                                    </div>
+                                    <Separator />
+                                    <div className="space-y-2 text-sm text-muted-foreground">
+                                        <p className="flex items-center gap-2"><Book size={16} /> {cert.courseName}</p>
+                                        <p className="flex items-center gap-2"><Calendar size={16} /> Issued: {new Date(cert.issueDate).toLocaleDateString()}</p>
+                                    </div>
+                                     <div className="mt-3 flex justify-end gap-2">
+                                        <Button size="sm" variant="outline"><FilePenLine className="mr-2 h-4 w-4" /> Edit</Button>
+                                        <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"><Trash2 className="mr-2 h-4 w-4" /> Revoke</Button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                             <div className="text-center text-muted-foreground py-12">
+                                <p>
+                                    {searchTerm ? `No certificates found for "${searchTerm}".` : "No certificates have been issued yet."}
+                                </p>
+                            </div>
                         )}
-                    </Table>
+                    </div>
                 </CardContent>
             </Card>
         </>
     );
 }
+
+    

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { PlusCircle, MoreHorizontal, FilePenLine, Trash2, AlertTriangle, Loader2 } from "lucide-react";
+import { PlusCircle, MoreHorizontal, FilePenLine, Trash2, AlertTriangle, Loader2, Book, Clock } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import type { Course } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -120,81 +120,157 @@ export default function CoursesPage() {
             </div>
             <Card>
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Course Name</TableHead>
-                                <TableHead>Course Code</TableHead>
-                                <TableHead>Duration</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        {loading ? <CoursesSkeleton /> : error ? (
-                            <TableBody>
+                    <div className="hidden md:block">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <AlertTriangle className="h-8 w-8 text-destructive" />
-                                            <p className="text-destructive font-medium">Failed to load courses.</p>
-                                            <p className="text-muted-foreground text-sm">{error}</p>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead>Course Name</TableHead>
+                                    <TableHead>Course Code</TableHead>
+                                    <TableHead>Duration</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            </TableBody>
-                        ) : (
-                            <TableBody>
-                                {courses.length > 0 ? (
-                                    courses.map((course) => (
-                                        <TableRow key={course.id}>
-                                            <TableCell className="font-medium">{course.course_name}</TableCell>
-                                            <TableCell>{course.course_code}</TableCell>
-                                            <TableCell>{course.duration}</TableCell>
-                                            <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem asChild>
-                                                            <Link href={`/dashboard/courses/edit/${course.id}`}>
-                                                                <FilePenLine className="mr-2 h-4 w-4" />
-                                                                <span>Edit</span>
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem
-                                                            className="text-red-500 focus:text-red-500"
-                                                            onClick={() => handleDeleteClick(course)}
-                                                        >
-                                                            <Trash2 className="mr-2 h-4 w-4" />
-                                                            <span>Delete</span>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
+                            </TableHeader>
+                            {loading ? <CoursesSkeleton /> : error ? (
+                                <TableBody>
                                     <TableRow>
                                         <TableCell colSpan={4} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-4">
-                                                <p className="text-muted-foreground">No courses have been added yet.</p>
-                                                <Button asChild size="sm">
-                                                    <Link href="/dashboard/courses/new">
-                                                        <PlusCircle className="mr-2 h-4 w-4" />
-                                                        Add Your First Course
-                                                    </Link>
-                                                </Button>
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                                <p className="text-destructive font-medium">Failed to load courses.</p>
+                                                <p className="text-muted-foreground text-sm">{error}</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
+                                </TableBody>
+                            ) : (
+                                <TableBody>
+                                    {courses.length > 0 ? (
+                                        courses.map((course) => (
+                                            <TableRow key={course.id}>
+                                                <TableCell className="font-medium">{course.course_name}</TableCell>
+                                                <TableCell>{course.course_code}</TableCell>
+                                                <TableCell>{course.duration}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                <span className="sr-only">Open menu</span>
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={`/dashboard/courses/edit/${course.id}`}>
+                                                                    <FilePenLine className="mr-2 h-4 w-4" />
+                                                                    <span>Edit</span>
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem
+                                                                className="text-red-500 focus:text-red-500"
+                                                                onClick={() => handleDeleteClick(course)}
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                <span>Delete</span>
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="h-48 text-center">
+                                                <div className="flex flex-col items-center justify-center gap-4">
+                                                    <p className="text-muted-foreground">No courses have been added yet.</p>
+                                                    <Button asChild size="sm">
+                                                        <Link href="/dashboard/courses/new">
+                                                            <PlusCircle className="mr-2 h-4 w-4" />
+                                                            Add Your First Course
+                                                        </Link>
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            )}
+                        </Table>
+                    </div>
+
+                    <div className="block md:hidden p-4 space-y-4">
+                         {loading ? (
+                            [...Array(3)].map((_, i) => (
+                                 <Card key={i} className="p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1.5">
+                                            <Skeleton className="h-5 w-48" />
+                                            <Skeleton className="h-4 w-24" />
+                                        </div>
+                                        <Skeleton className="h-8 w-8" />
+                                    </div>
+                                </Card>
+                            ))
+                        ) : error ? (
+                             <div className="flex flex-col items-center justify-center gap-2 p-8">
+                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                <p className="text-destructive font-medium">Failed to load courses.</p>
+                                <p className="text-muted-foreground text-sm text-center">{error}</p>
+                            </div>
+                        ) : courses.length > 0 ? (
+                            courses.map((course) => (
+                                <Card key={course.id} className="p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1 pr-2">
+                                            <h3 className="font-semibold">{course.course_name}</h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{course.course_code || 'N/A'}</span>
+                                            </p>
+                                            <p className="text-sm text-muted-foreground flex items-center gap-1.5 pt-1">
+                                                <Clock size={14} />{course.duration}
+                                            </p>
+                                        </div>
+                                         <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0 flex-shrink-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/dashboard/courses/edit/${course.id}`}>
+                                                        <FilePenLine className="mr-2 h-4 w-4" />
+                                                        <span>Edit</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    className="text-red-500 focus:text-red-500"
+                                                    onClick={() => handleDeleteClick(course)}
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    <span>Delete</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </Card>
+                            ))
+                        ) : (
+                             <div className="text-center text-muted-foreground py-12 px-4">
+                                <Book className="mx-auto h-12 w-12 text-gray-400" />
+                                <h3 className="mt-2 text-lg font-medium">No Courses Found</h3>
+                                <p className="mt-1 text-sm">Get started by adding your first course.</p>
+                                <Button asChild size="sm" className="mt-4">
+                                     <Link href="/dashboard/courses/new">
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Add Course
+                                    </Link>
+                                </Button>
+                            </div>
                         )}
-                    </Table>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -220,3 +296,5 @@ export default function CoursesPage() {
         </>
     );
 }
+
+    
