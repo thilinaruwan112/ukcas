@@ -7,55 +7,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building, Eye, X, BookUser } from "lucide-react";
-import Link from 'next/link';
-import { AdminUser, ApiInstitute } from '@/lib/types';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Wallet, Loader2, AlertTriangle } from "lucide-react";
+import type { ApiInstitute } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-
 
 export default function InstitutePaymentsPage() {
     const router = useRouter();
     const { toast } = useToast();
-    const [users, setUsers] = useState<AdminUser[]>([]);
+    const [institutes, setInstitutes] = useState<ApiInstitute[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
-    const [userToTopUp, setUserToTopUp] = useState<AdminUser | null>(null);
+    const [instituteToTopUp, setInstituteToTopUp] = useState<ApiInstitute | null>(null);
     const [topUpAmount, setTopUpAmount] = useState(0);
 
-    const fetchUsers = async () => {
+    const fetchInstitutes = async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/users');
+            const response = await fetch('/api/institutes');
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                throw new Error(errorData.message || `Failed to fetch users`);
+                throw new Error(errorData.message || `Failed to fetch institutes`);
             }
             const data = await response.json();
-            if (data.status === 'success' && Array.isArray(data.data)) {
-                const formattedUsers: AdminUser[] = data.data.map((user: any) => ({
-                    id: user.id,
-                    userName: user.user_name,
-                    instituteName: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.user_name,
-                    instituteAddress: [user.addressl1, user.addressl2, user.city].filter(Boolean).join(', '),
-                    registeredDate: user.created_at,
-                    email: user.email,
-                    balance: user.balance || 0,
-                    assignedInstitutes: user.institutes || [],
-                }));
-                setUsers(formattedUsers);
-            } else {
-                throw new Error(data.message || "Invalid data structure received from server.");
-            }
+            setInstitutes(Array.isArray(data) ? data : []);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
             setError(errorMessage);
@@ -65,49 +44,49 @@ export default function InstitutePaymentsPage() {
     };
     
     useEffect(() => {
-        fetchUsers();
+        fetchInstitutes();
     }, []);
 
 
-    const filteredUsers = users.filter(user =>
-        user.instituteName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredInstitutes = institutes.filter(institute =>
+        institute.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        institute.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleEditClick = (userId: string) => router.push(`/admin/users/edit/${userId}`);
-    const handleTopUpClick = (user: AdminUser) => setUserToTopUp(user);
+    const handleTopUpClick = (institute: ApiInstitute) => setInstituteToTopUp(institute);
 
     
     const handleTopUpConfirm = async () => {
-        if (!userToTopUp || topUpAmount <= 0) return;
+        if (!instituteToTopUp || topUpAmount <= 0) return;
+        const currentBalance = instituteToTopUp.balance || 0;
 
         try {
             const token = sessionStorage.getItem('ukcas_token');
-            const response = await fetch('/api/users', {
+            const response = await fetch('/api/institutes', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ id: userToTopUp.id, balance: userToTopUp.balance + topUpAmount }),
+                body: JSON.stringify({ id: instituteToTopUp.id, balance: currentBalance + topUpAmount }),
             });
             
             const result = await response.json();
-            if (!response.ok || result.status !== 'success') {
+            if (!response.ok) {
                  throw new Error(result.message || 'Failed to update balance.');
             }
             
-            setUsers(users.map(user => 
-                user.id === userToTopUp.id 
-                    ? { ...user, balance: user.balance + topUpAmount } 
-                    : user
+            setInstitutes(institutes.map(inst => 
+                inst.id === instituteToTopUp.id 
+                    ? { ...inst, balance: currentBalance + topUpAmount } 
+                    : inst
             ));
             toast({
                 title: "Balance Updated",
-                description: `Added $${topUpAmount.toFixed(2)} to ${userToTopUp.instituteName}'s balance.`,
+                description: `Added $${topUpAmount.toFixed(2)} to ${instituteToTopUp.name}'s balance.`,
             });
         } catch(error) {
              const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
             toast({ variant: 'destructive', title: 'Update Failed', description: errorMessage });
         } finally {
-             setUserToTopUp(null);
+             setInstituteToTopUp(null);
              setTopUpAmount(0);
         }
     };
@@ -118,9 +97,9 @@ export default function InstitutePaymentsPage() {
                 <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
                 </TableRow>
             ))}
         </TableBody>
@@ -136,7 +115,7 @@ export default function InstitutePaymentsPage() {
                 <div className="flex w-full sm:w-auto sm:justify-end items-center gap-2">
                      <div className="relative w-full sm:w-64">
                         <Input
-                            placeholder="Search users..."
+                            placeholder="Search institutes..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -148,10 +127,10 @@ export default function InstitutePaymentsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>User/Institute Name</TableHead>
+                                <TableHead>Institute Name</TableHead>
                                 <TableHead>Balance</TableHead>
-                                <TableHead>Registered Date</TableHead>
                                 <TableHead>Email</TableHead>
+                                <TableHead>Country</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -162,21 +141,21 @@ export default function InstitutePaymentsPage() {
                                         <TableCell colSpan={5} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <AlertTriangle className="h-8 w-8 text-destructive" />
-                                                <p className="text-destructive font-medium">Failed to load users.</p>
+                                                <p className="text-destructive font-medium">Failed to load institutes.</p>
                                                 <p className="text-muted-foreground text-sm">{error}</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {!error && filteredUsers.length > 0 ? (
-                                    filteredUsers.map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell className="font-medium">{user.instituteName}</TableCell>
-                                        <TableCell>${user.balance.toFixed(2)}</TableCell>
-                                        <TableCell>{new Date(user.registeredDate).toLocaleDateString()}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
+                                {!error && filteredInstitutes.length > 0 ? (
+                                    filteredInstitutes.map((institute) => (
+                                    <TableRow key={institute.id}>
+                                        <TableCell className="font-medium">{institute.name}</TableCell>
+                                        <TableCell>${(institute.balance || 0).toFixed(2)}</TableCell>
+                                        <TableCell>{institute.email}</TableCell>
+                                        <TableCell>{institute.country}</TableCell>
                                         <TableCell className="text-right">
-                                            <Button onClick={() => handleTopUpClick(user)} size="sm">
+                                            <Button onClick={() => handleTopUpClick(institute)} size="sm">
                                                 <Wallet className="mr-2 h-4 w-4" />
                                                 <span>Top-up</span>
                                             </Button>
@@ -188,7 +167,7 @@ export default function InstitutePaymentsPage() {
                                         <TableRow>
                                             <TableCell colSpan={5} className="h-48 text-center">
                                                 <p className="text-muted-foreground">
-                                                    {searchTerm ? `No users found for "${searchTerm}".` : "No users have been created yet."}
+                                                    {searchTerm ? `No institutes found for "${searchTerm}".` : "No institutes found."}
                                                 </p>
                                             </TableCell>
                                         </TableRow>
@@ -200,13 +179,13 @@ export default function InstitutePaymentsPage() {
                 </CardContent>
             </Card>
             
-            <Dialog open={!!userToTopUp} onOpenChange={() => { setUserToTopUp(null); setTopUpAmount(0); }}>
+            <Dialog open={!!instituteToTopUp} onOpenChange={() => { setInstituteToTopUp(null); setTopUpAmount(0); }}>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Top-up Balance</DialogTitle>
                   <DialogDescription>
-                    Enter the amount to add to the balance of <span className="font-semibold">{userToTopUp?.instituteName}</span>.
-                    Current balance: ${userToTopUp?.balance.toFixed(2)}
+                    Enter the amount to add to the balance of <span className="font-semibold">{instituteToTopUp?.name}</span>.
+                    Current balance: ${(instituteToTopUp?.balance || 0).toFixed(2)}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-2 py-4">

@@ -48,3 +48,46 @@ export async function GET(request: Request) {
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
 }
+
+export async function PATCH(request: Request) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+    if (!apiUrl || !apiKey) {
+        return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
+    }
+
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
+    }
+
+    try {
+        const body = await request.json();
+        if (!body.id) {
+            return NextResponse.json({ status: 'error', message: 'Institute ID is required for update.' }, { status: 400 });
+        }
+        
+        const { id, ...patchData } = body;
+
+        const response = await fetch(`${apiUrl}/institutes/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': apiKey,
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(patchData),
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to update institute.');
+        }
+
+        return NextResponse.json({ status: 'success', data: result });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+        return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
+    }
+}
