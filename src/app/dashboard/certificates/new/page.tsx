@@ -140,7 +140,7 @@ export default function IssueCertificatePage() {
             sessionStorage.setItem('ukcas_active_institute', JSON.stringify(updatedInstitute));
             setInstitute(updatedInstitute);
 
-            const studentName = students.find(s => s.id === values.studentId)?.name || 'Unknown Student';
+            const studentName = students.find(s => String(s.id) === values.studentId)?.name || 'Unknown Student';
             
             console.log("New pending certificate submitted:", {
                 ...values,
@@ -209,7 +209,7 @@ export default function IssueCertificatePage() {
                                         <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder={isLoading ? "Loading courses..." : "Select a course"} />
-                                        </Trigger>
+                                        </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
                                              {!isLoading && courses.length === 0 && <p className="p-4 text-sm text-muted-foreground">No courses found.</p>}
@@ -274,3 +274,5 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
+
+    
