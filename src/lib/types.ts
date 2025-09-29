@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 export interface Institute {
   id: string;
   name: string;
@@ -117,7 +111,4 @@ export interface Student {
   created_at: string;
 }
 
-
-
-
-
+    
