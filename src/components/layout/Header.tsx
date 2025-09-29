@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { usePathname } from 'next/navigation';
@@ -63,6 +63,9 @@ export default function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
+             <SheetHeader className="sr-only">
+              <SheetTitle>Mobile Navigation Menu</SheetTitle>
+            </SheetHeader>
             <div className="flex flex-col space-y-6 p-4">
               <Logo />
               <nav className="flex flex-col space-y-4">
