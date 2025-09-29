@@ -18,9 +18,17 @@ async function handleRequest(request: Request) {
             }
             const { searchParams } = new URL(request.url);
             const courseId = searchParams.get('id');
+            const instituteId = searchParams.get('instituteId');
 
             if (courseId) {
                 let fetchUrl = `${apiUrl}/institute-courses/${courseId}`;
+                const response = await fetch(fetchUrl, { headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                return NextResponse.json(data, { status: response.status });
+            }
+
+            if (instituteId) {
+                 let fetchUrl = `${apiUrl}/institute-courses?institute_id=${instituteId}`;
                 const response = await fetch(fetchUrl, { headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` } });
                 const data = await response.json();
                 return NextResponse.json(data, { status: response.status });

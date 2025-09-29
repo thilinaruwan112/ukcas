@@ -16,10 +16,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 async function getCourses(instituteId: string, token: string): Promise<Course[]> {
     try {
-        const response = await fetch(`/api/courses`, {
-            method: 'POST',
+        const response = await fetch(`/api/courses?instituteId=${instituteId}`, {
+            method: 'GET',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ institute_id: instituteId }),
         });
         if (!response.ok) {
             const errorData = await response.json();
