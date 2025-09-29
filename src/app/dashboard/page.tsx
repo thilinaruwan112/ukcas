@@ -8,24 +8,42 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { ApiInstitute, Certificate } from "@/lib/types";
+import type { ApiInstitute, Certificate, Student } from "@/lib/types";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 
-// Mock fetching functions until APIs are ready
-async function getStudentCount(instituteId: string): Promise<number> {
-    // Replace with actual API call
-    console.log(`Fetching student count for institute ${instituteId}`);
-    return Promise.resolve(4521); 
+async function getStudents(instituteId: string, token: string): Promise<Student[]> {
+    try {
+        const response = await fetch(`/api/students?instituteId=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch students');
+        }
+        const data = await response.json();
+        return data.status === 'success' && Array.isArray(data.data) ? data.data : [];
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
-async function getCertificates(instituteId: string): Promise<Certificate[]> {
-    // Replace with actual API call
-    console.log(`Fetching certificates for institute ${instituteId}`);
-    return Promise.resolve([
-        { id: 'UKCAS-12345678', studentName: 'Alice Johnson', courseName: 'Data Analytics', issueDate: '2024-07-21', instituteId: '1', status: 'Approved' },
-        { id: 'UKCAS-23456789', studentName: 'Eve Adams', courseName: 'Computer Science', issueDate: '2024-08-05', instituteId: '1', status: 'Pending' },
-    ]);
+async function getCertificates(instituteId: string, token: string): Promise<Certificate[]> {
+    try {
+        const response = await fetch(`/api/certificates?instituteId=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch certificates');
+        }
+        const data = await response.json();
+        return data.status === 'success' && Array.isArray(data.data) ? data.data : [];
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
 
@@ -84,8 +102,9 @@ export default function InstituteDashboardPage() {
     useEffect(() => {
         const instituteDataString = sessionStorage.getItem('ukcas_active_institute');
         const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        const token = sessionStorage.getItem('ukcas_token');
 
-        if (!instituteDataString || !instituteId) {
+        if (!instituteDataString || !instituteId || !token) {
             router.push('/admin/select-institute');
             return;
         }
@@ -96,18 +115,18 @@ export default function InstituteDashboardPage() {
         async function fetchData() {
             try {
                 // Fetch all data in parallel
-                const [studentCount, certificates] = await Promise.all([
-                    getStudentCount(instituteId!),
-                    getCertificates(instituteId!)
+                const [studentsData, certificatesData] = await Promise.all([
+                    getStudents(instituteId, token),
+                    getCertificates(instituteId, token)
                 ]);
                 
                 setStats([
-                    { title: "Total Students", value: studentCount.toLocaleString(), icon: <Users className="h-8 w-8 text-muted-foreground" /> },
-                    { title: "Certificates Issued", value: certificates.length.toLocaleString(), icon: <GraduationCap className="h-8 w-8 text-muted-foreground" /> },
+                    { title: "Total Students", value: studentsData.length.toLocaleString(), icon: <Users className="h-8 w-8 text-muted-foreground" /> },
+                    { title: "Certificates Issued", value: certificatesData.length.toLocaleString(), icon: <GraduationCap className="h-8 w-8 text-muted-foreground" /> },
                     { title: "Account Balance", value: `$${activeInstitute.balance ? Number(activeInstitute.balance).toFixed(2) : '0.00'}`, icon: <Wallet className="h-8 w-8 text-muted-foreground" /> },
                 ]);
 
-                setRecentCertificates(certificates.slice(0, 5));
+                setRecentCertificates(certificatesData.slice(0, 5));
 
             } catch (error) {
                 console.error("Failed to fetch dashboard data:", error);
