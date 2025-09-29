@@ -1,4 +1,5 @@
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -101,8 +102,9 @@ export interface AdminUser {
 }
 
 export interface Student {
-    id: string;
-    name: string;
-    course: string;
-    joinedDate: string;
+  id: string;
+  name: string;
+  email_address: string;
+  phone_number: string;
+  created_at: string;
 }
