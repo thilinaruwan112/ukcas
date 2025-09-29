@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { UserPlus, ArrowLeft, CalendarIcon } from "lucide-react";
+import { UserPlus, ArrowLeft, CalendarIcon, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -20,22 +20,64 @@ export default function NewStudentPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [dob, setDob] = useState<Date | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
 
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setIsLoading(true);
+
       const formData = new FormData(e.currentTarget);
-      const studentName = formData.get('name') as string;
+      const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+      const token = sessionStorage.getItem('ukcas_token');
+      
+      if (!instituteId || !token) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not find institute or authentication token. Please log in again.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      formData.append('institute_id', instituteId);
+      if (dob) {
+        formData.set('date_of_birth', format(dob, 'yyyy-MM-dd'));
+      }
 
-      // In a real app, you would save this data to your database
-      console.log(Object.fromEntries(formData.entries()));
+      try {
+        const response = await fetch('/api/students', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData,
+        });
 
-      toast({
-          title: "Student Registered",
-          description: `${studentName} has been successfully added to your student records.`,
-      });
+        const result = await response.json();
 
-      router.push('/dashboard/students');
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to register student.');
+        }
+
+        toast({
+            title: "Student Registered",
+            description: `${formData.get('name')} has been successfully added to your student records.`,
+        });
+
+        router.push('/dashboard/students');
+
+      } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+          toast({
+              variant: "destructive",
+              title: "Registration Failed",
+              description: errorMessage,
+          });
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   return (
@@ -59,7 +101,7 @@ export default function NewStudentPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">Student's Full Name</Label>
-                    <Input id="name" name="name" placeholder="e.g., John Doe" required />
+                    <Input id="name" name="name" placeholder="e.g., John Doe" required disabled={isLoading} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="date_of_birth">Date of Birth</Label>
@@ -71,6 +113,7 @@ export default function NewStudentPage() {
                                 "w-full justify-start text-left font-normal",
                                 !dob && "text-muted-foreground"
                             )}
+                             disabled={isLoading}
                             >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {dob ? format(dob, "PPP") : <span>Pick a date</span>}
@@ -94,53 +137,54 @@ export default function NewStudentPage() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="email_address">Student's Email</Label>
-                    <Input id="email_address" name="email_address" type="email" placeholder="e.g., john.doe@example.com" />
+                    <Input id="email_address" name="email_address" type="email" placeholder="e.g., john.doe@example.com" disabled={isLoading} />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="phone_number">Phone Number</Label>
-                    <Input id="phone_number" name="phone_number" type="tel" placeholder="e.g., +44 1234 567890" />
+                    <Input id="phone_number" name="phone_number" type="tel" placeholder="e.g., +44 1234 567890" disabled={isLoading}/>
                 </div>
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="country">Country</Label>
-                    <Input id="country" name="country" placeholder="e.g., United Kingdom" />
+                    <Input id="country" name="country" placeholder="e.g., United Kingdom" disabled={isLoading} />
                 </div>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="address">Full Address</Label>
-                <Textarea id="address" name="address" placeholder="123 Example Street, London, EX1 2MP" />
+                <Textarea id="address" name="address" placeholder="123 Example Street, London, EX1 2MP" disabled={isLoading} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="id_card_front">ID Card (Front)</Label>
-                    <Input id="id_card_front" name="id_card_front" type="file" />
+                    <Input id="id_card_front" name="id_card_front" type="file" disabled={isLoading}/>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="id_card_back">ID Card (Back)</Label>
-                    <Input id="id_card_back" name="id_card_back" type="file" />
+                    <Input id="id_card_back" name="id_card_back" type="file" disabled={isLoading}/>
                 </div>
             </div>
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="ol_certificate">O/L Certificate</Label>
-                    <Input id="ol_certificate" name="ol_certificate" type="file" />
+                    <Input id="ol_certificate" name="ol_certificate" type="file" disabled={isLoading}/>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="al_certificate">A/L Certificate</Label>
-                    <Input id="al_certificate" name="al_certificate" type="file" />
+                    <Input id="al_certificate" name="al_certificate" type="file" disabled={isLoading}/>
                 </div>
             </div>
 
             <div className="space-y-2">
                 <Label htmlFor="student_photo">Student Photo</Label>
-                <Input id="student_photo" name="student_photo" type="file" accept="image/*" />
+                <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading}/>
             </div>
             
-            <Button type="submit" className="w-full h-12 text-base" size="lg">
-              Register Student
+            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? 'Registering...' : 'Register Student'}
             </Button>
           </form>
         </CardContent>
@@ -148,3 +192,5 @@ export default function NewStudentPage() {
     </div>
   );
 }
+
+    
