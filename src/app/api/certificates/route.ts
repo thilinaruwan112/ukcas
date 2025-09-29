@@ -30,14 +30,17 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const instituteId = searchParams.get('instituteId');
+    const all = searchParams.get('all');
 
-    if (!instituteId) {
-        return NextResponse.json({ status: 'error', message: 'Institute ID is required.' }, { status: 400 });
-    }
 
     try {
+        let fetchUrl = `${apiUrl}/students-certificates`;
+        if (instituteId) {
+            fetchUrl = `${apiUrl}/students-certificates/institute/${instituteId}`;
+        }
+        
         // 1. Fetch the raw certificate data
-        const certificatesResponse = await fetch(`${apiUrl}/students-certificates/institute/${instituteId}`, {
+        const certificatesResponse = await fetch(fetchUrl, {
             headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` }
         });
         
@@ -120,3 +123,4 @@ async function handlePost(request: Request) {
 export async function POST(request: Request) {
     return handlePost(request);
 }
+

@@ -1,10 +1,11 @@
+
 'use client';
 
 import type { ReactNode } from "react";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { LogOut, Building2, Settings, UserCircle, Award, Users, Library } from "lucide-react";
+import { LogOut, Building2, Settings, UserCircle, Award, Users, Library, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AdminHeader from "@/components/layout/AdminHeader";
 import { useState, useEffect } from "react";
@@ -70,7 +71,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   <SidebarMenuItem>
                     <SidebarMenuButton href="/admin/accreditation" isActive={pathname.startsWith('/admin/accreditation')}>
                       <Award />
-                      Accreditation
+                      Accreditation Letters
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/approve-certificates" isActive={pathname.startsWith('/admin/approve-certificates')}>
+                      <ShieldCheck />
+                      Approve Certificates
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </>
