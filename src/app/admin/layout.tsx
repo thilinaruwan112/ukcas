@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
-import { LogOut, Building2, Settings, UserCircle, Award, Users, Library, ShieldCheck } from "lucide-react";
+import { LogOut, Building2, Settings, UserCircle, Award, Users, Library, ShieldCheck, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AdminHeader from "@/components/layout/AdminHeader";
 import { useState, useEffect } from "react";
@@ -60,6 +60,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     <SidebarMenuButton href="/admin/admin-institutes" isActive={pathname.startsWith('/admin/admin-institutes')}>
                       <Building2 />
                       Institutes
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                   <SidebarMenuItem>
+                    <SidebarMenuButton href="/admin/institute-payments" isActive={pathname.startsWith('/admin/institute-payments')}>
+                      <Wallet />
+                      Institute Payments
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
