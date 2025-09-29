@@ -256,6 +256,9 @@ export default function IssueCertificatePage() {
                                             mode="single"
                                             selected={field.value}
                                             onSelect={field.onChange}
+                                            captionLayout="dropdown-buttons"
+                                            fromYear={new Date().getFullYear() - 70}
+                                            toYear={new Date().getFullYear() + 5}
                                             disabled={(date) =>
                                                 date > new Date() || date < new Date("1900-01-01")
                                             }
@@ -298,6 +301,9 @@ export default function IssueCertificatePage() {
                                                 mode="single"
                                                 selected={field.value}
                                                 onSelect={field.onChange}
+                                                captionLayout="dropdown-buttons"
+                                                fromYear={new Date().getFullYear() - 70}
+                                                toYear={new Date().getFullYear() + 5}
                                                 disabled={(date) =>
                                                     date > new Date() || date < new Date("1900-01-01")
                                                 }
@@ -339,6 +345,9 @@ export default function IssueCertificatePage() {
                                                 mode="single"
                                                 selected={field.value}
                                                 onSelect={field.onChange}
+                                                captionLayout="dropdown-buttons"
+                                                fromYear={new Date().getFullYear() - 70}
+                                                toYear={new Date().getFullYear() + 5}
                                                 disabled={(date) =>
                                                     date > new Date() || date < new Date("1900-01-01")
                                                 }
