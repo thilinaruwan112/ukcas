@@ -90,7 +90,7 @@ class FtpController
         }
 
         if ($file['size'] > $maxSize) {
-            return 'File size too large. Maximum 5MB allowed.';
+            return 'File size too large. Maximum 10MB allowed.';
         }
 
         return null; // No errors
