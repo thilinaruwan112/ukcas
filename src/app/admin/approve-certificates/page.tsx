@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import type { Certificate } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -33,20 +33,37 @@ async function getPendingCertificates(token: string): Promise<Certificate[]> {
     }
 }
 
+async function updateCertificateStatus(id: string, status: 'Approved' | 'Rejected', token: string): Promise<any> {
+    const response = await fetch('/api/certificates', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ id, status }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+        throw new Error(result.message || `Failed to update status to ${status}`);
+    }
+    return result;
+}
+
+
 export default function ApproveCertificatesPage() {
     const { toast } = useToast();
     const router = useRouter();
     const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('ukcas_token');
+    const fetchCertificates = () => {
+         const token = sessionStorage.getItem('ukcas_token');
         if (!token) {
             router.push('/login');
             return;
         }
 
+        setLoading(true);
         getPendingCertificates(token)
             .then(data => setCertificates(data))
             .catch(err => {
@@ -54,7 +71,37 @@ export default function ApproveCertificatesPage() {
                 setError(msg);
             })
             .finally(() => setLoading(false));
+    }
+
+    useEffect(() => {
+       fetchCertificates();
     }, [router]);
+    
+    const handleStatusUpdate = async (id: string, status: 'Approved' | 'Rejected') => {
+        setUpdatingId(id);
+        const token = sessionStorage.getItem('ukcas_token');
+        if (!token) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
+            setUpdatingId(null);
+            return;
+        }
+
+        try {
+            await updateCertificateStatus(id, status, token);
+            toast({
+                title: 'Success',
+                description: `Certificate has been ${status.toLowerCase()}.`,
+            });
+            // Refresh the list
+            setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== id));
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : 'An unknown error occurred.';
+            toast({ variant: 'destructive', title: 'Update Failed', description: msg });
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
 
     const CertificatesSkeleton = () => (
         <TableBody>
@@ -64,7 +111,7 @@ export default function ApproveCertificatesPage() {
                     <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell className="text-right"><div className="flex justify-end gap-2"><Skeleton className="h-8 w-16" /><Skeleton className="h-8 w-16" /></div></TableCell>
+                    <TableCell className="text-right"><div className="flex justify-end gap-2"><Skeleton className="h-8 w-24" /><Skeleton className="h-8 w-20" /></div></TableCell>
                 </TableRow>
             ))}
         </TableBody>
@@ -117,11 +164,25 @@ export default function ApproveCertificatesPage() {
                                         <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="space-x-2">
-                                                <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700">
-                                                    <Check className="mr-2 h-4 w-4" /> Approve
+                                                 <Button 
+                                                    size="sm" 
+                                                    variant="outline" 
+                                                    className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                                                    onClick={() => handleStatusUpdate(cert.id, 'Approved')}
+                                                    disabled={updatingId === cert.id}
+                                                >
+                                                    {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                                                    Approve
                                                 </Button>
-                                                <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700">
-                                                    <X className="mr-2 h-4 w-4" /> Deny
+                                                <Button 
+                                                    size="sm" 
+                                                    variant="outline" 
+                                                    className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+                                                    onClick={() => handleStatusUpdate(cert.id, 'Rejected')}
+                                                    disabled={updatingId === cert.id}
+                                                >
+                                                    {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                                                    Deny
                                                 </Button>
                                             </div>
                                         </TableCell>

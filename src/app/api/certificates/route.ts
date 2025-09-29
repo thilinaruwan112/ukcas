@@ -124,3 +124,50 @@ export async function POST(request: Request) {
     return handlePost(request);
 }
 
+async function handlePatch(request: Request) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+    if (!apiUrl || !apiKey) {
+        return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
+    }
+
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
+    }
+
+    try {
+        const { id, status } = await request.json();
+
+        if (!id || !status || !['Approved', 'Rejected'].includes(status)) {
+            return NextResponse.json({ status: 'error', message: 'Certificate ID and a valid status are required.' }, { status: 400 });
+        }
+
+        const updateUrl = `${apiUrl}/students-certificates/${id}/approved-status/${status}`;
+
+        const updateResponse = await fetch(updateUrl, {
+            method: 'PUT', // As per user instruction
+            headers: {
+                'X-API-KEY': apiKey,
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const updateResult = await updateResponse.json();
+
+        if (!updateResponse.ok || updateResult.status !== 'success') {
+            throw new Error(updateResult.message || 'Failed to update certificate status.');
+        }
+
+        return NextResponse.json({ status: 'success', data: updateResult.data });
+
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+        return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
+    }
+}
+
+export async function PATCH(request: Request) {
+    return handlePatch(request);
+}
