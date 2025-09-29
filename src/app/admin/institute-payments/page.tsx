@@ -23,6 +23,7 @@ export default function InstitutePaymentsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [instituteToTopUp, setInstituteToTopUp] = useState<ApiInstitute | null>(null);
     const [topUpAmount, setTopUpAmount] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const fetchInstitutes = async () => {
         setLoading(true);
@@ -58,34 +59,50 @@ export default function InstitutePaymentsPage() {
     
     const handleTopUpConfirm = async () => {
         if (!instituteToTopUp || topUpAmount <= 0) return;
-        const currentBalance = instituteToTopUp.balance || 0;
+        setIsSubmitting(true);
 
         try {
             const token = sessionStorage.getItem('ukcas_token');
-            const response = await fetch('/api/institutes', {
-                method: 'PATCH',
+            const userStr = sessionStorage.getItem('ukcas_user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            
+            if (!token) {
+                 throw new Error("Authentication token not found.");
+            }
+
+            const payload = {
+                institute_id: instituteToTopUp.id,
+                type: 'CREDIT',
+                amount: topUpAmount,
+                created_by: user?.user_name || 'admin',
+                active_status: 1,
+                remark: 'Admin top-up'
+            };
+
+            const response = await fetch('/api/institute-payments', {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ id: instituteToTopUp.id, balance: currentBalance + topUpAmount }),
+                body: JSON.stringify(payload),
             });
             
             const result = await response.json();
             if (!response.ok) {
-                 throw new Error(result.message || 'Failed to update balance.');
+                 throw new Error(result.message || 'Failed to process payment.');
             }
             
-            setInstitutes(institutes.map(inst => 
-                inst.id === instituteToTopUp.id 
-                    ? { ...inst, balance: currentBalance + topUpAmount } 
-                    : inst
-            ));
             toast({
-                title: "Balance Updated",
-                description: `Added $${topUpAmount.toFixed(2)} to ${instituteToTopUp.name}'s balance.`,
+                title: "Top-up Successful",
+                description: `Added $${topUpAmount.toFixed(2)} to ${instituteToTopUp.name}'s account.`,
             });
+            
+            // Refetch institutes to get the updated balance
+            await fetchInstitutes();
+
         } catch(error) {
              const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
             toast({ variant: 'destructive', title: 'Update Failed', description: errorMessage });
         } finally {
+             setIsSubmitting(false);
              setInstituteToTopUp(null);
              setTopUpAmount(0);
         }
@@ -155,7 +172,7 @@ export default function InstitutePaymentsPage() {
                                         <TableCell>{institute.email}</TableCell>
                                         <TableCell>{institute.country}</TableCell>
                                         <TableCell className="text-right">
-                                            <Button onClick={() => handleTopUpClick(institute)} size="sm">
+                                            <Button onClick={() => handleTopUpClick(institute)} size="sm" disabled={isSubmitting}>
                                                 <Wallet className="mr-2 h-4 w-4" />
                                                 <span>Top-up</span>
                                             </Button>
@@ -194,11 +211,15 @@ export default function InstitutePaymentsPage() {
                         id="topUpAmount" type="number" value={topUpAmount || ''}
                         onChange={(e) => setTopUpAmount(Number(e.target.value))}
                         placeholder="e.g., 50" min="0.01" step="0.01"
+                        disabled={isSubmitting}
                     />
                 </div>
                 <DialogFooter>
-                  <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
-                  <Button onClick={handleTopUpConfirm} disabled={topUpAmount <= 0}>Confirm Top-up</Button>
+                  <DialogClose asChild><Button variant="outline" disabled={isSubmitting}>Cancel</Button></DialogClose>
+                  <Button onClick={handleTopUpConfirm} disabled={topUpAmount <= 0 || isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isSubmitting ? "Processing..." : "Confirm Top-up"}
+                    </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
