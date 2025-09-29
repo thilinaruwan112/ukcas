@@ -30,18 +30,23 @@ export default function NewStudentPage() {
       const formData = new FormData(e.currentTarget);
       const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
       const token = sessionStorage.getItem('ukcas_token');
+      const userData = sessionStorage.getItem('ukcas_user');
+      const user = userData ? JSON.parse(userData) : null;
       
-      if (!instituteId || !token) {
+      if (!instituteId || !token || !user) {
         toast({
             variant: "destructive",
             title: "Error",
-            description: "Could not find institute or authentication token. Please log in again.",
+            description: "Could not find institute, user, or authentication token. Please log in again.",
         });
         setIsLoading(false);
         return;
       }
       
       formData.append('institute_id', instituteId);
+      formData.append('created_by', user.user_name || 'system');
+      formData.append('active_status', '1');
+      
       if (dob) {
         formData.set('date_of_birth', format(dob, 'yyyy-MM-dd'));
       }
@@ -192,5 +197,3 @@ export default function NewStudentPage() {
     </div>
   );
 }
-
-    
