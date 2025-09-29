@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Users, GraduationCap, Wallet, ArrowRight } from "lucide-react";
+import { Users, GraduationCap, Wallet, ArrowRight, Book, Calendar, User, FileCheck2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import type { ApiInstitute, Certificate, Student } from "@/lib/types";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
+import { Separator } from '@/components/ui/separator';
 
 async function getStudents(instituteId: string, token: string): Promise<Student[]> {
     try {
@@ -182,7 +183,8 @@ export default function InstituteDashboardPage() {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <div className="overflow-x-auto">
+                    {/* Responsive container: hidden on mobile, table on md+ */}
+                    <div className="hidden md:block">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -214,6 +216,37 @@ export default function InstituteDashboardPage() {
                             </TableBody>
                         </Table>
                     </div>
+                    
+                    {/* Mobile card view: block on mobile, hidden on md+ */}
+                    <div className="block md:hidden">
+                        {recentCertificates.length > 0 ? (
+                             <div className="space-y-4">
+                                {recentCertificates.map((cert) => (
+                                    <div key={cert.id} className="rounded-lg border p-4 space-y-3">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="font-semibold flex items-center gap-2"><User />{cert.studentName}</h3>
+                                                <p className="text-sm text-muted-foreground font-mono flex items-center gap-2"><FileCheck2 size={16} />{cert.id}</p>
+                                            </div>
+                                             <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
+                                                {cert.status}
+                                            </Badge>
+                                        </div>
+                                        <Separator />
+                                        <div className="space-y-2 text-sm">
+                                            <p className="flex items-center gap-2"><Book size={16} className="text-muted-foreground"/> {cert.courseName}</p>
+                                            <p className="flex items-center gap-2"><Calendar size={16} className="text-muted-foreground"/> {new Date(cert.issueDate).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                           <div className="text-center text-muted-foreground py-12">
+                                <p>No recent certificates found.</p>
+                            </div>
+                        )}
+                    </div>
+
                 </CardContent>
             </Card>
         </>
