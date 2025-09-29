@@ -1,7 +1,8 @@
-require_once './controllers/InstitutePaymentController.php';
+
 <?php
 // controllers/StudentCertificateController.php
 require_once './models/StudentCertificate.php';
+require_once './controllers/InstitutePaymentController.php';
 
 class StudentCertificateController
 {
