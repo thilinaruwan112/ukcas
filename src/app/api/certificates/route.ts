@@ -144,14 +144,20 @@ async function handlePatch(request: Request) {
             return NextResponse.json({ status: 'error', message: 'Certificate ID and a valid status are required.' }, { status: 400 });
         }
 
-        const updateUrl = `${apiUrl}/students-certificates/${id}/approved-status/${status}`;
+        const updateUrl = `${apiUrl}/students-certificates/approved-status`;
+        const payload = {
+            certificate_id: id,
+            status: status.toLowerCase()
+        };
 
         const updateResponse = await fetch(updateUrl, {
-            method: 'PUT', // As per user instruction
+            method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'X-API-KEY': apiKey,
                 'Authorization': `Bearer ${token}`
             },
+            body: JSON.stringify(payload)
         });
 
         const updateResult = await updateResponse.json();
