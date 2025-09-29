@@ -13,7 +13,7 @@ class StudentCertificateController
     // Update approved_status of a certificate
     public function updateApprovedStatus($certificate_id, $status)
     {
-        $validStatuses = ['Pending', 'Approved', 'Rejected', 'Suspended'];
+        $validStatuses = ['pending', 'approved', 'rejected', 'suspended'];
         if (!in_array($status, $validStatuses)) {
             echo json_encode([
                 'status' => 'error',
