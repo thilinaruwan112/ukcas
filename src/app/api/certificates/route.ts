@@ -53,7 +53,7 @@ export async function GET(request: Request) {
 
     try {
         // 1. Fetch the raw certificate data
-        const certificatesResponse = await fetch(`${apiUrl}/students-certificates?institute_id=${instituteId}`, {
+        const certificatesResponse = await fetch(`${apiUrl}/students-certificates/institute/${instituteId}`, {
             headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` }
         });
         
