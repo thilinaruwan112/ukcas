@@ -143,7 +143,7 @@ export default function IssueCertificatePage() {
             );
 
             if (existingCertificate) {
-                setDuplicateWarning(`A certificate for this student and course already exists (Status: ${existingCertificate.status}).`);
+                setDuplicateWarning(`A certificate for this student and course already exists (Status: ${existingCertificate.status}). Applying again is not allowed.`);
             } else {
                 setDuplicateWarning(null);
             }
@@ -268,9 +268,9 @@ export default function IssueCertificatePage() {
                             />
 
                              {duplicateWarning && (
-                                <div className="flex items-center gap-2 rounded-md border border-yellow-500/50 bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
-                                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                                    <p>{duplicateWarning}</p>
+                                <div className="flex items-center gap-3 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive dark:bg-destructive/20">
+                                    <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                                    <p className="font-semibold">{duplicateWarning}</p>
                                 </div>
                             )}
 
@@ -419,3 +419,5 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
+
+    
