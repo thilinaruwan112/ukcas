@@ -1,3 +1,4 @@
+require_once './controllers/InstitutePaymentController.php';
 <?php
 // controllers/StudentCertificateController.php
 require_once './models/StudentCertificate.php';
@@ -21,10 +22,25 @@ class StudentCertificateController
             ]);
             return;
         }
-        $result = $this->model->updateApprovedStatus($certificate_id, $status);
+        $updated = $this->model->updateApprovedStatus($certificate_id, $status);
+        // If approved, create payment entry
+        if ($updated && strtolower($status) === 'approved') {
+            $paymentController = new InstitutePaymentController($GLOBALS['pdo']);
+            // Prepare payment data (customize as needed)
+            $certificate = $this->model->getById($certificate_id);
+            $paymentData = [
+                'institute_id' => $certificate['institute_id'] ?? null,
+                'type' => 'CREDIT', // or 'DEBIT' based on your business logic
+                'amount' => $certificate['payment_amount'] ?? 0,
+                'created_by' => $certificate['created_by'] ?? null,
+                'active_status' => 1,
+                'remark' => 'Certificate approval payment for certificate ID ' . $certificate_id,
+            ];
+            $paymentController->create($paymentData);
+        }
         echo json_encode([
-            'status' => $result ? 'success' : 'error',
-            'message' => $result ? 'Approved status updated.' : 'Update failed.'
+            'status' => $updated ? 'success' : 'error',
+            'message' => $updated ? 'Approved status updated.' : 'Update failed.'
         ]);
     }
 
