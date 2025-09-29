@@ -23,19 +23,18 @@ export default function NewCoursePage() {
       
       const formData = new FormData(e.currentTarget);
       const token = sessionStorage.getItem('ukcas_token');
+      const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
       const userData = sessionStorage.getItem('ukcas_user');
       const user = userData ? JSON.parse(userData) : null;
       
-      if (!token || !user) {
-          toast({ variant: 'destructive', title: "Authentication Error", description: "You must be logged in to create a course." });
+      if (!token || !user || !instituteId) {
+          toast({ variant: 'destructive', title: "Authentication Error", description: "You must be logged in and have an institute selected to create a course." });
           setIsLoading(false);
           return;
       }
-      
-      const instituteId = 1; // Hardcoded for now, should come from user session/context
 
       const payload = {
-          institute_id: instituteId,
+          institute_id: parseInt(instituteId),
           course_name: formData.get('courseName') as string,
           course_code: formData.get('courseCode') as string,
           description: formData.get('description') as string,
