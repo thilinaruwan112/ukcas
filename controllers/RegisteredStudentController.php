@@ -30,11 +30,41 @@ class RegisteredStudentController
     public function create()
     {
         $data = $_POST;
-        $data['id_card_front'] = $this->handleFile('id_card_front');
-        $data['id_card_back'] = $this->handleFile('id_card_back');
-        $data['ol_certificate'] = $this->handleFile('ol_certificate');
-        $data['al_certificate'] = $this->handleFile('al_certificate');
-        $data['student_photo'] = $this->handleFile('student_photo');
+        require_once './controllers/FtpController.php';
+        $ftpController = new FtpController($GLOBALS['pdo']);
+
+        $fileFields = [
+            'id_card_front',
+            'id_card_back',
+            'ol_certificate',
+            'al_certificate',
+            'student_photo'
+        ];
+
+        $studentId = isset($data['student_id']) ? $data['student_id'] : (isset($data['id']) ? $data['id'] : null);
+        foreach ($fileFields as $field) {
+            if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES[$field];
+                if ($studentId) {
+                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
+                    $safeName = preg_replace('/\s+/', '-', trim($safeName));
+                    $safeName = strtolower($safeName);
+                    $ftpPath = "/students/$studentId/$field-$safeName.$ext";
+                    $result = $ftpController->uploadImage($file, $ftpPath);
+                    if (isset($result['status']) && $result['status'] === 'success') {
+                        $data[$field] = $ftpPath;
+                    } else {
+                        $data[$field] = '';
+                    }
+                } else {
+                    $data[$field] = '';
+                }
+            } else {
+                $data[$field] = isset($_POST[$field]) ? $_POST[$field] : '';
+            }
+        }
+
         $student = $this->model->create($data);
         echo json_encode([
             'status' => 'success',
@@ -45,11 +75,43 @@ class RegisteredStudentController
     public function update($id)
     {
         $data = $_POST;
-        $data['id_card_front'] = $this->handleFile('id_card_front');
-        $data['id_card_back'] = $this->handleFile('id_card_back');
-        $data['ol_certificate'] = $this->handleFile('ol_certificate');
-        $data['al_certificate'] = $this->handleFile('al_certificate');
-        $data['student_photo'] = $this->handleFile('student_photo');
+        require_once './controllers/FtpController.php';
+        $ftpController = new FtpController($GLOBALS['pdo']);
+
+        $fileFields = [
+            'id_card_front',
+            'id_card_back',
+            'ol_certificate',
+            'al_certificate',
+            'student_photo'
+        ];
+
+        $studentId = isset($data['student_id']) ? $data['student_id'] : (isset($data['id']) ? $data['id'] : $id);
+        $current = $this->model->getById($id);
+        foreach ($fileFields as $field) {
+            if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES[$field];
+                if ($studentId) {
+                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
+                    $safeName = preg_replace('/\s+/', '-', trim($safeName));
+                    $safeName = strtolower($safeName);
+                    $ftpPath = "/students/$studentId/$field-$safeName.$ext";
+                    $result = $ftpController->uploadImage($file, $ftpPath);
+                    if (isset($result['status']) && $result['status'] === 'success') {
+                        $data[$field] = $ftpPath;
+                    } else {
+                        $data[$field] = isset($current[$field]) ? $current[$field] : '';
+                    }
+                } else {
+                    $data[$field] = isset($current[$field]) ? $current[$field] : '';
+                }
+            } else {
+                // No new image uploaded, keep current image URL
+                $data[$field] = isset($current[$field]) ? $current[$field] : (isset($_POST[$field]) ? $_POST[$field] : '');
+            }
+        }
+
         $student = $this->model->update($id, $data);
         echo json_encode([
             'status' => 'success',
