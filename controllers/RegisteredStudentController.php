@@ -47,10 +47,10 @@ class RegisteredStudentController
             $data[$field] = '';
         }
 
-        // Debug: echo initial data before creation
-        echo "<pre>Initial Data Before Create:\n";
-        print_r($data);
-        echo "</pre>";
+        // // Debug: echo initial data before creation
+        // echo "<pre>Initial Data Before Create:\n";
+        // print_r($data);
+        // echo "</pre>";
 
         // Create student first (without images)
         $student = $this->model->create($data);
@@ -77,10 +77,10 @@ class RegisteredStudentController
             }
         }
 
-        // Debug: echo updateData after image upload
-        echo "<pre>Update Data After Image Upload:\n";
-        print_r($updateData);
-        echo "</pre>";
+        // // Debug: echo updateData after image upload
+        // echo "<pre>Update Data After Image Upload:\n";
+        // print_r($updateData);
+        // echo "</pre>";
 
         // Update student record with image paths
         if (!empty($updateData)) {
