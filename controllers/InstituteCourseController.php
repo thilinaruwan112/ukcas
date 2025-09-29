@@ -11,8 +11,7 @@ class InstituteCourseController
     }
     public function getAll()
     {
-        $data = json_decode(file_get_contents("php://input"), true);
-        $institute_id = $data['institute_id'] ?? null;
+        $institute_id = isset($_GET['institute_id']) ? $_GET['institute_id'] : null;
         echo json_encode([
             'status' => 'success',
             'data' => $this->model->getAll($institute_id)
