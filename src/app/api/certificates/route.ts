@@ -15,21 +15,6 @@ async function getCourseDetails(courseId: string, apiKey: string, apiUrl: string
     }
 }
 
-async function getStudentDetails(studentId: string, apiKey: string, apiUrl: string, token: string) {
-    try {
-        // Assuming an endpoint exists to get student by ID. This needs to be confirmed.
-        // For now, let's assume a generic students endpoint that can be filtered.
-        const response = await fetch(`${apiUrl}/registered-students/${studentId}`, { // This endpoint might need to be adjusted
-             headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) return null;
-        const data = await response.json();
-         return data.status === 'success' ? data.data : null;
-    } catch {
-        return null;
-    }
-}
-
 
 export async function GET(request: Request) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -70,18 +55,15 @@ export async function GET(request: Request) {
         // 2. Fetch details for each certificate
         const detailedCertificates = await Promise.all(
             certificatesData.data.map(async (cert: any) => {
-                const [course, student] = await Promise.all([
-                    getCourseDetails(cert.course_id, apiKey, apiUrl, token),
-                    getStudentDetails(cert.student_id, apiKey, apiUrl, token) 
-                ]);
+                const course = await getCourseDetails(cert.course_id, apiKey, apiUrl, token);
 
                 return {
                     id: cert.certificate_id,
-                    studentName: student?.name || 'Unknown Student',
+                    studentName: cert.student_name || 'Unknown Student',
                     courseName: course?.course_name || 'Unknown Course',
                     issueDate: cert.created_at,
                     instituteId: cert.institute_id,
-                    status: cert.is_active === '1' ? 'Approved' : 'Pending',
+                    status: cert.approved_status || (cert.is_active === '1' ? 'Approved' : 'Pending'),
                 };
             })
         );
