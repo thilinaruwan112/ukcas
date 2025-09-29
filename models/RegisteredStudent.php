@@ -20,27 +20,7 @@ class RegisteredStudent
     }
     public function create($data)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO registered_students (name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)");
-        $stmt->execute([
-            $data['name'],
-            $data['date_of_birth'],
-            $data['email_address'],
-            $data['country'],
-            $data['phone_number'],
-            $data['address'],
-            $data['id_card_front'],
-            $data['id_card_back'],
-            $data['ol_certificate'],
-            $data['al_certificate'],
-            $data['student_photo'],
-            $data['created_by'],
-            $data['active_status']
-        ]);
-        return $this->getById($this->pdo->lastInsertId());
-    }
-    public function update($id, $data)
-    {
-        $stmt = $this->pdo->prepare("UPDATE registered_students SET name = ?, date_of_birth = ?, email_address = ?, country = ?, phone_number = ?, address = ?, id_card_front = ?, id_card_back = ?, ol_certificate = ?, al_certificate = ?, student_photo = ?, created_by = ?, active_status = ? WHERE id = ?");
+        $stmt = $this->pdo->prepare("INSERT INTO registered_students (name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status, institute_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)");
         $stmt->execute([
             $data['name'],
             $data['date_of_birth'],
@@ -55,6 +35,28 @@ class RegisteredStudent
             $data['student_photo'],
             $data['created_by'],
             $data['active_status'],
+            $data['institute_id']
+        ]);
+        return $this->getById($this->pdo->lastInsertId());
+    }
+    public function update($id, $data)
+    {
+        $stmt = $this->pdo->prepare("UPDATE registered_students SET name = ?, date_of_birth = ?, email_address = ?, country = ?, phone_number = ?, address = ?, id_card_front = ?, id_card_back = ?, ol_certificate = ?, al_certificate = ?, student_photo = ?, created_by = ?, active_status = ?, institute_id = ? WHERE id = ?");
+        $stmt->execute([
+            $data['name'],
+            $data['date_of_birth'],
+            $data['email_address'],
+            $data['country'],
+            $data['phone_number'],
+            $data['address'],
+            $data['id_card_front'],
+            $data['id_card_back'],
+            $data['ol_certificate'],
+            $data['al_certificate'],
+            $data['student_photo'],
+            $data['created_by'],
+            $data['active_status'],
+            $data['institute_id'],
             $id
         ]);
         return $this->getById($id);
