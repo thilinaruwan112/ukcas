@@ -125,12 +125,14 @@ export default function IssueCertificatePage() {
         }
 
         const payload = {
-            ...values,
-            institute_id: institute.id,
-            created_by: user.user_name || 'system',
+            student_id: values.student_id,
+            course_id: values.course_id,
             issueDate: format(values.issueDate, "yyyy-MM-dd"),
             from_date: format(values.from_date, "yyyy-MM-dd"),
             to_date: format(values.to_date, "yyyy-MM-dd"),
+            institute_id: institute.id,
+            created_by: user.user_name || 'system',
+            is_active: 1
         };
 
         try {
@@ -371,3 +373,5 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
+
+    
