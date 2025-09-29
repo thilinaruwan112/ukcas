@@ -48,6 +48,7 @@ export interface ApiInstitute {
     updated_at: string;
     created_by: string;
     slug: string;
+    balance?: number;
 }
 
 export interface UserInstituteAssignment {
