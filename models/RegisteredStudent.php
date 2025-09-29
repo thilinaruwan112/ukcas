@@ -7,6 +7,7 @@ class RegisteredStudent
     {
         $this->pdo = $pdo;
     }
+
     public function getAll()
     {
         $stmt = $this->pdo->query("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status FROM registered_students");
@@ -66,5 +67,13 @@ class RegisteredStudent
         $stmt = $this->pdo->prepare("DELETE FROM registered_students WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->rowCount() > 0;
+    }
+
+    // Get students by institute_id
+    public function getByInstituteId($institute_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT id, name, date_of_birth, email_address, country, phone_number, address, id_card_front, id_card_back, ol_certificate, al_certificate, student_photo, created_at, created_by, active_status FROM registered_students WHERE institute_id = ?");
+        $stmt->execute([$institute_id]);
+        return $stmt->fetchAll();
     }
 }

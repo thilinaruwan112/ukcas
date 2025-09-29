@@ -12,6 +12,9 @@ return [
     'GET /registered-students/{id}' => function ($id) use ($controller) {
         $controller->getById($id);
     },
+    'GET /registered-students/institute/{institute_id}' => function ($institute_id) use ($controller) {
+        $controller->getByInstituteId($institute_id);
+    },
     'POST /registered-students/' => function () use ($controller) {
         $controller->create();
     },

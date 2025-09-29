@@ -4,6 +4,7 @@ require_once './models/RegisteredStudent.php';
 
 class RegisteredStudentController
 {
+
     private $model;
     private $uploadDir = './uploads/students/';
     public function __construct($pdo)
@@ -137,5 +138,15 @@ class RegisteredStudentController
             }
         }
         return isset($_POST[$key]) ? $_POST[$key] : '';
+    }
+
+    // Get students by institute_id
+    public function getByInstituteId($institute_id)
+    {
+        $result = $this->model->getByInstituteId($institute_id);
+        echo json_encode([
+            'status' => 'success',
+            'data' => $result
+        ]);
     }
 }
