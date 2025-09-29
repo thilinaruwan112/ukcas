@@ -27,8 +27,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Student, Course, ApiInstitute } from "@/lib/types";
 
-const CERTIFICATE_COST = 10;
-
 const formSchema = z.object({
   student_id: z.string({ required_error: "Please select a student." }),
   course_id: z.string({
@@ -133,7 +131,6 @@ export default function IssueCertificatePage() {
             issueDate: format(values.issueDate, "yyyy-MM-dd"),
             from_date: format(values.from_date, "yyyy-MM-dd"),
             to_date: format(values.to_date, "yyyy-MM-dd"),
-            institute: { id: institute.id, balance: institute.balance } // Pass only necessary info
         };
 
         try {
@@ -148,17 +145,12 @@ export default function IssueCertificatePage() {
             if (!response.ok) {
                 throw new Error(result.message || 'Failed to issue certificate.');
             }
-
-            // Update session storage with new balance
-            if (result.updatedInstitute) {
-                sessionStorage.setItem('ukcas_active_institute', JSON.stringify(result.updatedInstitute));
-            }
             
             const studentName = students.find(s => String(s.id) === values.student_id)?.name || 'Unknown Student';
             
             toast({
                 title: "Certificate Submitted!",
-                description: `The new certificate for ${studentName} is pending admin approval. $${CERTIFICATE_COST.toFixed(2)} has been deducted from your balance.`,
+                description: `The new certificate for ${studentName} is now pending admin approval.`,
             });
             
             router.push('/dashboard/certificates');
@@ -183,7 +175,7 @@ export default function IssueCertificatePage() {
                         <GraduationCap className="h-8 w-8" />
                     </div>
                     <CardTitle className="text-2xl sm:text-3xl font-bold font-headline">Issue New Certificate</CardTitle>
-                    <CardDescription>Fill out the form below. Each certificate costs ${CERTIFICATE_COST.toFixed(2)} to issue, which will be deducted from your balance upon submission.</CardDescription>
+                    <CardDescription>Fill out the form below. Once approved by an admin, the cost will be deducted from your balance.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>

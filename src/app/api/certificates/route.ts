@@ -1,7 +1,6 @@
 
 import { NextResponse } from 'next/server';
 
-// This is a simplified representation. In a real app, these would be more robust.
 async function getCourseDetails(courseId: string, apiKey: string, apiUrl: string, token: string) {
     try {
         const response = await fetch(`${apiUrl}/institute-courses/${courseId}`, {
@@ -91,21 +90,9 @@ async function handlePost(request: Request) {
     }
 
     try {
-        const body = await request.json();
-        const { institute, ...certificateData } = body;
-        const CERTIFICATE_COST = 10;
+        const certificateData = await request.json();
         
-        // 1. Verify balance
-        if (!institute || typeof institute.balance === 'undefined') {
-            return NextResponse.json({ status: 'error', message: 'Could not verify institute balance.' }, { status: 400 });
-        }
-        
-        const currentBalance = Number(institute.balance) || 0;
-        if (currentBalance < CERTIFICATE_COST) {
-            return NextResponse.json({ status: 'error', message: `Insufficient balance. You need at least $${CERTIFICATE_COST.toFixed(2)}.` }, { status: 402 });
-        }
-
-        // 2. Create the certificate
+        // Create the certificate
         const createResponse = await fetch(`${apiUrl}/students-certificates`, {
             method: 'POST',
             headers: {
@@ -122,14 +109,7 @@ async function handlePost(request: Request) {
             throw new Error(createResult.message || 'Failed to create the certificate.');
         }
 
-        // 3. Deduct balance (mocking this part, should be a separate API call in a real app)
-        const newBalance = currentBalance - CERTIFICATE_COST;
-        const updatedInstitute = { ...institute, balance: newBalance };
-
-        // In a real app, you would make another API call here to update the user's balance.
-        // For now, we return the updated institute data for the client to update session storage.
-        
-        return NextResponse.json({ status: 'success', data: createResult.data, updatedInstitute });
+        return NextResponse.json({ status: 'success', data: createResult.data });
 
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
