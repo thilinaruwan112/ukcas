@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2, ArrowLeft, GraduationCap } from "lucide-react";
+import { CalendarIcon, Loader2, ArrowLeft, GraduationCap, AlertCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Student, Course, ApiInstitute } from "@/lib/types";
+import type { Student, Course, ApiInstitute, Certificate } from "@/lib/types";
 
 const formSchema = z.object({
   student_id: z.string({ required_error: "Please select a student." }),
@@ -69,6 +69,20 @@ async function getCourses(instituteId: string, token: string): Promise<Course[]>
     }
 }
 
+async function getCertificates(instituteId: string, token: string): Promise<Certificate[]> {
+    try {
+        const response = await fetch(`/api/certificates?instituteId=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.status === 'success' && Array.isArray(data.data) ? data.data.map((c: any) => ({...c, studentId: c.student_id, courseId: c.course_id })) : [];
+    } catch {
+        return [];
+    }
+}
+
+
 export default function IssueCertificatePage() {
     const { toast } = useToast();
     const router = useRouter();
@@ -78,12 +92,17 @@ export default function IssueCertificatePage() {
     const [institute, setInstitute] = useState<ApiInstitute | null>(null);
     const [students, setStudents] = useState<Student[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
+    const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [user, setUser] = useState<any>(null);
+    const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {},
     });
+    
+    const watchedStudentId = form.watch("student_id");
+    const watchedCourseId = form.watch("course_id");
 
     useEffect(() => {
         const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
@@ -102,17 +121,36 @@ export default function IssueCertificatePage() {
 
         async function fetchData() {
             setIsLoading(true);
-            const [studentsData, coursesData] = await Promise.all([
+            const [studentsData, coursesData, certificatesData] = await Promise.all([
                 getStudents(instituteId, token),
                 getCourses(instituteId, token),
+                getCertificates(instituteId, token)
             ]);
             setStudents(studentsData);
             setCourses(coursesData);
+            setCertificates(certificatesData);
             setIsLoading(false);
         }
 
         fetchData();
     }, [router, toast]);
+    
+    useEffect(() => {
+        if (watchedStudentId && watchedCourseId) {
+            const existingCertificate = certificates.find(cert => 
+                String(cert.studentId) === String(watchedStudentId) && 
+                String(cert.courseId) === String(watchedCourseId)
+            );
+
+            if (existingCertificate) {
+                setDuplicateWarning(`A certificate for this student and course already exists (Status: ${existingCertificate.status}).`);
+            } else {
+                setDuplicateWarning(null);
+            }
+        } else {
+            setDuplicateWarning(null);
+        }
+    }, [watchedStudentId, watchedCourseId, certificates]);
 
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -228,6 +266,14 @@ export default function IssueCertificatePage() {
                                     </FormItem>
                                 )}
                             />
+
+                             {duplicateWarning && (
+                                <div className="flex items-center gap-2 rounded-md border border-yellow-500/50 bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+                                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                                    <p>{duplicateWarning}</p>
+                                </div>
+                            )}
+
                             <FormField
                                 control={form.control}
                                 name="issueDate"
@@ -362,7 +408,7 @@ export default function IssueCertificatePage() {
                                     )}
                                 />
                             </div>
-                            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting || isLoading}>
+                            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting || isLoading || !!duplicateWarning}>
                             {(isSubmitting || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
                             </Button>
@@ -373,5 +419,3 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
-
-    

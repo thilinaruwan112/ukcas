@@ -4,6 +4,7 @@
 
 
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -90,7 +91,9 @@ export interface Certificate {
   courseName: string;
   issueDate: string;
   instituteId: string;
-  status: 'Approved' | 'Pending' | 'Denied';
+  studentId?: string;
+  courseId?: string;
+  status: 'Approved' | 'Pending' | 'Denied' | 'Rejected';
   student_name?: string;
 }
 
@@ -113,6 +116,7 @@ export interface Student {
   phone_number: string;
   created_at: string;
 }
+
 
 
 

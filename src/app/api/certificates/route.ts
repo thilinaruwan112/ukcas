@@ -65,6 +65,8 @@ export async function GET(request: Request) {
                     courseName: course?.course_name || 'Unknown Course',
                     issueDate: cert.created_at,
                     instituteId: cert.institute_id,
+                    studentId: cert.student_id,
+                    courseId: cert.course_id,
                     status: cert.approved_status || (cert.is_active === '1' ? 'Approved' : 'Pending'),
                     student_name: cert.student_name
                 };
