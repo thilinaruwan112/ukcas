@@ -290,7 +290,7 @@ export default function IssueCertificatePage() {
                                 </div>
                             )}
 
-                            {isSelectionComplete && (
+                            {isSelectionComplete && !duplicateWarning && (
                                 <>
                                     <FormField
                                         control={form.control}
@@ -439,7 +439,3 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
-
-    
-
-    
