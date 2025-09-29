@@ -26,8 +26,12 @@ class StudentCertificateController
     public function create()
     {
         $data = json_decode(file_get_contents("php://input"), true);
-        // Generate a random 6-digit certificate_id if not provided
-        $data['certificate_id'] = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        // Generate a unique 6-digit certificate_id
+        do {
+            $data['certificate_id'] = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $exists = $this->model->getByCertificateId($data['certificate_id']);
+        } while ($exists);
+
         $certificate = $this->model->create($data);
         echo json_encode([
             'status' => 'success',
@@ -58,6 +62,15 @@ class StudentCertificateController
     public function getByInstituteId($institute_id)
     {
         $result = $this->model->getByInstituteId($institute_id);
+        echo json_encode([
+            'status' => 'success',
+            'data' => $result
+        ]);
+    }
+
+    public function getByCertificateId($certificateId)
+    {
+        $result = $this->model->getByCertificateId($certificateId);
         echo json_encode([
             'status' => 'success',
             'data' => $result

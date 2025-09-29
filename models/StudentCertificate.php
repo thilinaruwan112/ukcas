@@ -7,24 +7,33 @@ class StudentCertificate
     {
         $this->pdo = $pdo;
     }
+
+    // Check if certificate_id exists
+    public function getByCertificateId($certificate_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM students_certificates WHERE certificate_id = ?");
+        $stmt->execute([$certificate_id]);
+        return $stmt->fetch();
+    }
     public function getAll()
     {
-        $stmt = $this->pdo->query("SELECT id, institute_id, course_id, certificate_id, created_at, created_by, is_active, approved_status FROM students_certificates");
+        $stmt = $this->pdo->query("SELECT sc.id, sc.institute_id, sc.course_id, sc.certificate_id, sc.student_id, sc.created_at, sc.created_by, sc.is_active, sc.approved_status, rs.name AS student_name FROM students_certificates sc LEFT JOIN registered_students rs ON sc.student_id = rs.id");
         return $stmt->fetchAll();
     }
     public function getById($id)
     {
-        $stmt = $this->pdo->prepare("SELECT id, institute_id, course_id, certificate_id, created_at, created_by, is_active, approved_status FROM students_certificates WHERE id = ?");
+        $stmt = $this->pdo->prepare("SELECT sc.id, sc.institute_id, sc.course_id, sc.certificate_id, sc.student_id, sc.created_at, sc.created_by, sc.is_active, sc.approved_status, rs.name AS student_name FROM students_certificates sc LEFT JOIN registered_students rs ON sc.student_id = rs.id WHERE sc.id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
     public function create($data)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO students_certificates (institute_id, course_id, certificate_id, created_at, created_by, is_active, approved_status) VALUES (?, ?, ?, NOW(), ?, ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO students_certificates (institute_id, course_id, certificate_id, student_id, created_at, created_by, is_active, approved_status) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?)");
         $stmt->execute([
             $data['institute_id'],
             $data['course_id'],
             $data['certificate_id'],
+            $data['student_id'],
             $data['created_by'],
             $data['is_active'],
             'Pending'
@@ -33,11 +42,12 @@ class StudentCertificate
     }
     public function update($id, $data)
     {
-        $stmt = $this->pdo->prepare("UPDATE students_certificates SET institute_id = ?, course_id = ?, certificate_id = ?, created_by = ?, is_active = ?, approved_status = ? WHERE id = ?");
+        $stmt = $this->pdo->prepare("UPDATE students_certificates SET institute_id = ?, course_id = ?, certificate_id = ?, student_id = ?, created_by = ?, is_active = ?, approved_status = ? WHERE id = ?");
         $stmt->execute([
             $data['institute_id'],
             $data['course_id'],
             $data['certificate_id'],
+            $data['student_id'],
             $data['created_by'],
             $data['is_active'],
             'Pending',
@@ -55,7 +65,7 @@ class StudentCertificate
     // Get students by institute_id
     public function getByInstituteId($institute_id)
     {
-        $stmt = $this->pdo->prepare("SELECT id, institute_id, course_id, certificate_id, created_at, created_by, is_active, approved_status FROM students_certificates WHERE institute_id = ?");
+        $stmt = $this->pdo->prepare("SELECT sc.id, sc.institute_id, sc.course_id, sc.certificate_id, sc.student_id, sc.created_at, sc.created_by, sc.is_active, sc.approved_status, rs.name AS student_name FROM students_certificates sc LEFT JOIN registered_students rs ON sc.student_id = rs.id WHERE sc.institute_id = ?");
         $stmt->execute([$institute_id]);
         return $stmt->fetchAll();
     }
