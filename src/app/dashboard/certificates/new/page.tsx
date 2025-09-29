@@ -30,17 +30,17 @@ import type { Student, Course, ApiInstitute } from "@/lib/types";
 const CERTIFICATE_COST = 10;
 
 const formSchema = z.object({
-  studentId: z.string({ required_error: "Please select a student." }),
-  courseId: z.string({
+  student_id: z.string({ required_error: "Please select a student." }),
+  course_id: z.string({
     required_error: "Please select a course.",
   }),
   issueDate: z.date({
     required_error: "An issue date is required.",
   }),
-  fromDate: z.date({
+  from_date: z.date({
     required_error: "A 'from' date is required.",
   }),
-    toDate: z.date({
+    to_date: z.date({
     required_error: "A 'to' date is required.",
   }),
 });
@@ -80,6 +80,7 @@ export default function IssueCertificatePage() {
     const [institute, setInstitute] = useState<ApiInstitute | null>(null);
     const [students, setStudents] = useState<Student[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
+    const [user, setUser] = useState<any>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -90,14 +91,16 @@ export default function IssueCertificatePage() {
         const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
         const token = sessionStorage.getItem('ukcas_token');
         const instituteDataStr = sessionStorage.getItem('ukcas_active_institute');
+        const userDataStr = sessionStorage.getItem('ukcas_user');
 
-        if (!instituteId || !token || !instituteDataStr) {
+        if (!instituteId || !token || !instituteDataStr || !userDataStr) {
             toast({ variant: "destructive", title: "Error", description: "You must be logged in and have an institute selected." });
             router.push('/admin/select-institute');
             return;
         }
 
         setInstitute(JSON.parse(instituteDataStr));
+        setUser(JSON.parse(userDataStr));
 
         async function fetchData() {
             setIsLoading(true);
@@ -114,46 +117,44 @@ export default function IssueCertificatePage() {
     }, [router, toast]);
 
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
+        const token = sessionStorage.getItem('ukcas_token');
+        if (!token || !institute || !user) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Authentication details are missing.' });
+            setIsSubmitting(false);
+            return;
+        }
 
-        // Simulate API call and balance check
-        setTimeout(() => {
-            if (!institute) {
-                toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: "Could not identify your institution.",
-                });
-                setIsSubmitting(false);
-                return;
-            }
+        const payload = {
+            ...values,
+            institute_id: institute.id,
+            created_by: user.user_name || 'system',
+            issueDate: format(values.issueDate, "yyyy-MM-dd"),
+            from_date: format(values.from_date, "yyyy-MM-dd"),
+            to_date: format(values.to_date, "yyyy-MM-dd"),
+            institute: { id: institute.id, balance: institute.balance } // Pass only necessary info
+        };
 
-            const currentBalance = Number(institute.balance) || 0;
-            if (currentBalance < CERTIFICATE_COST) {
-                toast({
-                    variant: "destructive",
-                    title: "Insufficient Balance",
-                    description: `You need at least $${CERTIFICATE_COST.toFixed(2)} to issue a certificate. Your current balance is $${currentBalance.toFixed(2)}.`,
-                });
-                setIsSubmitting(false);
-                return;
-            }
-            
-            // Deduct balance and create pending certificate (simulation)
-            const newBalance = currentBalance - CERTIFICATE_COST;
-            const updatedInstitute = { ...institute, balance: newBalance };
-            sessionStorage.setItem('ukcas_active_institute', JSON.stringify(updatedInstitute));
-            setInstitute(updatedInstitute);
-
-            const studentName = students.find(s => String(s.id) === values.studentId)?.name || 'Unknown Student';
-            
-            console.log("New pending certificate submitted:", {
-                ...values,
-                id: `UKCAS-${Math.floor(Math.random() * 90000000) + 10000000}`,
-                instituteId: institute.id,
-                status: 'Pending',
+        try {
+            const response = await fetch('/api/certificates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                body: JSON.stringify(payload),
             });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to issue certificate.');
+            }
+
+            // Update session storage with new balance
+            if (result.updatedInstitute) {
+                sessionStorage.setItem('ukcas_active_institute', JSON.stringify(result.updatedInstitute));
+            }
+            
+            const studentName = students.find(s => String(s.id) === values.student_id)?.name || 'Unknown Student';
             
             toast({
                 title: "Certificate Submitted!",
@@ -162,7 +163,12 @@ export default function IssueCertificatePage() {
             
             router.push('/dashboard/certificates');
 
-        }, 1000);
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : 'An unknown error occurred.';
+            toast({ variant: 'destructive', title: 'Submission Failed', description: msg });
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -184,7 +190,7 @@ export default function IssueCertificatePage() {
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                             <FormField
                                 control={form.control}
-                                name="studentId"
+                                name="student_id"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Student's Full Name</FormLabel>
@@ -207,7 +213,7 @@ export default function IssueCertificatePage() {
                             />
                             <FormField
                                 control={form.control}
-                                name="courseId"
+                                name="course_id"
                                 render={({ field }) => (
                                     <FormItem>
                                     <FormLabel>Course or Qualification Name</FormLabel>
@@ -272,7 +278,7 @@ export default function IssueCertificatePage() {
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                <FormField
                                     control={form.control}
-                                    name="fromDate"
+                                    name="from_date"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                         <FormLabel>From Date</FormLabel>
@@ -313,7 +319,7 @@ export default function IssueCertificatePage() {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="toDate"
+                                    name="to_date"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                         <FormLabel>To Date</FormLabel>
@@ -363,5 +369,4 @@ export default function IssueCertificatePage() {
             </Card>
         </div>
     );
-
-    
+}
