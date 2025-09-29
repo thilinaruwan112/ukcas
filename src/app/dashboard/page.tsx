@@ -182,36 +182,38 @@ export default function InstituteDashboardPage() {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Student Name</TableHead>
-                                <TableHead>Course</TableHead>
-                                <TableHead>Issue Date</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Certificate ID</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {recentCertificates.length > 0 ? recentCertificates.map(cert => (
-                                <TableRow key={cert.id}>
-                                    <TableCell>{cert.studentName}</TableCell>
-                                    <TableCell>{cert.courseName}</TableCell>
-                                    <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
-                                            {cert.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="font-mono">{cert.id}</TableCell>
-                                </TableRow>
-                            )) : (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center">No recent certificates found.</TableCell>
+                                    <TableHead>Student Name</TableHead>
+                                    <TableHead>Course</TableHead>
+                                    <TableHead>Issue Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Certificate ID</TableHead>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {recentCertificates.length > 0 ? recentCertificates.map(cert => (
+                                    <TableRow key={cert.id}>
+                                        <TableCell>{cert.studentName}</TableCell>
+                                        <TableCell>{cert.courseName}</TableCell>
+                                        <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
+                                                {cert.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="font-mono">{cert.id}</TableCell>
+                                    </TableRow>
+                                )) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-24 text-center">No recent certificates found.</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </>
