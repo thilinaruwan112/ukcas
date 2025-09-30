@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import Link from 'next/link';
 import type { ApiInstitute } from '@/lib/types';
 import { ThemeSwitcher } from './theme-switcher';
+import { SidebarTrigger } from '../ui/sidebar';
 
 interface UserData {
     email: string;
@@ -62,6 +63,7 @@ export default function AdminHeader() {
     return (
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b bg-background px-6">
              <div className="flex items-center gap-4">
+                <SidebarTrigger className="md:hidden" />
                 {institute && user?.acc_type !== 'admin' && (
                     <Button variant="outline" asChild className="hidden sm:flex">
                         <Link href="/admin/select-institute">
