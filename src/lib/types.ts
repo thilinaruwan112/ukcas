@@ -110,6 +110,7 @@ export interface Student {
   email_address: string;
   phone_number: string;
   created_at: string;
+  description?: string;
 }
 
 export interface CertificateVerificationData {

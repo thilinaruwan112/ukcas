@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Building, AlertTriangle } from "lucide-react";
+import { Building, AlertTriangle, Printer } from "lucide-react";
 import type { ApiInstitute } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -125,6 +125,14 @@ export default function AdminInstitutesPage() {
                                                         Approve/Edit
                                                     </Link>
                                                 </Button>
+                                                 {app.accreditation_status === 'Accredited' && (
+                                                    <Button asChild variant="secondary" size="sm">
+                                                        <Link href={`/accreditation-letter/${app.id}`} target="_blank">
+                                                            <Printer className="mr-2 h-4 w-4" />
+                                                            Print Letter
+                                                        </Link>
+                                                    </Button>
+                                                )}
                                                 <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Deny</Button>
                                             </div>
                                         </TableCell>
