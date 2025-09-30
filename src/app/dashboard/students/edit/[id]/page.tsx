@@ -97,13 +97,22 @@ const fileBaseUrl = 'https://content-provider.payshia.com/ukcas/';
 function FilePreview({ path, label }: { path?: string; label: string }) {
     if (!path) return null;
 
-    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(path);
+    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(path);
+    const fullUrl = `${fileBaseUrl}${path}`;
 
     return (
-        <a href={`${fileBaseUrl}${path}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1.5 mt-1.5">
-            {isImage ? <ImageIcon className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
-            View Current {label}
-        </a>
+        <div className="mt-2">
+            {isImage ? (
+                 <a href={fullUrl} target="_blank" rel="noopener noreferrer" className="block">
+                    <Image src={fullUrl} alt={`Current ${label}`} width={200} height={120} className="rounded-md object-cover border" />
+                 </a>
+            ) : (
+                <a href={fullUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline flex items-center gap-1.5">
+                    <FileText className="h-4 w-4" />
+                    View Current {label}
+                </a>
+            )}
+        </div>
     )
 }
 
@@ -336,15 +345,9 @@ export default function EditStudentPage() {
 
             <div className="space-y-2">
                 <Label htmlFor="student_photo">Student Photo</Label>
-                <div className="flex items-center gap-4">
-                    <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading} className="flex-1"/>
-                    {student.student_photo_path && (
-                        <a href={`${fileBaseUrl}${student.student_photo_path}`} target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-                            <Image src={`${fileBaseUrl}${student.student_photo_path}`} alt="Current student photo" width={40} height={40} className="rounded-full object-cover border" />
-                        </a>
-                    )}
-                </div>
+                <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading}/>
                  <p className="text-xs text-muted-foreground">Upload a new photo to replace the current one.</p>
+                <FilePreview path={student.student_photo_path} label="Student Photo" />
             </div>
             
             <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
@@ -387,3 +390,5 @@ function EditStudentPageSkeleton() {
         </div>
     )
 }
+
+    
