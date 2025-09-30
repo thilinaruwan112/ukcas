@@ -135,7 +135,6 @@ export function VerifyCertificatePageClient() {
                         <CardContent className="p-6 grid gap-4 text-sm">
                            <div className="flex flex-col space-y-2 text-center border-b pb-4">
                                 <span className="font-semibold text-xl text-foreground">{result.certificate.name}</span>
-                                <span className="text-muted-foreground">{result.certificate.email_address}</span>
                            </div>
                            <div className="grid grid-cols-2 gap-4">
                                <InfoItem icon={<FileSearch size={16}/>} label="Certificate ID" value={result.certificate.certificate_id.toString()} mono />
