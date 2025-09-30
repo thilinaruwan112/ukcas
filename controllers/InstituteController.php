@@ -43,17 +43,43 @@ class InstituteController
     // Create new institute
     public function createRecord()
     {
-        $data = json_decode(file_get_contents("php://input"), true);
+        $data = $_POST;
+        require_once './controllers/FtpController.php';
+        $ftpController = new FtpController($GLOBALS['pdo']);
 
-        if ($data && isset($data['name'])) {
-            // Generate unique code with prefix UKCAS and check for uniqueness
+        // Handle logo upload
+        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['logo'];
+            $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
+            $safeName = preg_replace('/\s+/', '-', trim($safeName));
+            $safeName = strtolower($safeName);
+            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+            // Use code or fallback to random for folder
             $prefix = 'UKCAS';
             do {
                 $random = mt_rand(1000, 9999);
                 $data['code'] = $prefix . $random;
-                // Check uniqueness
                 $exists = $this->model->getByCode($data['code']);
             } while ($exists);
+            $logoPath = "/ukcas/institutes/{$data['code']}/logo/{$safeName}.{$ext}";
+            $result = $ftpController->uploadImage($file, $logoPath);
+            if (isset($result['status']) && $result['status'] === 'success') {
+                $data['logo_path'] = 'https://content-provider.payshia.com' . $logoPath;
+            } else {
+                $data['logo_path'] = '';
+            }
+        } else {
+            $data['logo_path'] = '';
+            // Generate code if not already set
+            $prefix = 'UKCAS';
+            do {
+                $random = mt_rand(1000, 9999);
+                $data['code'] = $prefix . $random;
+                $exists = $this->model->getByCode($data['code']);
+            } while ($exists);
+        }
+
+        if ($data && isset($data['name'])) {
             $id = $this->model->create($data);
             http_response_code(201);
             echo json_encode([
@@ -70,9 +96,30 @@ class InstituteController
     // Update institute
     public function updateRecord($id)
     {
-        $data = json_decode(file_get_contents("php://input"), true);
+        $data = $_POST;
+        require_once './controllers/FtpController.php';
+        $ftpController = new FtpController($GLOBALS['pdo']);
+        $current = $this->model->getById($id);
+        // Handle logo upload
+        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['logo'];
+            $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
+            $safeName = preg_replace('/\s+/', '-', trim($safeName));
+            $safeName = strtolower($safeName);
+            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $code = isset($data['code']) ? $data['code'] : (isset($current['code']) ? $current['code'] : 'UKCAS' . mt_rand(1000, 9999));
+            $logoPath = "/ukcas/institutes/{$code}/logo/{$safeName}.{$ext}";
+            $result = $ftpController->uploadImage($file, $logoPath);
+            if (isset($result['status']) && $result['status'] === 'success') {
+                $data['logo_path'] = 'https://content-provider.payshia.com' . $logoPath;
+            } else {
+                $data['logo_path'] = isset($current['logo_path']) ? $current['logo_path'] : '';
+            }
+        } else {
+            $data['logo_path'] = isset($current['logo_path']) ? $current['logo_path'] : '';
+        }
 
-        if ($data && isset($data['name'], $data['code'])) {
+        if ($data && isset($data['name'])) {
             $this->model->update($id, $data);
             echo json_encode([
                 'message' => 'Institute updated successfully',
