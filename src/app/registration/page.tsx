@@ -92,11 +92,7 @@ export default function RegistrationPage() {
                     <Label htmlFor="name">Institute Name</Label>
                     <Input id="name" name="name" placeholder="e.g., Global Tech University" required value={instituteName} onChange={handleNameChange} disabled={isLoading} />
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="slug">URL Slug (Auto-generated)</Label>
-                    <Input id="slug" name="slug" placeholder="e.g., global-tech-university" required value={slug} onChange={(e) => setSlug(e.target.value)} disabled={isLoading} />
-                </div>
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="contact_person">Contact Person</Label>
