@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardHeader from "@/components/layout/DashboardHeader";
+import { Logo } from "@/components/Logo";
 
 export default function InstituteLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -44,9 +45,7 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
             <Link href="/dashboard">
-              <span className="text-xl font-bold text-sidebar-foreground px-2">
-                Institute Portal
-              </span>
+              <Logo />
             </Link>
           </SidebarHeader>
           <SidebarContent>

@@ -9,6 +9,7 @@ import { LogOut, Building2, Settings, UserCircle, Award, Users, Library, ShieldC
 import { Button } from "@/components/ui/button";
 import AdminHeader from "@/components/layout/AdminHeader";
 import { useState, useEffect } from "react";
+import { Logo } from "@/components/Logo";
 
 interface UserData {
     acc_type: string;
@@ -57,7 +58,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
             <Link href={isAdmin ? "/admin/admin-institutes" : "/admin/select-institute"}>
-              <span className="text-xl font-bold text-sidebar-foreground px-2">UKCAS Admin</span>
+              <Logo />
             </Link>
           </SidebarHeader>
           <SidebarContent>
