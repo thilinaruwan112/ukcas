@@ -137,7 +137,7 @@ foreach ($routes as $route => $handler) {
         if ($method === 'GET') {
             requireApiKey();
         } elseif ($isInstituteCreate) {
-            requireApiKey();
+            // requireApiKey();
         } elseif (!$isLoginRoute) {
             requireJwt();
         }
