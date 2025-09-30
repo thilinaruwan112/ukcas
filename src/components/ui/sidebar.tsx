@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -553,17 +554,28 @@ const SidebarMenuButton = React.forwardRef<
       className,
       href,
       children,
+      onClick,
       ...props
     },
     ref
   ) => {
-    const { isMobile, state } = useSidebar()
+    const { isMobile, state, setOpenMobile } = useSidebar()
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (isMobile) {
+        setOpenMobile(false)
+      }
+      if (onClick) {
+        onClick(event)
+      }
+    }
 
     const allProps = {
       "data-sidebar": "menu-button",
       "data-size": size,
       "data-active": isActive,
       className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+      onClick: handleClick,
       ...props,
     }
 
