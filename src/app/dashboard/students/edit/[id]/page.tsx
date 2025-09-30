@@ -288,6 +288,32 @@ export default function EditStudentPage() {
                 <Textarea id="address" name="address" defaultValue={student.address} placeholder="123 Example Street, London, EX1 2MP" disabled={isLoading} />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="id_card_front">ID Card (Front)</Label>
+                    <Input id="id_card_front" name="id_card_front" type="file" disabled={isLoading}/>
+                     <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="id_card_back">ID Card (Back)</Label>
+                    <Input id="id_card_back" name="id_card_back" type="file" disabled={isLoading}/>
+                     <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                </div>
+            </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="ol_certificate">O/L Certificate</Label>
+                    <Input id="ol_certificate" name="ol_certificate" type="file" disabled={isLoading}/>
+                     <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="al_certificate">A/L Certificate</Label>
+                    <Input id="al_certificate" name="al_certificate" type="file" disabled={isLoading}/>
+                     <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                </div>
+            </div>
+
             <div className="space-y-2">
                 <Label htmlFor="student_photo">Student Photo</Label>
                 <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading}/>
