@@ -41,7 +41,7 @@ class Institute
             INSERT INTO {$this->table}
             (name, code, type, accreditation_status, accreditation_valid_until, email, phone, website,
              address_line1, address_line2, city, state, country, postal_code, created_at, updated_at, created_by, status, slug, logo_path)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         ");
         $stmt->execute([
             $data['name'],
