@@ -80,6 +80,7 @@ export default function EditCoursePage() {
           course_code: formData.get('courseCode') as string,
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
+          active_status: course.active_status,
       };
 
       try {
