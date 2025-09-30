@@ -48,7 +48,7 @@ class Institute
             $data['code'],
             $data['type'],
             $data['accreditation_status'],
-            $data['accreditation_valid_until'],
+            $data['accreditation_valid_until'] ?? null,
             $data['email'],
             $data['phone'],
             $data['website'],
