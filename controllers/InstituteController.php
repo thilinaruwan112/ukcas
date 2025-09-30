@@ -44,6 +44,9 @@ class InstituteController
     public function createRecord()
     {
         $data = $_POST;
+        $now = date('Y-m-d H:i:s');
+        $data['created_at'] = $now;
+        $data['updated_at'] = $now;
         require_once './controllers/FtpController.php';
         $ftpController = new FtpController($GLOBALS['pdo']);
 
@@ -97,6 +100,8 @@ class InstituteController
     public function updateRecord($id)
     {
         $data = $_POST;
+        $now = date('Y-m-d H:i:s');
+        $data['updated_at'] = $now;
         require_once './controllers/FtpController.php';
         $ftpController = new FtpController($GLOBALS['pdo']);
         $current = $this->model->getById($id);
