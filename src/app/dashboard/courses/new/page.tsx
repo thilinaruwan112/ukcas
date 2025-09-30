@@ -36,6 +36,7 @@ export default function NewCoursePage() {
       const payload = {
           institute_id: parseInt(instituteId),
           name: formData.get('courseName') as string,
+          course_code: formData.get('courseCode') as string,
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
           created_by: user.user_name || 'system',

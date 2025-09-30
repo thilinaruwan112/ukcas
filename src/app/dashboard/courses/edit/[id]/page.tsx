@@ -77,6 +77,7 @@ export default function EditCoursePage() {
       const payload = {
           id: course.id,
           name: formData.get('courseName') as string,
+          course_code: formData.get('courseCode') as string,
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
       };
