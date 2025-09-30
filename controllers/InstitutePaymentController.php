@@ -24,9 +24,8 @@ class InstitutePaymentController
             'data' => $this->model->getById($id)
         ]);
     }
-    public function create()
+    public function create($data)
     {
-        $data = json_decode(file_get_contents("php://input"), true);
         $payment = $this->model->create($data);
         echo json_encode([
             'status' => 'success',
@@ -34,9 +33,8 @@ class InstitutePaymentController
             'data' => $payment
         ]);
     }
-    public function update($id)
+    public function update($id, $data)
     {
-        $data = json_decode(file_get_contents("php://input"), true);
         $payment = $this->model->update($id, $data);
         echo json_encode([
             'status' => 'success',

@@ -26,24 +26,48 @@ class StudentCertificateController
         $updated = $this->model->updateApprovedStatus($certificate_id, $status);
         // If approved, create payment entry
         if ($updated && strtolower($status) === 'approved') {
+            // if (1 == 1) {
             $paymentController = new InstitutePaymentController($GLOBALS['pdo']);
             // Prepare payment data (customize as needed)
-            $certificate = $this->model->getById($certificate_id);
+            $certificate = $this->model->getByCertificateId($certificate_id);
+            // var_dump($certificate);
+            // Check for required fields
+            if (
+                empty($certificate['institute_id']) ||
+                empty($certificate['created_by'])
+            ) {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Missing required payment data from certificate.',
+                    'certificate' => $certificate
+                ]);
+                return;
+            }
             $paymentData = [
                 'institute_id' => $certificate['institute_id'] ?? null,
                 'type' => 'CREDIT', // or 'DEBIT' based on your business logic
-                'amount' => $certificate['payment_amount'] ?? 0,
+                'amount' => 10 ?? 0,
                 'created_by' => $certificate['created_by'] ?? null,
                 'active_status' => 1,
                 'remark' => 'Certificate approval payment for certificate ID ' . $certificate_id,
                 'ref_id' => $certificate_id
             ];
+
             $paymentController->create($paymentData);
         }
-        echo json_encode([
-            'status' => $updated ? 'success' : 'error',
-            'message' => $updated ? 'Approved status updated.' : 'Update failed.'
-        ]);
+        if ($updated) {
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Approved status updated.'
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Update failed. Certificate not found or status unchanged.',
+                'certificate_id' => $certificate_id,
+                'requested_status' => $status
+            ]);
+        }
     }
 
     public function getAll()

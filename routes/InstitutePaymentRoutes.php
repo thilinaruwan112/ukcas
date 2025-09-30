@@ -13,10 +13,14 @@
             $controller->getById($id);
         },
         'POST /institute-payments/' => function () use ($controller) {
-            $controller->create();
+
+            $data = json_decode(file_get_contents("php://input"), true);
+            $controller->create($data);
         },
         'PUT /institute-payments/{id}' => function ($id) use ($controller) {
-            $controller->update($id);
+
+            $data = json_decode(file_get_contents("php://input"), true);
+            $controller->update($id, $data);
         },
         'DELETE /institute-payments/{id}' => function ($id) use ($controller) {
             $controller->delete($id);
