@@ -37,6 +37,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     setLoading(false);
   }, [pathname, router]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('ukcas_user');
+    localStorage.removeItem('ukcas_token');
+    localStorage.removeItem('ukcas_active_institute');
+    localStorage.removeItem('ukcas_active_institute_id');
+    router.push('/login');
+  };
+
   const isAdmin = user?.acc_type === 'admin';
   
   if(loading) {
@@ -108,11 +116,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   </Button>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <Button asChild variant="ghost" className="w-full justify-start text-red-400 hover:text-red-400 hover:bg-red-500/10">
-                    <Link href="/login">
+                  <Button onClick={handleLogout} variant="ghost" className="w-full justify-start text-red-400 hover:text-red-400 hover:bg-red-500/10">
                       <LogOut />
                       Logout
-                    </Link>
                   </Button>
                 </SidebarMenuItem>
               </SidebarMenu>

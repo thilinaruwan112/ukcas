@@ -3,7 +3,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -28,6 +28,15 @@ import DashboardHeader from "@/components/layout/DashboardHeader";
 
 export default function InstituteLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('ukcas_user');
+    localStorage.removeItem('ukcas_token');
+    localStorage.removeItem('ukcas_active_institute');
+    localStorage.removeItem('ukcas_active_institute_id');
+    router.push('/login');
+  };
 
   return (
     <SidebarProvider>
@@ -81,14 +90,12 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Button
-                  asChild
+                  onClick={handleLogout}
                   variant="ghost"
                   className="w-full justify-start text-red-400 hover:text-red-400 hover:bg-red-500/10"
                 >
-                  <Link href="/login">
                     <LogOut />
                     Logout
-                  </Link>
                 </Button>
               </SidebarMenuItem>
             </SidebarMenu>
