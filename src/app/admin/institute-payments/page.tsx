@@ -14,9 +14,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 
-async function getBalance(instituteId: string): Promise<number> {
+async function getBalance(instituteId: string, token: string): Promise<number> {
     try {
-        const response = await fetch(`/api/institute-payments/${instituteId}`);
+        const response = await fetch(`/api/institute-payments/${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (!response.ok) {
             return 0;
         }
@@ -44,6 +46,11 @@ export default function InstitutePaymentsPage() {
         setLoading(true);
         setError(null);
         try {
+            const token = sessionStorage.getItem('ukcas_token');
+            if (!token) {
+                throw new Error("Authentication token not found.");
+            }
+
             const response = await fetch('/api/institutes');
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
@@ -56,7 +63,7 @@ export default function InstitutePaymentsPage() {
             
             const institutesWithBalances = await Promise.all(
                 instituteData.map(async (institute: ApiInstitute) => {
-                    const balance = await getBalance(institute.id);
+                    const balance = await getBalance(institute.id, token);
                     return { ...institute, balance };
                 })
             );
@@ -72,8 +79,13 @@ export default function InstitutePaymentsPage() {
     };
     
     useEffect(() => {
+        const token = sessionStorage.getItem('ukcas_token');
+        if (!token) {
+            router.push('/login');
+            return;
+        }
         fetchInstitutes();
-    }, []);
+    }, [router]);
 
 
     const filteredInstitutes = institutes.filter(institute =>
@@ -253,5 +265,3 @@ export default function InstitutePaymentsPage() {
         </>
     );
 }
-
-    
