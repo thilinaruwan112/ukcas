@@ -16,7 +16,8 @@ import type { Student } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
+import { usePagination, DOTS } from '@/hooks/use-pagination';
 
 async function getStudents(instituteId: string, token: string): Promise<Student[]> {
     try {
@@ -77,6 +78,13 @@ export default function StudentListPage() {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredStudents.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+
+    const paginationRange = usePagination({
+        currentPage,
+        totalCount: filteredStudents.length,
+        pageSize: itemsPerPage,
+    });
+
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
@@ -297,13 +305,22 @@ export default function StudentListPage() {
                                 <PaginationItem>
                                     <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
                                 </PaginationItem>
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <PaginationItem key={i}>
-                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
-                                            {i + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
+                                {paginationRange?.map((pageNumber, index) => {
+                                    if (pageNumber === DOTS) {
+                                        return <PaginationItem key={`dot-${index}`}><PaginationEllipsis /></PaginationItem>;
+                                    }
+                                    return (
+                                        <PaginationItem key={pageNumber}>
+                                            <PaginationLink
+                                                href="#"
+                                                isActive={currentPage === pageNumber}
+                                                onClick={(e) => { e.preventDefault(); handlePageChange(pageNumber as number); }}
+                                            >
+                                                {pageNumber}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    );
+                                })}
                                 <PaginationItem>
                                     <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
                                 </PaginationItem>
