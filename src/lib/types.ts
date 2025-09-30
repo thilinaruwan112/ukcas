@@ -106,11 +106,15 @@ export interface AdminUser {
 
 export interface Student {
   id: string;
+  institute_id: string;
   name: string;
   email_address: string;
   phone_number: string;
+  date_of_birth: string;
+  address: string;
+  country: string;
   created_at: string;
-  description?: string;
+  student_photo_path?: string;
 }
 
 export interface CertificateVerificationData {
@@ -133,4 +137,3 @@ export interface CertificateVerificationData {
   address: string;
   student_photo: string;
 }
-    

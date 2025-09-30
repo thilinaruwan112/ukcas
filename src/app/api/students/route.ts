@@ -1,4 +1,5 @@
 
+
 import { NextResponse } from 'next/server';
 
 export const config = {
@@ -27,6 +28,14 @@ async function handleRequest(request: Request) {
         if (request.method === 'GET') {
             const { searchParams } = new URL(request.url);
             const instituteId = searchParams.get('instituteId');
+            const studentId = searchParams.get('id');
+
+            if (studentId) {
+                const fetchUrl = `${apiUrl}/registered-students/${studentId}`;
+                 const response = await fetch(fetchUrl, { headers });
+                const data = await response.json();
+                return NextResponse.json(data, { status: response.status });
+            }
 
             if (!instituteId) {
                 return NextResponse.json({ status: 'error', message: 'Institute ID is required.' }, { status: 400 });
@@ -41,15 +50,23 @@ async function handleRequest(request: Request) {
 
         if (request.method === 'POST') {
             const formData = await request.formData();
+            const studentId = formData.get('id') as string;
             
             const postHeaders: HeadersInit = {
                 'X-API-KEY': apiKey,
                 'Authorization': `Bearer ${token}`
-                // 'Content-Type' header should not be set manually for FormData.
-                // The browser or fetch will set it with the correct boundary.
+                // 'Content-Type' header is set automatically for FormData
             };
+            
+            let fetchUrl = `${apiUrl}/registered-students`;
+            if (studentId) {
+                 // The backend uses POST for updates, identified by the presence of an ID.
+                 // The actual endpoint might be different, e.g. /registered-students/{id}
+                 // but based on docs, it might be the same endpoint with POST.
+                fetchUrl = `${apiUrl}/registered-students/${studentId}`;
+            }
 
-            const response = await fetch(`${apiUrl}/registered-students`, {
+            const response = await fetch(fetchUrl, {
                 method: 'POST',
                 headers: postHeaders,
                 body: formData,
@@ -69,4 +86,3 @@ async function handleRequest(request: Request) {
 
 export async function GET(request: Request) { return handleRequest(request); }
 export async function POST(request: Request) { return handleRequest(request); }
-

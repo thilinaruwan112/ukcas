@@ -188,9 +188,11 @@ export default function StudentListPage() {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>
-                                                            <UserCog className="mr-2 h-4 w-4" />
-                                                            <span>Edit Details</span>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/dashboard/students/edit/${student.id}`}>
+                                                                <UserCog className="mr-2 h-4 w-4" />
+                                                                <span>Edit Details</span>
+                                                            </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         <DropdownMenuItem
@@ -255,9 +257,11 @@ export default function StudentListPage() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>
-                                                    <UserCog className="mr-2 h-4 w-4" />
-                                                    <span>Edit Details</span>
+                                                <DropdownMenuItem asChild>
+                                                     <Link href={`/dashboard/students/edit/${student.id}`}>
+                                                        <UserCog className="mr-2 h-4 w-4" />
+                                                        <span>Edit Details</span>
+                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
@@ -331,5 +335,3 @@ export default function StudentListPage() {
         </>
     );
 }
-
-    
