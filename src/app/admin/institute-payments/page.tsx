@@ -72,7 +72,7 @@ export default function InstitutePaymentsPage() {
 
             const payload = {
                 institute_id: instituteToTopUp.id,
-                type: 'CREDIT',
+                type: 'DEBIT',
                 amount: topUpAmount,
                 created_by: user?.user_name || 'admin',
                 active_status: 1,
