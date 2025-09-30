@@ -56,10 +56,10 @@ class StudentCertificateController
             $paymentController->create($paymentData);
         }
         if ($updated) {
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Approved status updated.'
-            ]);
+            // echo json_encode([
+            //     'status' => 'success',
+            //     'message' => 'Approved status updated.'
+            // ]);
         } else {
             echo json_encode([
                 'status' => 'error',
