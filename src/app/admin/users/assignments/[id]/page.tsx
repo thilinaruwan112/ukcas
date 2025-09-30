@@ -85,7 +85,7 @@ export default function ManageAssignmentsPage() {
         setLoading(false);
         return;
     }
-    const token = sessionStorage.getItem('ukcas_token');
+    const token = localStorage.getItem('ukcas_token');
     if (!token) {
         router.push('/login');
         return;
@@ -121,7 +121,7 @@ export default function ManageAssignmentsPage() {
 
   const handleUnassignConfirm = async () => {
     if (!assignmentToDelete) return;
-    const token = sessionStorage.getItem('ukcas_token');
+    const token = localStorage.getItem('ukcas_token');
     if (!token) return;
 
     try {
@@ -149,7 +149,7 @@ export default function ManageAssignmentsPage() {
         toast({ variant: 'destructive', title: 'Error', description: 'Please select an institute and a role.' });
         return;
     }
-    const token = sessionStorage.getItem('ukcas_token');
+    const token = localStorage.getItem('ukcas_token');
     if (!token) return;
     
     setIsAssigning(true);

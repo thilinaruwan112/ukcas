@@ -26,12 +26,12 @@ export default function DashboardHeader() {
     const [institute, setInstitute] = useState<ApiInstitute | null>(null);
 
     useEffect(() => {
-        const userDataString = sessionStorage.getItem('ukcas_user');
+        const userDataString = localStorage.getItem('ukcas_user');
         if (userDataString) {
             setUser(JSON.parse(userDataString));
         }
         
-        const instituteDataString = sessionStorage.getItem('ukcas_active_institute');
+        const instituteDataString = localStorage.getItem('ukcas_active_institute');
         if (instituteDataString) {
             setInstitute(JSON.parse(instituteDataString));
         } else {
@@ -42,10 +42,10 @@ export default function DashboardHeader() {
     }, [router]);
 
     const handleLogout = () => {
-        sessionStorage.removeItem('ukcas_user');
-        sessionStorage.removeItem('ukcas_token');
-        sessionStorage.removeItem('ukcas_active_institute');
-        sessionStorage.removeItem('ukcas_active_institute_id');
+        localStorage.removeItem('ukcas_user');
+        localStorage.removeItem('ukcas_token');
+        localStorage.removeItem('ukcas_active_institute');
+        localStorage.removeItem('ukcas_active_institute_id');
         router.push('/login');
     };
 

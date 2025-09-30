@@ -118,9 +118,9 @@ export default function InstituteDashboardPage() {
     const [balance, setBalance] = useState<number>(0);
 
     useEffect(() => {
-        const instituteDataString = sessionStorage.getItem('ukcas_active_institute');
-        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
-        const token = sessionStorage.getItem('ukcas_token');
+        const instituteDataString = localStorage.getItem('ukcas_active_institute');
+        const instituteId = localStorage.getItem('ukcas_active_institute_id');
+        const token = localStorage.getItem('ukcas_token');
 
         if (!instituteDataString || !instituteId || !token) {
             router.push('/admin/select-institute');

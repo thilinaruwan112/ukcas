@@ -41,8 +41,8 @@ export default function CoursesPage() {
     const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
     useEffect(() => {
-        const token = sessionStorage.getItem('ukcas_token');
-        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        const token = localStorage.getItem('ukcas_token');
+        const instituteId = localStorage.getItem('ukcas_active_institute_id');
         
         if (!token || !instituteId) {
             toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in and have an institute selected.' });
@@ -65,7 +65,7 @@ export default function CoursesPage() {
 
     const handleDeleteConfirm = async () => {
         if (!courseToDelete) return;
-        const token = sessionStorage.getItem('ukcas_token');
+        const token = localStorage.getItem('ukcas_token');
         if (!token) return;
 
         try {

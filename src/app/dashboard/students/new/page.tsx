@@ -88,9 +88,9 @@ export default function NewStudentPage() {
       setIsLoading(true);
 
       const formData = new FormData(e.currentTarget);
-      const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
-      const token = sessionStorage.getItem('ukcas_token');
-      const userData = sessionStorage.getItem('ukcas_user');
+      const instituteId = localStorage.getItem('ukcas_active_institute_id');
+      const token = localStorage.getItem('ukcas_token');
+      const userData = localStorage.getItem('ukcas_user');
       const user = userData ? JSON.parse(userData) : null;
       
       if (!instituteId || !token || !user) {
@@ -268,5 +268,3 @@ export default function NewStudentPage() {
     </div>
   );
 }
-
-    

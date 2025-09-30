@@ -23,7 +23,7 @@ export default function StudentListPage() {
 
     // TODO: Implement API call to fetch students for the selected institute
     useEffect(() => {
-        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        const instituteId = localStorage.getItem('ukcas_active_institute_id');
         if (instituteId) {
             // Placeholder for fetching students for the institute
             // getStudentsByInstitute(instituteId).then(data => {
@@ -36,8 +36,7 @@ export default function StudentListPage() {
     }, []);
 
     const filteredStudents = students.filter(student =>
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.course.toLowerCase().includes(searchTerm.toLowerCase())
+        student.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleDeleteClick = (student: Student) => {
@@ -69,7 +68,7 @@ export default function StudentListPage() {
         const headers = ["ID", "Name", "Course", "Joined Date"];
         const csvContent = "data:text/csv;charset=utf-8," 
             + headers.join(",") + "\n" 
-            + filteredStudents.map(s => `${s.id},"${s.name}","${s.course}",${s.joinedDate}`).join("\n");
+            + filteredStudents.map(s => `${s.id},"${s.name}","${'deprecated'}","${'deprecated'}`).join("\n");
         
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -144,8 +143,8 @@ export default function StudentListPage() {
                                     filteredStudents.map((student) => (
                                     <TableRow key={student.id}>
                                         <TableCell className="font-medium">{student.name}</TableCell>
-                                        <TableCell>{student.course}</TableCell>
-                                        <TableCell>{new Date(student.joinedDate).toLocaleDateString()}</TableCell>
+                                        <TableCell>DEPRECATED</TableCell>
+                                        <TableCell>{new Date(student.created_at).toLocaleDateString()}</TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

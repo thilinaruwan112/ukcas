@@ -21,12 +21,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userDataString = sessionStorage.getItem('ukcas_user');
+    const userDataString = localStorage.getItem('ukcas_user');
     if (userDataString) {
         const parsedUser = JSON.parse(userDataString);
         setUser(parsedUser);
         
-        const activeInstitute = sessionStorage.getItem('ukcas_active_institute_id');
+        const activeInstitute = localStorage.getItem('ukcas_active_institute_id');
         if (parsedUser.acc_type !== 'admin' && !activeInstitute && pathname !== '/admin/select-institute') {
             router.replace('/admin/select-institute');
         }

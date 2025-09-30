@@ -120,10 +120,10 @@ export default function IssueCertificatePage() {
     const watchedCourseId = form.watch("course_id");
 
     useEffect(() => {
-        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
-        const token = sessionStorage.getItem('ukcas_token');
-        const instituteDataStr = sessionStorage.getItem('ukcas_active_institute');
-        const userDataStr = sessionStorage.getItem('ukcas_user');
+        const instituteId = localStorage.getItem('ukcas_active_institute_id');
+        const token = localStorage.getItem('ukcas_token');
+        const instituteDataStr = localStorage.getItem('ukcas_active_institute');
+        const userDataStr = localStorage.getItem('ukcas_user');
 
         if (!instituteId || !token || !instituteDataStr || !userDataStr) {
             toast({ variant: "destructive", title: "Error", description: "You must be logged in and have an institute selected." });
@@ -151,7 +151,7 @@ export default function IssueCertificatePage() {
     useEffect(() => {
         const checkCertificate = async () => {
             if (watchedStudentId && watchedCourseId && institute) {
-                const token = sessionStorage.getItem('ukcas_token');
+                const token = localStorage.getItem('ukcas_token');
                 if (!token) return;
 
                 setIsChecking(true);
@@ -184,7 +184,7 @@ export default function IssueCertificatePage() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
-        const token = sessionStorage.getItem('ukcas_token');
+        const token = localStorage.getItem('ukcas_token');
         if (!token || !institute || !user) {
             toast({ variant: 'destructive', title: 'Error', description: 'Authentication details are missing.' });
             setIsSubmitting(false);

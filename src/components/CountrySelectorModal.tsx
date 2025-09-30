@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -24,7 +25,7 @@ export default function CountrySelectorModal() {
   const { setLocale } = useI18n();
 
   useEffect(() => {
-    const languageSelected = sessionStorage.getItem('ukcas_language_selected');
+    const languageSelected = localStorage.getItem('ukcas_language_selected');
     if (!languageSelected) {
       setIsOpen(true);
     }
@@ -32,7 +33,7 @@ export default function CountrySelectorModal() {
 
   const handleLanguageSelect = (lang: string) => {
     setLocale(lang);
-    sessionStorage.setItem('ukcas_language_selected', 'true');
+    localStorage.setItem('ukcas_language_selected', 'true');
     setIsOpen(false);
   };
 

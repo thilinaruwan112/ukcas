@@ -82,7 +82,7 @@ export default function UserMaintenancePage() {
         if (!userToDelete) return;
         
         try {
-            const token = sessionStorage.getItem('ukcas_token');
+            const token = localStorage.getItem('ukcas_token');
             const response = await fetch('/api/users', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -111,7 +111,7 @@ export default function UserMaintenancePage() {
         if (!userToTopUp || topUpAmount <= 0) return;
 
         try {
-            const token = sessionStorage.getItem('ukcas_token');
+            const token = localStorage.getItem('ukcas_token');
             const response = await fetch('/api/users', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

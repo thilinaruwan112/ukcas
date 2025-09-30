@@ -139,7 +139,7 @@ export default function PrintCertificatePage() {
             </div>
             <div id="print-area" className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
                 <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black flex flex-col">
-                     <div className="absolute inset-0 z-0 opacity-80">
+                     <div className="absolute inset-0 z-0 opacity-100">
                         <Image 
                             src="https://content-provider.payshia.com/ukcas/institutes/1/docs/ukcas-letter-head.jpg" 
                             alt="Letterhead" 
@@ -152,7 +152,7 @@ export default function PrintCertificatePage() {
 
                         <div className="text-center mt-[150px] space-y-4">
                              <p className="text-lg">This is to certify that</p>
-                             <h1 className="text-5xl font-bold tracking-wide">{certificate.name}</h1>
+                             <h1 className="text-4xl font-bold tracking-wide">{certificate.name}</h1>
                              <p className="text-base max-w-xl mx-auto">has completed the United Kingdom College of Advanced Studies endorsed course of learning</p>
                              <h2 className="text-3xl font-semibold">{course.course_name}</h2>
                              <p className="text-base max-w-xl mx-auto">and completed the final examination in accordance with the standards of United Kingdom College of Advanced Studies.</p>
@@ -168,7 +168,7 @@ export default function PrintCertificatePage() {
 
                          <div className="mt-auto pt-16 flex justify-between items-end">
                             <div className="space-y-4">
-                                <div className="relative h-16 w-48">
+                                <div className="relative h-14 w-48">
                                     <Image 
                                         src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png" 
                                         alt="Signature"

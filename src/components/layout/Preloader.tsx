@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -16,12 +17,12 @@ export default function Preloader() {
 
   useEffect(() => {
     if (isMounted) {
-      const preloaderShown = sessionStorage.getItem('ukcas_preloader_shown');
+      const preloaderShown = localStorage.getItem('ukcas_preloader_shown');
       if (!preloaderShown) {
         setShouldRender(true);
         const fadeOutTimer = setTimeout(() => {
           setIsFadingOut(true);
-          sessionStorage.setItem('ukcas_preloader_shown', 'true');
+          localStorage.setItem('ukcas_preloader_shown', 'true');
         }, 1500); // Time logo is visible
 
         const unmountTimer = setTimeout(() => {

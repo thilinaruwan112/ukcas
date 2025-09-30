@@ -19,8 +19,8 @@ export function LoginPageClient() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const userToken = sessionStorage.getItem('ukcas_token');
-    const userDataString = sessionStorage.getItem('ukcas_user');
+    const userToken = localStorage.getItem('ukcas_token');
+    const userDataString = localStorage.getItem('ukcas_user');
     
     if (userToken && userDataString) {
       try {
@@ -31,8 +31,8 @@ export function LoginPageClient() {
           router.replace('/admin/select-institute');
         }
       } catch (error) {
-        // If parsing fails, clear session and let them log in again
-        sessionStorage.clear();
+        // If parsing fails, clear storage and let them log in again
+        localStorage.clear();
       }
     }
   }, [router]);
@@ -59,8 +59,8 @@ export function LoginPageClient() {
       console.log('API Response:', data);
 
       if (response.ok && data.status === 'success') {
-        sessionStorage.setItem('ukcas_token', data.token);
-        sessionStorage.setItem('ukcas_user', JSON.stringify(data.data));
+        localStorage.setItem('ukcas_token', data.token);
+        localStorage.setItem('ukcas_user', JSON.stringify(data.data));
 
         toast({
           title: 'Login Successful',

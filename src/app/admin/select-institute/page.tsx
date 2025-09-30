@@ -55,8 +55,8 @@ export default function SelectInstitutePage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const userStr = sessionStorage.getItem('ukcas_user');
-        const token = sessionStorage.getItem('ukcas_token');
+        const userStr = localStorage.getItem('ukcas_user');
+        const token = localStorage.getItem('ukcas_token');
         if (!userStr || !token) {
             router.push('/login');
             return;
@@ -82,8 +82,8 @@ export default function SelectInstitutePage() {
     }, [router]);
 
     const handleSelectInstitute = (institute: ApiInstitute) => {
-        sessionStorage.setItem('ukcas_active_institute', JSON.stringify(institute));
-        sessionStorage.setItem('ukcas_active_institute_id', institute.id);
+        localStorage.setItem('ukcas_active_institute', JSON.stringify(institute));
+        localStorage.setItem('ukcas_active_institute_id', institute.id);
         router.push('/dashboard');
     };
 

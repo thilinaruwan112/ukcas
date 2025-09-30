@@ -44,7 +44,7 @@ export default function EditCoursePage() {
         setIsFetching(false);
         return;
     }
-    const token = sessionStorage.getItem('ukcas_token');
+    const token = localStorage.getItem('ukcas_token');
     if (!token) {
         router.push('/login');
         return;
@@ -67,8 +67,8 @@ export default function EditCoursePage() {
       setIsLoading(true);
       
       const formData = new FormData(e.currentTarget);
-      const token = sessionStorage.getItem('ukcas_token');
-      const userData = sessionStorage.getItem('ukcas_user');
+      const token = localStorage.getItem('ukcas_token');
+      const userData = localStorage.getItem('ukcas_user');
       const user = userData ? JSON.parse(userData) : null;
 
        if (!token || !course || !user) {

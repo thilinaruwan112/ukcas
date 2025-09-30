@@ -42,8 +42,8 @@ export default function CertificateListPage() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        const token = sessionStorage.getItem('ukcas_token');
-        const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
+        const token = localStorage.getItem('ukcas_token');
+        const instituteId = localStorage.getItem('ukcas_active_institute_id');
         
         if (!token || !instituteId) {
             toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in and have an institute selected.' });

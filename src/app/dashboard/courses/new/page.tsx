@@ -22,9 +22,9 @@ export default function NewCoursePage() {
       setIsLoading(true);
       
       const formData = new FormData(e.currentTarget);
-      const token = sessionStorage.getItem('ukcas_token');
-      const instituteId = sessionStorage.getItem('ukcas_active_institute_id');
-      const userData = sessionStorage.getItem('ukcas_user');
+      const token = localStorage.getItem('ukcas_token');
+      const instituteId = localStorage.getItem('ukcas_active_institute_id');
+      const userData = localStorage.getItem('ukcas_user');
       const user = userData ? JSON.parse(userData) : null;
       
       if (!token || !user || !instituteId) {

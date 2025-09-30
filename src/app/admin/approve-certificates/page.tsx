@@ -63,7 +63,7 @@ export default function ApproveCertificatesPage() {
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const fetchCertificates = () => {
-         const token = sessionStorage.getItem('ukcas_token');
+         const token = localStorage.getItem('ukcas_token');
         if (!token) {
             router.push('/login');
             return;
@@ -85,7 +85,7 @@ export default function ApproveCertificatesPage() {
     
     const handleStatusUpdate = async (id: string, status: 'Approved' | 'Rejected') => {
         setUpdatingId(id);
-        const token = sessionStorage.getItem('ukcas_token');
+        const token = localStorage.getItem('ukcas_token');
         if (!token) {
             toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
             setUpdatingId(null);

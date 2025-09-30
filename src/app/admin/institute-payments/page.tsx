@@ -46,7 +46,7 @@ export default function InstitutePaymentsPage() {
         setLoading(true);
         setError(null);
         try {
-            const token = sessionStorage.getItem('ukcas_token');
+            const token = localStorage.getItem('ukcas_token');
             if (!token) {
                 throw new Error("Authentication token not found.");
             }
@@ -79,7 +79,7 @@ export default function InstitutePaymentsPage() {
     };
     
     useEffect(() => {
-        const token = sessionStorage.getItem('ukcas_token');
+        const token = localStorage.getItem('ukcas_token');
         if (!token) {
             router.push('/login');
             return;
@@ -101,8 +101,8 @@ export default function InstitutePaymentsPage() {
         setIsSubmitting(true);
 
         try {
-            const token = sessionStorage.getItem('ukcas_token');
-            const userStr = sessionStorage.getItem('ukcas_user');
+            const token = localStorage.getItem('ukcas_token');
+            const userStr = localStorage.getItem('ukcas_user');
             const user = userStr ? JSON.parse(userStr) : null;
             
             if (!token) {
