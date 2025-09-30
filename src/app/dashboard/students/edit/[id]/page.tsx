@@ -92,13 +92,12 @@ async function getStudentById(id: string, token: string): Promise<Student | null
     }
 }
 
-const fileBaseUrl = 'https://content-provider.payshia.com/ukcas/';
 
-function FilePreview({ path, label }: { path?: string; label: string }) {
+function FilePreview({ path, label }: { path?: string | null; label: string }) {
     if (!path) return null;
 
     const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(path);
-    const fullUrl = `${fileBaseUrl}${path}`;
+    const fullUrl = path; // The full URL is now constructed in the API route
 
     return (
         <div className="mt-2">
@@ -390,5 +389,3 @@ function EditStudentPageSkeleton() {
         </div>
     )
 }
-
-    

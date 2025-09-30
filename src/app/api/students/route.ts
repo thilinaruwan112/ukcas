@@ -32,8 +32,32 @@ async function handleRequest(request: Request) {
 
             if (studentId) {
                 const fetchUrl = `${apiUrl}/registered-students/${studentId}`;
-                 const response = await fetch(fetchUrl, { headers });
+                const response = await fetch(fetchUrl, { headers });
                 const data = await response.json();
+                
+                // Ensure all path properties are present, even if null
+                if (data.status === 'success' && data.data) {
+                    const studentData = data.data;
+                    const requiredPaths = [
+                        'student_photo_path',
+                        'id_card_front_path',
+                        'id_card_back_path',
+                        'ol_certificate_path',
+                        'al_certificate_path'
+                    ];
+                    requiredPaths.forEach(path => {
+                        if (!(path in studentData)) {
+                            studentData[path] = null;
+                        }
+                    });
+                     // Make sure full URL is constructed if not already
+                    studentData.student_photo_path = studentData.student_photo_path ? `https://content-provider.payshia.com/ukcas/${studentData.student_photo_path}` : null;
+                    studentData.id_card_front_path = studentData.id_card_front_path ? `https://content-provider.payshia.com/ukcas/${studentData.id_card_front_path}` : null;
+                    studentData.id_card_back_path = studentData.id_card_back_path ? `https://content-provider.payshia.com/ukcas/${studentData.id_card_back_path}` : null;
+                    studentData.ol_certificate_path = studentData.ol_certificate_path ? `https://content-provider.payshia.com/ukcas/${studentData.ol_certificate_path}` : null;
+                    studentData.al_certificate_path = studentData.al_certificate_path ? `https://content-provider.payshia.com/ukcas/${studentData.al_certificate_path}` : null;
+                }
+
                 return NextResponse.json(data, { status: response.status });
             }
 
