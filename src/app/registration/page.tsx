@@ -43,6 +43,10 @@ export default function RegistrationPage() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
+        console.log("Checking API credentials before sending...");
+        console.log("API URL:", apiUrl);
+        console.log("API Key:", apiKey);
+
         if (!apiUrl || !apiKey) {
             toast({ variant: 'destructive', title: "Configuration Error", description: "The API endpoint is not configured correctly." });
             setIsLoading(false);
@@ -51,6 +55,8 @@ export default function RegistrationPage() {
 
         const headers = new Headers();
         headers.append('X-API-KEY', apiKey);
+        
+        console.log("Request Headers being sent:", headers);
 
         try {
             const response = await fetch(`${apiUrl}/institutes`, {
@@ -60,6 +66,8 @@ export default function RegistrationPage() {
             });
 
             const result = await response.json();
+            
+            console.log("API Response received:", result);
 
             if (!response.ok) {
                 throw new Error(result.message || 'Failed to submit application.');
@@ -75,6 +83,7 @@ export default function RegistrationPage() {
             setSlug('');
             
         } catch (error) {
+            console.error("Submission Error:", error);
             const msg = error instanceof Error ? error.message : "An unknown error occurred.";
             toast({ variant: 'destructive', title: "Submission Failed", description: msg });
         } finally {
