@@ -27,7 +27,7 @@ return [
     },
 
     // Update institute
-    'PUT /institutes/{id}/' => function ($id) use ($instituteController) {
+    'POST /institutes/{id}/' => function ($id) use ($instituteController) {
         $instituteController->updateRecord($id);
     },
 
