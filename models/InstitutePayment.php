@@ -1,6 +1,7 @@
 <?php
 // models/InstitutePayment.php
 class InstitutePayment
+
 {
     private $pdo;
     public function __construct($pdo)
@@ -50,5 +51,17 @@ class InstitutePayment
         $stmt = $this->pdo->prepare("DELETE FROM institute_payments WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->rowCount() > 0;
+    }
+
+    // Get institute balance: sum of credits minus sum of debits
+    public function getInstituteBalance($institute_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT 
+            COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN amount ELSE 0 END), 0) - 
+            COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN amount ELSE 0 END), 0) AS balance
+            FROM institute_payments WHERE institute_id = ? AND active_status = 1");
+        $stmt->execute([$institute_id]);
+        $row = $stmt->fetch();
+        return $row ? $row['balance'] : 0;
     }
 }

@@ -3,6 +3,7 @@
 require_once './models/InstitutePayment.php';
 
 class InstitutePaymentController
+
 {
     private $model;
     public function __construct($pdo)
@@ -49,6 +50,17 @@ class InstitutePaymentController
         echo json_encode([
             'status' => $deleted ? 'success' : 'error',
             'message' => $deleted ? 'Payment deleted successfully.' : 'Payment not found.'
+        ]);
+    }
+
+    // Get institute balance
+    public function getInstituteBalance($institute_id)
+    {
+        $balance = $this->model->getInstituteBalance($institute_id);
+        echo json_encode([
+            'status' => 'success',
+            'institute_id' => $institute_id,
+            'balance' => $balance
         ]);
     }
 }
