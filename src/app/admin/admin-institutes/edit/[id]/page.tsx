@@ -63,6 +63,7 @@ export default function EditInstitutePage() {
   const { id } = params;
   const [institute, setInstitute] = useState<ApiInstitute | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -84,19 +85,52 @@ export default function EditInstitutePage() {
     }
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setIsSubmitting(true);
+      
       const formData = new FormData(e.currentTarget);
       const instituteName = formData.get('instituteName') as string;
+      
+      // The backend API for updates requires the ID to be part of the form data
+      if (typeof id === 'string') {
+        formData.append('id', id);
+      }
+      
+      const token = localStorage.getItem('ukcas_token');
+      if (!token) {
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You are not logged in.' });
+        setIsSubmitting(false);
+        return;
+      }
 
-      console.log('Updating institute:', Object.fromEntries(formData.entries()));
+      try {
+        const response = await fetch('/api/institutes', {
+            method: 'POST', // Backend expects POST for create and update
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData,
+        });
 
-      toast({
-          title: "Institute Updated",
-          description: `The details for "${instituteName}" have been successfully saved.`,
-      });
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to update institute.');
+        }
+        
+        toast({
+            title: "Institute Updated",
+            description: `The details for "${instituteName}" have been successfully saved.`,
+        });
 
-      router.push('/admin/admin-institutes');
+        router.push('/admin/admin-institutes');
+        router.refresh(); // Refresh the data on the previous page
+
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "An unknown error occurred.";
+        toast({ variant: 'destructive', title: 'Update Failed', description: msg });
+      } finally {
+        setIsSubmitting(false);
+      }
   };
 
   if (loading) {
@@ -140,43 +174,44 @@ export default function EditInstitutePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="instituteName">Institute Name</Label>
-                  <Input id="instituteName" name="instituteName" defaultValue={institute.name} required />
+                  <Input id="instituteName" name="name" defaultValue={institute.name} required disabled={isSubmitting} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="country">Country</Label>
-                  <Input id="country" name="country" defaultValue={institute.country} />
+                  <Input id="country" name="country" defaultValue={institute.country} disabled={isSubmitting} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address">Full Address</Label>
-                <Input id="address" name="address" defaultValue={institute.address_line1} />
+                <Input id="address" name="address_line1" defaultValue={institute.address_line1} disabled={isSubmitting} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div className="space-y-2">
                   <Label htmlFor="email">Contact Email</Label>
-                  <Input id="email" name="email" type="email" defaultValue={institute.email} required />
+                  <Input id="email" name="email" type="email" defaultValue={institute.email} required disabled={isSubmitting} />
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="website">Website URL</Label>
-                  <Input id="website" name="website" type="url" defaultValue={institute.website} />
+                  <Input id="website" name="website" type="url" defaultValue={institute.website} disabled={isSubmitting} />
                 </div>
               </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div className="space-y-2">
                     <Label htmlFor="logo">Institute Logo</Label>
-                    <Input id="logo" name="logo" type="file" accept="image/*" />
+                    <Input id="logo" name="logo" type="file" accept="image/*" disabled={isSubmitting} />
                     <p className="text-xs text-muted-foreground">Upload a new logo to replace the current one.</p>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="coverImage">Cover Image</Label>
-                    <Input id="coverImage" name="coverImage" type="file" accept="image/*" />
+                    <Input id="coverImage" name="cover_image" type="file" accept="image/*" disabled={isSubmitting} />
                      <p className="text-xs text-muted-foreground">Upload a new cover or banner image.</p>
                 </div>
               </div>
               
-              <Button type="submit" className="w-full h-12 text-base" size="lg">
-                Save Changes
+              <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </Button>
             </form>
           </CardContent>
@@ -184,4 +219,3 @@ export default function EditInstitutePage() {
       </div>
   );
 }
-
