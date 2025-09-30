@@ -13,9 +13,9 @@ class StudentCertificate
     // Check if certificate_id exists
     public function getByCertificateId($certificate_id)
     {
-    $stmt = $this->pdo->prepare("SELECT sc.*, rs.* FROM students_certificates sc LEFT JOIN registered_students rs ON sc.student_id = rs.id WHERE sc.certificate_id = ?");
-    $stmt->execute([$certificate_id]);
-    return $stmt->fetch();
+        $stmt = $this->pdo->prepare("SELECT sc.*, rs.*, ic.duration FROM students_certificates sc LEFT JOIN registered_students rs ON sc.student_id = rs.id LEFT JOIN institute_courses ic ON sc.course_id = ic.id WHERE sc.certificate_id = ?");
+        $stmt->execute([$certificate_id]);
+        return $stmt->fetch();
     }
     public function getAll()
     {
