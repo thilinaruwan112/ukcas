@@ -114,6 +114,7 @@ export interface Student {
   address: string;
   country: string;
   created_at: string;
+  active_status: string | number;
   student_photo?: string | null;
   id_card_front?: string | null;
   id_card_back?: string | null;

@@ -19,6 +19,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
+import { Switch } from '@/components/ui/switch';
 
 const countries = [
     { name: "Afghanistan", code: "AF" },
@@ -125,6 +126,7 @@ export default function EditStudentPage() {
   const [error, setError] = useState<string | null>(null);
   const [dob, setDob] = useState<Date | undefined>();
   const [country, setCountry] = useState<string | undefined>();
+  const [isActive, setIsActive] = useState(true);
   const id = typeof params.id === 'string' ? params.id : '';
 
   useEffect(() => {
@@ -147,6 +149,7 @@ export default function EditStudentPage() {
             if(data.country){
                 setCountry(data.country);
             }
+            setIsActive(data.active_status === '1' || data.active_status === 1);
         } else {
             setError("Student not found.");
         }
@@ -176,6 +179,7 @@ export default function EditStudentPage() {
       formData.append('id', student.id);
       formData.append('institute_id', student.institute_id);
       formData.append('created_by', user.user_name || 'system');
+      formData.append('active_status', isActive ? '1' : '0');
       
       if (dob) {
         formData.set('date_of_birth', format(dob, 'yyyy-MM-dd'));
@@ -249,6 +253,19 @@ export default function EditStudentPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={handleSubmit}>
+             <div className="space-y-2">
+                <Label>Active Status</Label>
+                <div className="flex items-center space-x-2">
+                    <Switch
+                        id="active_status"
+                        checked={isActive}
+                        onCheckedChange={setIsActive}
+                        disabled={isLoading}
+                    />
+                    <Label htmlFor="active_status">{isActive ? 'Active' : 'Inactive'}</Label>
+                </div>
+                <p className="text-xs text-muted-foreground">Inactive students cannot be issued new certificates.</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">Student's Full Name</Label>
@@ -374,6 +391,7 @@ function EditStudentPageSkeleton() {
                     <Skeleton className="h-5 w-80 mx-auto mt-2" />
                 </CardHeader>
                 <CardContent className="space-y-6">
+                     <div className="space-y-2"><Skeleton className="h-5 w-24" /><Skeleton className="h-10 w-full" /></div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2"><Skeleton className="h-5 w-24" /><Skeleton className="h-10 w-full" /></div>
                         <div className="space-y-2"><Skeleton className="h-5 w-24" /><Skeleton className="h-10 w-full" /></div>
