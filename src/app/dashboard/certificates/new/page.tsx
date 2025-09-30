@@ -70,16 +70,32 @@ async function getCourses(instituteId: string, token: string): Promise<Course[]>
     }
 }
 
-async function getCertificates(instituteId: string, token: string): Promise<Certificate[]> {
+async function checkExistingCertificate(studentId: string, courseId: string, instituteId: string, token: string): Promise<Certificate | null> {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+    if (!apiUrl || !apiKey) return null;
+
     try {
-        const response = await fetch(`/api/certificates?instituteId=${instituteId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`${apiUrl}/students-certificates/institute/check-certificate?student_id=${studentId}&course_id=${courseId}&institute_id=${instituteId}`, {
+            headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) return [];
+        if (!response.ok) return null;
         const data = await response.json();
-        return data.status === 'success' && Array.isArray(data.data) ? data.data.map((c: any) => ({...c, studentId: c.student_id, courseId: c.course_id })) : [];
-    } catch {
-        return [];
+        if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+            const certData = data.data[0];
+            return {
+                id: certData.certificate_id,
+                studentName: '', // Not needed for this check
+                courseName: '', // Not needed for this check
+                issueDate: certData.created_at,
+                instituteId: certData.institute_id,
+                status: certData.approved_status
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error("Failed to check existing certificate:", error);
+        return null;
     }
 }
 
@@ -93,8 +109,9 @@ export default function IssueCertificatePage() {
     const [institute, setInstitute] = useState<ApiInstitute | null>(null);
     const [students, setStudents] = useState<Student[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
-    const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [user, setUser] = useState<any>(null);
+
+    const [isChecking, setIsChecking] = useState(false);
     const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
     const [validationSuccessMessage, setValidationSuccessMessage] = useState<string | null>(null);
     const [isSelectionComplete, setIsSelectionComplete] = useState(false);
@@ -124,14 +141,12 @@ export default function IssueCertificatePage() {
 
         async function fetchData() {
             setIsLoading(true);
-            const [studentsData, coursesData, certificatesData] = await Promise.all([
+            const [studentsData, coursesData] = await Promise.all([
                 getStudents(instituteId, token),
-                getCourses(instituteId, token),
-                getCertificates(instituteId, token)
+                getCourses(instituteId, token)
             ]);
             setStudents(studentsData);
             setCourses(coursesData);
-            setCertificates(certificatesData);
             setIsLoading(false);
         }
 
@@ -139,27 +154,37 @@ export default function IssueCertificatePage() {
     }, [router, toast]);
     
     useEffect(() => {
-        if (watchedStudentId && watchedCourseId) {
-            const existingCertificate = certificates.find(cert => 
-                String(cert.studentId) === String(watchedStudentId) && 
-                String(cert.courseId) === String(watchedCourseId)
-            );
+        const checkCertificate = async () => {
+            if (watchedStudentId && watchedCourseId && institute) {
+                const token = sessionStorage.getItem('ukcas_token');
+                if (!token) return;
 
-            if (existingCertificate) {
-                setDuplicateWarning(`A certificate for this student and course already exists (Status: ${existingCertificate.status}). Applying again is not allowed.`);
+                setIsChecking(true);
+                setDuplicateWarning(null);
                 setValidationSuccessMessage(null);
                 setIsSelectionComplete(false);
+
+                const existingCertificate = await checkExistingCertificate(watchedStudentId, watchedCourseId, institute.id, token);
+                
+                if (existingCertificate) {
+                    setDuplicateWarning(`A certificate for this student and course already exists (Status: ${existingCertificate.status}). Applying again is not allowed.`);
+                    setValidationSuccessMessage(null);
+                    setIsSelectionComplete(false);
+                } else {
+                    setDuplicateWarning(null);
+                    setValidationSuccessMessage("Validation successful. You can now proceed.");
+                    setIsSelectionComplete(true);
+                }
+                setIsChecking(false);
             } else {
                 setDuplicateWarning(null);
-                setValidationSuccessMessage("Validation successful. You can now proceed.");
-                setIsSelectionComplete(true);
+                setValidationSuccessMessage(null);
+                setIsSelectionComplete(false);
             }
-        } else {
-            setDuplicateWarning(null);
-            setValidationSuccessMessage(null);
-            setIsSelectionComplete(false);
-        }
-    }, [watchedStudentId, watchedCourseId, certificates]);
+        };
+
+        checkCertificate();
+    }, [watchedStudentId, watchedCourseId, institute]);
 
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -235,7 +260,7 @@ export default function IssueCertificatePage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Student's Full Name</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                                        <Select onValueChange={field.onChange} value={field.value} disabled={isLoading || isChecking}>
                                             <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder={isLoading ? "Loading students..." : "Select a registered student"} />
@@ -258,7 +283,7 @@ export default function IssueCertificatePage() {
                                 render={({ field }) => (
                                     <FormItem>
                                     <FormLabel>Course or Qualification Name</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading || !watchedStudentId}>
+                                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading || isChecking || !watchedStudentId}>
                                         <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder={isLoading ? "Loading courses..." : "Select a course"} />
@@ -275,6 +300,13 @@ export default function IssueCertificatePage() {
                                     </FormItem>
                                 )}
                             />
+
+                             {isChecking && (
+                                <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>Validating...</span>
+                                </div>
+                             )}
 
                              {duplicateWarning && (
                                 <div className="flex items-center gap-3 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive dark:bg-destructive/20">
