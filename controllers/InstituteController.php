@@ -1,6 +1,5 @@
 <?php
 require_once './models/Institute.php';
-
 class InstituteController
 {
     private $model;
