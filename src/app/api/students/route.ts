@@ -1,6 +1,12 @@
 
 import { NextResponse } from 'next/server';
 
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
 async function handleRequest(request: Request) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
@@ -63,3 +69,4 @@ async function handleRequest(request: Request) {
 
 export async function GET(request: Request) { return handleRequest(request); }
 export async function POST(request: Request) { return handleRequest(request); }
+
