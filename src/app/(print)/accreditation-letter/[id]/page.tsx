@@ -107,7 +107,7 @@ export default function PrintAccreditationLetterPage() {
                 </Button>
             </div>
             <div id="print-area" className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
-                <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black flex flex-col">
+                <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[50px] font-body text-black flex flex-col">
                     <div className="absolute inset-0 z-0 opacity-80">
                         <Image 
                             src="https://content-provider.payshia.com/ukcas/institutes/1/docs/ukcas-letter-head.jpg" 
@@ -117,7 +117,7 @@ export default function PrintAccreditationLetterPage() {
                             quality={100}
                         />
                     </div>
-                    <div className="relative z-10 flex flex-col flex-grow pt-[180px]">
+                    <div className="relative z-10 flex flex-col flex-grow pt-[160px]">
                         <div className="text-sm">
                             <p>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             <br/>
@@ -139,7 +139,7 @@ export default function PrintAccreditationLetterPage() {
                             <p>We congratulate {institute.name} on its commitment to excellence in education.</p>
                         </div>
 
-                        <div className="mt-auto pt-16">
+                        <div className="pt-10">
                             <p>Yours faithfully,</p>
                             <div className="relative h-16 w-48 mt-2">
                                 <Image 
@@ -185,4 +185,3 @@ export default function PrintAccreditationLetterPage() {
         </>
     );
 }
-
