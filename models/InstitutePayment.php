@@ -57,8 +57,8 @@ class InstitutePayment
     public function getInstituteBalance($institute_id)
     {
         $stmt = $this->pdo->prepare("SELECT 
-            COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN amount ELSE 0 END), 0) - 
-            COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN amount ELSE 0 END), 0) AS balance
+            COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN amount ELSE 0 END), 0) - 
+            COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN amount ELSE 0 END), 0) AS balance
             FROM institute_payments WHERE institute_id = ? AND active_status = 1");
         $stmt->execute([$institute_id]);
         $row = $stmt->fetch();
