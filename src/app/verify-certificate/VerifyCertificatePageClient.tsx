@@ -1,29 +1,34 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileSearch, CheckCircle, XCircle, Loader2, User, BookOpen as BookIcon, Calendar, Building } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { ApiInstitute, Course } from "@/lib/types";
+import type { ApiInstitute, Course, CertificateVerificationData } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
+import { useSearchParams } from "next/navigation";
+
 
 interface VerificationResult {
-    certificate: any; // Using 'any' as the structure is complex and nested
+    certificate: CertificateVerificationData;
     institute: ApiInstitute;
     course: Course;
 }
 
 export function VerifyCertificatePageClient() {
-    const [certificateId, setCertificateId] = useState("");
+    const searchParams = useSearchParams();
+    const initialCertId = searchParams.get('id');
+
+    const [certificateId, setCertificateId] = useState(initialCertId || "");
     const [result, setResult] = useState<VerificationResult | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleVerify = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleVerify = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
         if (!certificateId.trim()) {
             setError("Please enter a Certificate ID.");
             return;
@@ -54,6 +59,14 @@ export function VerifyCertificatePageClient() {
             setIsLoading(false);
         }
     };
+    
+     useEffect(() => {
+        if (initialCertId) {
+            handleVerify();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialCertId]);
+
 
     return (
         <div className="py-16 md:py-24">
@@ -125,7 +138,7 @@ export function VerifyCertificatePageClient() {
                                 <span className="text-muted-foreground">{result.certificate.email_address}</span>
                            </div>
                            <div className="grid grid-cols-2 gap-4">
-                               <InfoItem icon={<FileSearch size={16}/>} label="Certificate ID" value={result.certificate.certificate_id} mono />
+                               <InfoItem icon={<FileSearch size={16}/>} label="Certificate ID" value={result.certificate.certificate_id.toString()} mono />
                                <InfoItem icon={<Calendar size={16}/>} label="Issue Date" value={new Date(result.certificate.created_at).toLocaleDateString()} />
                            </div>
                             <InfoItem icon={<BookIcon size={16}/>} label="Qualification/Course" value={result.course.course_name} />

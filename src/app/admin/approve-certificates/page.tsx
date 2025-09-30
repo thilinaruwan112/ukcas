@@ -11,7 +11,10 @@ import type { Certificate } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Check, X } from 'lucide-react';
+import { Check, X, Printer } from 'lucide-react';
+import Link from 'next/link';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal } from 'lucide-react';
 
 async function getPendingCertificates(token: string): Promise<Certificate[]> {
     try {
@@ -24,7 +27,8 @@ async function getPendingCertificates(token: string): Promise<Certificate[]> {
         }
         const data = await response.json();
         if (data.status === 'success' && Array.isArray(data.data)) {
-            return data.data.filter((cert: Certificate) => cert.status === 'Pending');
+            // Return all certificates, not just pending, so we can see their status
+            return data.data;
         }
         return [];
     } catch (error) {
@@ -40,13 +44,13 @@ async function updateCertificateStatus(id: string, status: 'Approved' | 'Rejecte
         body: JSON.stringify({ id, status }),
     });
 
-    const result = await response.json();
-
     if (!response.ok) {
-        throw new Error(result.message || `Failed to update status to ${status}`);
+        const errorResult = await response.json().catch(() => ({ message: 'An unknown error occurred during status update.' }));
+        throw new Error(errorResult.message);
     }
-
-    return result.message || 'Status updated successfully.';
+    
+    const result = await response.json();
+    return result.message || `Status updated to ${status} successfully.`;
 }
 
 
@@ -92,10 +96,10 @@ export default function ApproveCertificatesPage() {
             const successMessage = await updateCertificateStatus(id, status, token);
             toast({
                 title: 'Success',
-                description: successMessage || `Certificate has been ${status.toLowerCase()}.`,
+                description: successMessage,
             });
-            // Refresh the list
-            setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== id));
+            // Refresh the list to show the updated status
+            fetchCertificates();
         } catch (error) {
             const msg = error instanceof Error ? error.message : 'An unknown error occurred.';
             toast({ variant: 'destructive', title: 'Update Failed', description: msg });
@@ -118,6 +122,8 @@ export default function ApproveCertificatesPage() {
             ))}
         </TableBody>
     );
+    
+    const pendingCertificates = certificates.filter(c => c.status === 'Pending');
 
     return (
         <>
@@ -157,36 +163,54 @@ export default function ApproveCertificatesPage() {
                             </TableBody>
                         ) : (
                             <TableBody>
-                                {certificates.length > 0 ? (
-                                    certificates.map((cert) => (
+                                {pendingCertificates.length > 0 ? (
+                                    pendingCertificates.map((cert) => (
                                     <TableRow key={cert.id}>
                                         <TableCell className="font-medium">{cert.studentName}</TableCell>
                                         <TableCell>{cert.courseName}</TableCell>
                                         <TableCell>{cert.instituteId}</TableCell>
                                         <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
                                         <TableCell className="text-right">
-                                            <div className="space-x-2">
-                                                 <Button 
-                                                    size="sm" 
-                                                    variant="outline" 
-                                                    className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
-                                                    onClick={() => handleStatusUpdate(cert.id, 'Approved')}
-                                                    disabled={updatingId === cert.id}
-                                                >
-                                                    {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                                                    Approve
-                                                </Button>
-                                                <Button 
-                                                    size="sm" 
-                                                    variant="outline" 
-                                                    className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
-                                                    onClick={() => handleStatusUpdate(cert.id, 'Rejected')}
-                                                    disabled={updatingId === cert.id}
-                                                >
-                                                    {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
-                                                    Deny
-                                                </Button>
-                                            </div>
+                                            {cert.status === 'Pending' ? (
+                                                <div className="space-x-2">
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="outline" 
+                                                        className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                                                        onClick={() => handleStatusUpdate(cert.id, 'Approved')}
+                                                        disabled={updatingId === cert.id}
+                                                    >
+                                                        {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                                                        Approve
+                                                    </Button>
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="outline" 
+                                                        className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+                                                        onClick={() => handleStatusUpdate(cert.id, 'Rejected')}
+                                                        disabled={updatingId === cert.id}
+                                                    >
+                                                        {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                                                        Deny
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                 <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuItem asChild>
+                                                             <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                                <Printer className="mr-2 h-4 w-4" />
+                                                                Print Certificate
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                     ))

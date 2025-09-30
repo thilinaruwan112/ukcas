@@ -6,9 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2 } from "lucide-react";
+import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2, Printer } from "lucide-react";
 import Link from 'next/link';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import type { Certificate } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
@@ -168,6 +168,15 @@ export default function CertificateListPage() {
                                                             <FilePenLine className="mr-2 h-4 w-4" />
                                                             <span>View/Edit</span>
                                                         </DropdownMenuItem>
+                                                        {cert.status === 'Approved' && (
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                                    <Printer className="mr-2 h-4 w-4" />
+                                                                    <span>Print Certificate</span>
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                         <DropdownMenuSeparator />
                                                         <DropdownMenuItem className="text-red-500 focus:text-red-500">
                                                             <Trash2 className="mr-2 h-4 w-4" />
                                                             <span>Revoke</span>
@@ -234,8 +243,15 @@ export default function CertificateListPage() {
                                         <p className="flex items-center gap-2"><Book size={16} /> {cert.courseName}</p>
                                         <p className="flex items-center gap-2"><Calendar size={16} /> Issued: {new Date(cert.issueDate).toLocaleDateString()}</p>
                                     </div>
-                                     <div className="mt-3 flex justify-end gap-2">
+                                     <div className="mt-3 flex flex-wrap justify-end gap-2">
                                         <Button size="sm" variant="outline"><FilePenLine className="mr-2 h-4 w-4" /> Edit</Button>
+                                         {cert.status === 'Approved' && (
+                                            <Button size="sm" variant="outline" asChild>
+                                                <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                    <Printer className="mr-2 h-4 w-4" /> Print
+                                                </Link>
+                                            </Button>
+                                        )}
                                         <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"><Trash2 className="mr-2 h-4 w-4" /> Revoke</Button>
                                     </div>
                                 </div>
