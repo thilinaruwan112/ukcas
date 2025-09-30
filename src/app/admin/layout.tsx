@@ -57,9 +57,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen w-full">
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
-            <Link href={isAdmin ? "/admin/admin-institutes" : "/admin/select-institute"}>
-              <Logo />
-            </Link>
+            <Logo variant="white" />
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>

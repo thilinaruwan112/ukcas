@@ -44,9 +44,7 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen w-full">
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
           <SidebarHeader>
-            <Link href="/dashboard">
-              <Logo />
-            </Link>
+            <Logo variant="white" />
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
