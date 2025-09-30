@@ -93,6 +93,20 @@ export default function RegistrationPage() {
                     <Input id="name" name="name" placeholder="e.g., Global Tech University" required value={instituteName} onChange={handleNameChange} disabled={isLoading} />
                 </div>
                 
+                <div className="space-y-2">
+                    <Label htmlFor="type">Institute Type</Label>
+                    <Select name="type" required disabled={isLoading}>
+                        <SelectTrigger id="type">
+                            <SelectValue placeholder="Select the type of your institution" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Institute">Institute</SelectItem>
+                            <SelectItem value="University">University</SelectItem>
+                            <SelectItem value="College">College</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="contact_person">Contact Person</Label>
