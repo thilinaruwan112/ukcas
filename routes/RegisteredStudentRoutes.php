@@ -18,7 +18,7 @@ return [
     'POST /registered-students/' => function () use ($controller) {
         $controller->create();
     },
-    'PUT /registered-students/{id}' => function ($id) use ($controller) {
+    'POST /registered-students/{id}' => function ($id) use ($controller) {
         $controller->update($id);
     },
     'DELETE /registered-students/{id}' => function ($id) use ($controller) {
