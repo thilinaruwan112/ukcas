@@ -124,4 +124,12 @@ class Institute
         $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = ?");
         $stmt->execute([$id]);
     }
+
+    // Get institute by code
+    public function getByCode($code)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM institutes WHERE code = ?");
+        $stmt->execute([$code]);
+        return $stmt->fetch();
+    }
 }

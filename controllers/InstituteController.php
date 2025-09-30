@@ -45,7 +45,15 @@ class InstituteController
     {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if ($data && isset($data['name'], $data['code'])) {
+        if ($data && isset($data['name'])) {
+            // Generate unique code with prefix UKCAS and check for uniqueness
+            $prefix = 'UKCAS';
+            do {
+                $random = mt_rand(1000, 9999);
+                $data['code'] = $prefix . $random;
+                // Check uniqueness
+                $exists = $this->model->getByCode($data['code']);
+            } while ($exists);
             $id = $this->model->create($data);
             http_response_code(201);
             echo json_encode([
