@@ -179,13 +179,13 @@ export default function InstitutePaymentsPage() {
 
     return (
         <>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold">Institute Payments</h1>
                     <p className="text-muted-foreground">Manage and top up institute account balances.</p>
                 </div>
                 <div className="flex w-full sm:w-auto sm:justify-end items-center gap-2">
-                     <div className="relative w-full sm:w-64">
+                     <div className="relative w-full sm:max-w-xs">
                         <Input
                             placeholder="Search institutes..."
                             value={searchTerm}

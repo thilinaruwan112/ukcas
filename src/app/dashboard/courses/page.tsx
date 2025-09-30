@@ -121,12 +121,12 @@ export default function CoursesPage() {
 
     return (
         <>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold">Course Management</h1>
                     <p className="text-muted-foreground">View, add, edit, and manage your offered courses.</p>
                 </div>
-                <Button asChild>
+                <Button asChild className="w-full sm:w-auto">
                     <Link href="/dashboard/courses/new">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add New Course

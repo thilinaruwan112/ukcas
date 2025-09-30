@@ -98,12 +98,12 @@ export default function AdminInstitutesPage() {
 
     return (
         <>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold">Institute Management</h1>
                     <p className="text-muted-foreground">Manage accreditation applications and create new institutes.</p>
                 </div>
-                 <Button asChild>
+                 <Button asChild className="w-full sm:w-auto">
                     <Link href="/admin/admin-institutes/new">
                         <Building className="mr-2 h-4 w-4" />
                         Create Institute

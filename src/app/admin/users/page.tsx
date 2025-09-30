@@ -194,20 +194,20 @@ export default function UserMaintenancePage() {
 
     return (
         <>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold">User Maintenance</h1>
                     <p className="text-muted-foreground">Create, edit, and manage institute user accounts.</p>
                 </div>
-                <div className="flex w-full sm:w-auto sm:justify-end items-center gap-2">
-                     <div className="relative w-full sm:w-64">
+                <div className="flex w-full flex-col sm:flex-row sm:w-auto items-stretch sm:items-center gap-2">
+                     <div className="relative w-full sm:w-auto sm:min-w-64">
                         <Input
                             placeholder="Search users..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <Button asChild>
+                    <Button asChild className="w-full sm:w-auto">
                        <Link href="/admin/users/new">
                            <UserPlus className="mr-2 h-4 w-4" />
                            Add New User

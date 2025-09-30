@@ -166,9 +166,9 @@ export default function InstituteDashboardPage() {
 
     return (
         <>
-            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                  <h1 className="text-2xl font-bold">Dashboard</h1>
-                 <Button asChild><Link href="/dashboard/certificates/new">Issue New Certificate</Link></Button>
+                 <Button asChild className="w-full sm:w-auto"><Link href="/dashboard/certificates/new">Issue New Certificate</Link></Button>
             </div>
 
             <Card className="bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800/50">
