@@ -58,24 +58,27 @@ export async function POST(request: Request) {
         return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
     }
 
+    // A token is required for authenticated creation, but public registration might not have one.
+    // The backend endpoint should differentiate if necessary.
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
-    }
-
+    
     try {
         const formData = await request.formData();
         
-        // The backend expects POST for creation
         const fetchUrl = `${apiUrl}/institutes`;
+
+        const headers: HeadersInit = {
+            'X-API-KEY': apiKey,
+            // Content-Type is set automatically by fetch for FormData
+        };
+
+        if(token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
 
         const response = await fetch(fetchUrl, {
             method: 'POST',
-            headers: {
-                'X-API-KEY': apiKey,
-                'Authorization': `Bearer ${token}`
-                // Content-Type is set automatically by fetch for FormData
-            },
+            headers,
             body: formData,
         });
 
