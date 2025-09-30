@@ -110,6 +110,11 @@ class InstituteController
         $data = $_POST;
         $now = date('Y-m-d H:i:s');
         $data['updated_at'] = $now;
+        $current = $this->model->getById($id);
+        // Always keep the current code
+        if (isset($current['code'])) {
+            $data['code'] = $current['code'];
+        }
         // Generate slug from name
         if (isset($data['name'])) {
             $slug = strtolower(trim($data['name']));
@@ -120,7 +125,6 @@ class InstituteController
         }
         require_once './controllers/FtpController.php';
         $ftpController = new FtpController($GLOBALS['pdo']);
-        $current = $this->model->getById($id);
         // Handle logo upload
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['logo'];
@@ -128,7 +132,7 @@ class InstituteController
             $safeName = preg_replace('/\s+/', '-', trim($safeName));
             $safeName = strtolower($safeName);
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $code = isset($data['code']) ? $data['code'] : (isset($current['code']) ? $current['code'] : 'UKCAS' . mt_rand(1000, 9999));
+            $code = $data['code'];
             $logoPath = "/ukcas/institutes/{$code}/logo/{$safeName}.{$ext}";
             $result = $ftpController->uploadImage($file, $logoPath);
             if (isset($result['status']) && $result['status'] === 'success') {
