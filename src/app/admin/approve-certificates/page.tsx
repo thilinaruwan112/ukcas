@@ -40,37 +40,13 @@ async function updateCertificateStatus(id: string, status: 'Approved' | 'Rejecte
         body: JSON.stringify({ id, status }),
     });
 
-    const responseText = await response.text();
+    const result = await response.json();
 
     if (!response.ok) {
-        // If the response is not OK, try to parse it as a single JSON error object
-        try {
-            const result = JSON.parse(responseText);
-            throw new Error(result.message || `Failed to update status to ${status}`);
-        } catch (e) {
-            // If parsing fails, throw the raw text
-            throw new Error(responseText || `Failed to update status to ${status}`);
-        }
+        throw new Error(result.message || `Failed to update status to ${status}`);
     }
 
-    // If the response is OK, handle the potential multi-part JSON success response
-    try {
-        const jsonObjects = responseText.replace(/}{/g, '}\n{').split('\n');
-        const messages = jsonObjects.map(objStr => {
-            if (objStr.trim() === '') return null;
-            try {
-                const parsed = JSON.parse(objStr);
-                return parsed.message;
-            } catch {
-                return null;
-            }
-        }).filter(Boolean);
-
-        return messages.join(' ') || 'Status updated successfully.';
-    } catch (error) {
-        // Fallback for any other parsing errors, though the above should be robust.
-        return 'Status updated successfully, but the response was unclear.';
-    }
+    return result.message || 'Status updated successfully.';
 }
 
 
