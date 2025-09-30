@@ -60,10 +60,13 @@ export async function POST(request: Request) {
 
     try {
         const formData = await request.formData();
+        const instituteId = formData.get('id');
         
-        // The endpoint is the same for create and update.
-        // The presence of an 'id' in the form data dictates the operation on the backend.
-        const fetchUrl = `${apiUrl}/institutes`;
+        let fetchUrl = `${apiUrl}/institutes`;
+
+        if (instituteId) {
+            fetchUrl = `${apiUrl}/institutes/${instituteId}`;
+        }
         
         const headers: HeadersInit = { 'X-API-KEY': apiKey };
         const token = request.headers.get('Authorization')?.replace('Bearer ', '');
@@ -80,7 +83,6 @@ export async function POST(request: Request) {
         const result = await response.json();
 
         if (!response.ok) {
-            // Forward the exact error message and status code from the backend
             return NextResponse.json({ message: result.message || 'An error occurred with the external API.' }, { status: response.status });
         }
 
@@ -135,4 +137,3 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
 }
-
