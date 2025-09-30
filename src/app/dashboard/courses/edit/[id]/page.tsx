@@ -76,8 +76,7 @@ export default function EditCoursePage() {
       
       const payload = {
           id: course.id,
-          course_name: formData.get('courseName') as string,
-          course_code: formData.get('courseCode') as string,
+          name: formData.get('courseName') as string,
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
       };
@@ -96,7 +95,7 @@ export default function EditCoursePage() {
 
         toast({
             title: "Course Updated",
-            description: `The course "${payload.course_name}" has been successfully updated.`,
+            description: `The course "${payload.name}" has been successfully updated.`,
         });
 
         router.push('/dashboard/courses');
