@@ -48,14 +48,14 @@ export default function RegistrationPage() {
             setIsLoading(false);
             return;
         }
-        
-        // Add the API key to the form data itself as a fallback
-        formData.append('api_key', apiKey);
 
+        const headers = new Headers();
+        headers.append('X-API-KEY', apiKey);
 
         try {
             const response = await fetch(`${apiUrl}/institutes`, {
                 method: 'POST',
+                headers: headers,
                 body: formData,
             });
 
