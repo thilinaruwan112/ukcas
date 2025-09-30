@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
 
 
 export default function UserMaintenancePage() {
@@ -30,6 +32,8 @@ export default function UserMaintenancePage() {
     const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
     const [userToTopUp, setUserToTopUp] = useState<AdminUser | null>(null);
     const [topUpAmount, setTopUpAmount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -73,6 +77,17 @@ export default function UserMaintenancePage() {
         user.instituteName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     const handleDeleteClick = (user: AdminUser) => setUserToDelete(user);
     const handleEditClick = (userId: string) => router.push(`/admin/users/edit/${userId}`);
@@ -203,8 +218,8 @@ export default function UserMaintenancePage() {
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {!error && filteredUsers.length > 0 ? (
-                                    filteredUsers.map((user) => (
+                                {!error && currentItems.length > 0 ? (
+                                    currentItems.map((user) => (
                                     <TableRow key={user.id}>
                                         <TableCell className="font-medium">{user.instituteName}</TableCell>
                                         <TableCell>${user.balance.toFixed(2)}</TableCell>
@@ -261,6 +276,27 @@ export default function UserMaintenancePage() {
                         )}
                     </Table>
                 </CardContent>
+                {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
 
             <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>

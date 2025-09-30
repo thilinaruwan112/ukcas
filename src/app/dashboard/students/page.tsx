@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,6 +16,7 @@ import type { Student } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
 
 async function getStudents(instituteId: string, token: string): Promise<Student[]> {
     try {
@@ -41,6 +43,8 @@ export default function StudentListPage() {
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const token = localStorage.getItem('ukcas_token');
@@ -68,6 +72,17 @@ export default function StudentListPage() {
         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (student.email_address && student.email_address.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredStudents.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     const handleDeleteClick = (student: Student) => {
         setStudentToDelete(student);
@@ -157,8 +172,8 @@ export default function StudentListPage() {
                                 </TableBody>
                             ) : (
                                 <TableBody>
-                                    {filteredStudents.length > 0 ? (
-                                        filteredStudents.map((student) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((student) => (
                                         <TableRow key={student.id}>
                                             <TableCell className="font-medium">{student.name}</TableCell>
                                             <TableCell>{student.email_address}</TableCell>
@@ -227,8 +242,8 @@ export default function StudentListPage() {
                                 <p className="text-destructive font-medium">Failed to load students.</p>
                                 <p className="text-muted-foreground text-sm text-center">{error}</p>
                             </div>
-                        ) : filteredStudents.length > 0 ? (
-                            filteredStudents.map((student) => (
+                        ) : currentItems.length > 0 ? (
+                            currentItems.map((student) => (
                                 <div key={student.id} className="rounded-lg border p-4 space-y-3">
                                     <div className="flex justify-between items-start">
                                         <h3 className="font-semibold pr-2">{student.name}</h3>
@@ -267,11 +282,31 @@ export default function StudentListPage() {
                              <div className="text-center text-muted-foreground py-12">
                                 <p>
                                     {searchTerm ? `No students found for "${searchTerm}".` : "No students have been registered yet."}
-                                </p>
-                            </div>
+                                </p>                            </div>
                         )}
                     </div>
                 </CardContent>
+                {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
 
             <AlertDialog open={!!studentToDelete} onOpenChange={() => setStudentToDelete(null)}>

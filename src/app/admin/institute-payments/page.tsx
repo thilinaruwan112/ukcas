@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
+
 
 async function getBalance(instituteId: string, token: string): Promise<number> {
     try {
@@ -41,6 +44,8 @@ export default function InstitutePaymentsPage() {
     const [instituteToTopUp, setInstituteToTopUp] = useState<ApiInstitute | null>(null);
     const [topUpAmount, setTopUpAmount] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const fetchInstitutes = async () => {
         setLoading(true);
@@ -92,6 +97,17 @@ export default function InstitutePaymentsPage() {
         institute.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         institute.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredInstitutes.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredInstitutes.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     const handleTopUpClick = (institute: ApiInstitute) => setInstituteToTopUp(institute);
 
@@ -203,8 +219,8 @@ export default function InstitutePaymentsPage() {
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {!error && filteredInstitutes.length > 0 ? (
-                                    filteredInstitutes.map((institute) => (
+                                {!error && currentItems.length > 0 ? (
+                                    currentItems.map((institute) => (
                                     <TableRow key={institute.id}>
                                         <TableCell className="font-medium">{institute.name}</TableCell>
                                         <TableCell>${Number(institute.balance || 0).toFixed(2)}</TableCell>
@@ -233,6 +249,27 @@ export default function InstitutePaymentsPage() {
                         )}
                     </Table>
                 </CardContent>
+                {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
             
             <Dialog open={!!instituteToTopUp} onOpenChange={() => { setInstituteToTopUp(null); setTopUpAmount(0); }}>

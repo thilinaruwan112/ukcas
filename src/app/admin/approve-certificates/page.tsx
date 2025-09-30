@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,6 +16,7 @@ import { Check, X, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
 
 async function getPendingCertificates(token: string): Promise<Certificate[]> {
     try {
@@ -61,6 +63,8 @@ export default function ApproveCertificatesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const fetchCertificates = () => {
          const token = localStorage.getItem('ukcas_token');
@@ -125,6 +129,17 @@ export default function ApproveCertificatesPage() {
     
     const pendingCertificates = certificates.filter(c => c.status === 'Pending');
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = pendingCertificates.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(pendingCertificates.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -163,8 +178,8 @@ export default function ApproveCertificatesPage() {
                             </TableBody>
                         ) : (
                             <TableBody>
-                                {pendingCertificates.length > 0 ? (
-                                    pendingCertificates.map((cert) => (
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((cert) => (
                                     <TableRow key={cert.id}>
                                         <TableCell className="font-medium">{cert.studentName}</TableCell>
                                         <TableCell>{cert.courseName}</TableCell>
@@ -225,6 +240,27 @@ export default function ApproveCertificatesPage() {
                         )}
                     </Table>
                 </CardContent>
+                {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
         </>
     )

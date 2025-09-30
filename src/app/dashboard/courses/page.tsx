@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,6 +14,7 @@ import { PlusCircle, MoreHorizontal, FilePenLine, Trash2, AlertTriangle, Loader2
 import { useToast } from '@/hooks/use-toast';
 import type { Course } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
 
 async function getCourses(instituteId: string, token: string): Promise<Course[]> {
     try {
@@ -39,6 +41,8 @@ export default function CoursesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const token = localStorage.getItem('ukcas_token');
@@ -88,6 +92,17 @@ export default function CoursesPage() {
             toast({ variant: 'destructive', title: "Deletion Failed", description: msg });
         } finally {
             setCourseToDelete(null);
+        }
+    };
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = courses.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(courses.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
         }
     };
     
@@ -144,8 +159,8 @@ export default function CoursesPage() {
                                 </TableBody>
                             ) : (
                                 <TableBody>
-                                    {courses.length > 0 ? (
-                                        courses.map((course) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((course) => (
                                             <TableRow key={course.id}>
                                                 <TableCell className="font-medium">{course.course_name}</TableCell>
                                                 <TableCell>{course.course_code}</TableCell>
@@ -217,8 +232,8 @@ export default function CoursesPage() {
                                 <p className="text-destructive font-medium">Failed to load courses.</p>
                                 <p className="text-muted-foreground text-sm text-center">{error}</p>
                             </div>
-                        ) : courses.length > 0 ? (
-                            courses.map((course) => (
+                        ) : currentItems.length > 0 ? (
+                            currentItems.map((course) => (
                                 <Card key={course.id} className="p-4">
                                     <div className="flex justify-between items-start">
                                         <div className="space-y-1 pr-2">
@@ -272,6 +287,27 @@ export default function CoursesPage() {
                         )}
                     </div>
                 </CardContent>
+                {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
 
             <AlertDialog open={!!courseToDelete} onOpenChange={() => setCourseToDelete(null)}>

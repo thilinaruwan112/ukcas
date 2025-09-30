@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
 
 async function getCertificates(instituteId: string, token: string): Promise<Certificate[]> {
     try {
@@ -40,6 +42,8 @@ export default function CertificateListPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const token = localStorage.getItem('ukcas_token');
@@ -67,6 +71,18 @@ export default function CertificateListPage() {
         cert.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (cert.id && cert.id.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredCertificates.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredCertificates.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
 
     const handleExport = () => {
         // Export logic remains the same
@@ -143,8 +159,8 @@ export default function CertificateListPage() {
                                 </TableBody>
                             ) : (
                                 <TableBody>
-                                    {filteredCertificates.length > 0 ? (
-                                        filteredCertificates.map((cert) => (
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((cert) => (
                                         <TableRow key={cert.id}>
                                             <TableCell className="font-mono">{cert.id}</TableCell>
                                             <TableCell className="font-medium">{cert.studentName}</TableCell>
@@ -226,8 +242,8 @@ export default function CertificateListPage() {
                                 <p className="text-destructive font-medium">Failed to load certificates.</p>
                                 <p className="text-muted-foreground text-sm text-center">{error}</p>
                             </div>
-                        ) : filteredCertificates.length > 0 ? (
-                            filteredCertificates.map((cert) => (
+                        ) : currentItems.length > 0 ? (
+                            currentItems.map((cert) => (
                                 <div key={cert.id} className="rounded-lg border p-4 space-y-3">
                                     <div className="flex justify-between items-start">
                                         <div>
@@ -265,6 +281,27 @@ export default function CertificateListPage() {
                         )}
                     </div>
                 </CardContent>
+                {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
         </>
     );

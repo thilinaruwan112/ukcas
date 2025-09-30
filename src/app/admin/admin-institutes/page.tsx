@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Building, AlertTriangle, Printer } from "lucide-react";
 import type { ApiInstitute } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
 
 async function getInstitutes(): Promise<ApiInstitute[]> {
     try {
@@ -31,6 +32,8 @@ export default function AdminInstitutesPage() {
     const [institutes, setInstitutes] = useState<ApiInstitute[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         getInstitutes()
@@ -45,6 +48,17 @@ export default function AdminInstitutesPage() {
                  setLoading(false);
             });
     }, []);
+    
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = institutes.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(institutes.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     const InstitutesSkeleton = () => (
         <TableBody>
@@ -104,8 +118,8 @@ export default function AdminInstitutesPage() {
                             </TableBody>
                         ) : (
                             <TableBody>
-                                {institutes.length > 0 ? (
-                                    institutes.map((app) => (
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((app) => (
                                     <TableRow key={app.id}>
                                         <TableCell className="font-medium">{app.name}</TableCell>
                                         <TableCell>{app.country}</TableCell>
@@ -149,6 +163,27 @@ export default function AdminInstitutesPage() {
                         )}
                     </Table>
                 </CardContent>
+                 {totalPages > 1 && (
+                    <div className="p-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink href="#" isActive={currentPage === i + 1} onClick={(e) => { e.preventDefault(); handlePageChange(i + 1); }}>
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </Card>
         </>
     )
