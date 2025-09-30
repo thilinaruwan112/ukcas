@@ -3,11 +3,12 @@
 
 import { useRouter, useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { UserCog, ArrowLeft, CalendarIcon, Loader2, AlertTriangle } from "lucide-react";
+import { UserCog, ArrowLeft, CalendarIcon, Loader2, AlertTriangle, FileText, ImageIcon } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
@@ -89,6 +90,21 @@ async function getStudentById(id: string, token: string): Promise<Student | null
         console.error(error);
         return null;
     }
+}
+
+const fileBaseUrl = 'https://content-provider.payshia.com/ukcas/';
+
+function FilePreview({ path, label }: { path?: string; label: string }) {
+    if (!path) return null;
+
+    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(path);
+
+    return (
+        <a href={`${fileBaseUrl}${path}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1.5 mt-1.5">
+            {isImage ? <ImageIcon className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
+            View Current {label}
+        </a>
+    )
 }
 
 export default function EditStudentPage() {
@@ -292,12 +308,14 @@ export default function EditStudentPage() {
                 <div className="space-y-2">
                     <Label htmlFor="id_card_front">ID Card (Front)</Label>
                     <Input id="id_card_front" name="id_card_front" type="file" disabled={isLoading}/>
-                     <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                    <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                    <FilePreview path={student.id_card_front_path} label="ID Card (Front)" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="id_card_back">ID Card (Back)</Label>
                     <Input id="id_card_back" name="id_card_back" type="file" disabled={isLoading}/>
                      <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                     <FilePreview path={student.id_card_back_path} label="ID Card (Back)" />
                 </div>
             </div>
 
@@ -306,17 +324,26 @@ export default function EditStudentPage() {
                     <Label htmlFor="ol_certificate">O/L Certificate</Label>
                     <Input id="ol_certificate" name="ol_certificate" type="file" disabled={isLoading}/>
                      <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                     <FilePreview path={student.ol_certificate_path} label="O/L Certificate" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="al_certificate">A/L Certificate</Label>
                     <Input id="al_certificate" name="al_certificate" type="file" disabled={isLoading}/>
                      <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
+                     <FilePreview path={student.al_certificate_path} label="A/L Certificate" />
                 </div>
             </div>
 
             <div className="space-y-2">
                 <Label htmlFor="student_photo">Student Photo</Label>
-                <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading}/>
+                <div className="flex items-center gap-4">
+                    <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading} className="flex-1"/>
+                    {student.student_photo_path && (
+                        <a href={`${fileBaseUrl}${student.student_photo_path}`} target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+                            <Image src={`${fileBaseUrl}${student.student_photo_path}`} alt="Current student photo" width={40} height={40} className="rounded-full object-cover border" />
+                        </a>
+                    )}
+                </div>
                  <p className="text-xs text-muted-foreground">Upload a new photo to replace the current one.</p>
             </div>
             

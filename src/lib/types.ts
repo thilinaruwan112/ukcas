@@ -115,6 +115,10 @@ export interface Student {
   country: string;
   created_at: string;
   student_photo_path?: string;
+  id_card_front_path?: string;
+  id_card_back_path?: string;
+  ol_certificate_path?: string;
+  al_certificate_path?: string;
 }
 
 export interface CertificateVerificationData {
