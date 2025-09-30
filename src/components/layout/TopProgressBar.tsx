@@ -20,7 +20,6 @@ export default function TopProgressBar() {
 
     const handleAnchorClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      // Find the anchor tag, as the click target might be a child element.
       const anchor = target.closest('a');
       
       if (anchor) {
@@ -28,13 +27,18 @@ export default function TopProgressBar() {
             const targetUrl = new URL(anchor.href);
             const currentUrl = new URL(window.location.href);
 
+            // Ignore if it's just a hash link on the same page
+            if (anchor.getAttribute('href') === '#') {
+                return;
+            }
+
             // Start progress if it's an internal navigation to a different page
             if (targetUrl.origin === currentUrl.origin && targetUrl.href !== currentUrl.href) {
                 NProgress.start();
             }
         } catch (err) {
             // Handle cases where anchor.href is not a full URL (e.g., mailto:)
-            if (anchor.href.startsWith(window.location.origin)) {
+             if (anchor.getAttribute('href')?.startsWith('/') && anchor.getAttribute('href') !== '#') {
                  NProgress.start();
             }
         }
