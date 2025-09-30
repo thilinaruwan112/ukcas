@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -48,6 +49,48 @@ export async function GET(request: Request) {
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
 }
+
+export async function POST(request: Request) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+    if (!apiUrl || !apiKey) {
+        return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
+    }
+
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
+    }
+
+    try {
+        const formData = await request.formData();
+        
+        // The backend expects POST for creation
+        const fetchUrl = `${apiUrl}/institutes`;
+
+        const response = await fetch(fetchUrl, {
+            method: 'POST',
+            headers: {
+                'X-API-KEY': apiKey,
+                'Authorization': `Bearer ${token}`
+                // Content-Type is set automatically by fetch for FormData
+            },
+            body: formData,
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to create institute.');
+        }
+
+        return NextResponse.json({ status: 'success', data: result });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+        return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
+    }
+}
+
 
 export async function PATCH(request: Request) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
