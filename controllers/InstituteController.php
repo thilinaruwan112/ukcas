@@ -47,6 +47,14 @@ class InstituteController
         $now = date('Y-m-d H:i:s');
         $data['created_at'] = $now;
         $data['updated_at'] = $now;
+        // Generate slug from name
+        if (isset($data['name'])) {
+            $slug = strtolower(trim($data['name']));
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/\s+/', '-', $slug);
+            $slug = preg_replace('/-+/', '-', $slug);
+            $data['slug'] = $slug;
+        }
         require_once './controllers/FtpController.php';
         $ftpController = new FtpController($GLOBALS['pdo']);
 
@@ -102,6 +110,14 @@ class InstituteController
         $data = $_POST;
         $now = date('Y-m-d H:i:s');
         $data['updated_at'] = $now;
+        // Generate slug from name
+        if (isset($data['name'])) {
+            $slug = strtolower(trim($data['name']));
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/\s+/', '-', $slug);
+            $slug = preg_replace('/-+/', '-', $slug);
+            $data['slug'] = $slug;
+        }
         require_once './controllers/FtpController.php';
         $ftpController = new FtpController($GLOBALS['pdo']);
         $current = $this->model->getById($id);
