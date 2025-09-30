@@ -14,6 +14,21 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 
+async function getBalance(instituteId: string): Promise<number> {
+    try {
+        const response = await fetch(`/api/institute-payments/${instituteId}`);
+        if (!response.ok) {
+            return 0;
+        }
+        const data = await response.json();
+        return data.balance || 0;
+    } catch (error) {
+        console.error(`Failed to fetch balance for institute ${instituteId}:`, error);
+        return 0;
+    }
+}
+
+
 export default function InstitutePaymentsPage() {
     const router = useRouter();
     const { toast } = useToast();
@@ -34,8 +49,20 @@ export default function InstitutePaymentsPage() {
                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
                 throw new Error(errorData.message || `Failed to fetch institutes`);
             }
-            const data = await response.json();
-            setInstitutes(Array.isArray(data) ? data : []);
+            let instituteData = await response.json();
+            if (!Array.isArray(instituteData)) {
+                 instituteData = [];
+            }
+            
+            const institutesWithBalances = await Promise.all(
+                instituteData.map(async (institute: ApiInstitute) => {
+                    const balance = await getBalance(institute.id);
+                    return { ...institute, balance };
+                })
+            );
+
+            setInstitutes(institutesWithBalances);
+
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
             setError(errorMessage);
@@ -226,3 +253,5 @@ export default function InstitutePaymentsPage() {
         </>
     );
 }
+
+    
