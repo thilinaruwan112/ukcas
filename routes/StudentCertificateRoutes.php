@@ -12,6 +12,9 @@ return [
     'GET /students-certificates/{id}' => function ($id) use ($controller) {
         $controller->getById($id);
     },
+    'GET /students-certificates/certificate/{certificate_id}' => function ($certificate_id) use ($controller) {
+        $controller->getByCertificateId($certificate_id);
+    },
     'GET /students-certificates/institute/check-certificate' => function () use ($controller) {
         $student_id = $_GET['student_id'] ?? null;
         $course_id = $_GET['course_id'] ?? null;
