@@ -207,7 +207,7 @@ export default function InstitutePaymentsPage() {
                                     filteredInstitutes.map((institute) => (
                                     <TableRow key={institute.id}>
                                         <TableCell className="font-medium">{institute.name}</TableCell>
-                                        <TableCell>${(institute.balance || 0).toFixed(2)}</TableCell>
+                                        <TableCell>${Number(institute.balance || 0).toFixed(2)}</TableCell>
                                         <TableCell>{institute.email}</TableCell>
                                         <TableCell>{institute.country}</TableCell>
                                         <TableCell className="text-right">
@@ -241,7 +241,7 @@ export default function InstitutePaymentsPage() {
                   <DialogTitle>Top-up Balance</DialogTitle>
                   <DialogDescription>
                     Enter the amount to add to the balance of <span className="font-semibold">{instituteToTopUp?.name}</span>.
-                    Current balance: ${(instituteToTopUp?.balance || 0).toFixed(2)}
+                    Current balance: ${Number(instituteToTopUp?.balance || 0).toFixed(2)}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-2 py-4">
