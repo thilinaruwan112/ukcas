@@ -22,48 +22,10 @@ import {
 import Link from "next/link"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
-
-// Function to get a cookie value by name
-function getCookie(name: string): string | undefined {
-  if (typeof document === "undefined") {
-    return undefined
-  }
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift()
-  }
-}
-
-// Store for sidebar state that syncs with cookies
-function createSidebarStore(defaultOpen: boolean) {
-  let open = defaultOpen
-  const listeners = new Set<() => void>()
-
-  // Initial state from cookie
-  const cookieValue = getCookie(SIDEBAR_COOKIE_NAME)
-  if (cookieValue) {
-    open = cookieValue === "true"
-  }
-
-  return {
-    getSnapshot: () => open,
-    subscribe: (listener: () => void) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
-    },
-    setOpen: (newOpen: boolean) => {
-      open = newOpen
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
-      listeners.forEach((listener) => listener())
-    },
-  }
-}
 
 type SidebarContext = {
   state: "expanded" | "collapsed"
@@ -109,12 +71,16 @@ const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
 
-    // Create a memoized store instance
-    const store = React.useMemo(() => createSidebarStore(defaultOpen), [defaultOpen]);
-
-    // useSyncExternalStore to get the sidebar state
-    const _open = React.useSyncExternalStore(store.subscribe, store.getSnapshot);
-
+    // Using useState with an effect to read from localStorage client-side
+    const [_open, _setOpen] = React.useState(defaultOpen)
+    
+    React.useEffect(() => {
+      const storedValue = localStorage.getItem(SIDEBAR_COOKIE_NAME)
+      if (storedValue) {
+        _setOpen(JSON.parse(storedValue))
+      }
+    }, [])
+    
     const open = openProp ?? _open
     
     const setOpen = React.useCallback(
@@ -123,10 +89,11 @@ const SidebarProvider = React.forwardRef<
         if (setOpenProp) {
           setOpenProp(openState)
         } else {
-          store.setOpen(openState)
+          _setOpen(openState)
+          localStorage.setItem(SIDEBAR_COOKIE_NAME, JSON.stringify(openState))
         }
       },
-      [setOpenProp, open, store]
+      [setOpenProp, open, _setOpen]
     )
 
     // Helper to toggle the sidebar.
