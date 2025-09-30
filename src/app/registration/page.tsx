@@ -6,11 +6,9 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { BadgeCheck, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
-import { slugify } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function RegistrationPage() {
@@ -18,13 +16,6 @@ export default function RegistrationPage() {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [instituteName, setInstituteName] = useState('');
-    const [slug, setSlug] = useState('');
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const name = e.target.value;
-        setInstituteName(name);
-        setSlug(slugify(name));
-    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -35,55 +26,32 @@ export default function RegistrationPage() {
         // Hardcode values for a public application
         formData.set('accreditation_status', 'Pending');
         formData.set('status', 'Active');
-        formData.set('slug', slug); // Ensure slug is set from state
         
         const contactPerson = formData.get('contact_person') as string;
         formData.set('created_by', contactPerson || 'public_applicant');
         
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-        console.log("Checking API credentials before sending...");
-        console.log("API URL:", apiUrl);
-        console.log("API Key:", apiKey);
-
-        if (!apiUrl || !apiKey) {
-            toast({ variant: 'destructive', title: "Configuration Error", description: "The API endpoint is not configured correctly." });
-            setIsLoading(false);
-            return;
-        }
-
-        const headers = new Headers();
-        headers.append('X-API-KEY', apiKey);
-        
-        console.log("Request Headers being sent:", headers);
-
         try {
-            const response = await fetch(`${apiUrl}/institutes`, {
+            const response = await fetch('/api/institutes', {
                 method: 'POST',
-                headers: headers,
                 body: formData,
             });
 
             const result = await response.json();
-            
-            console.log("API Response received:", result);
 
             if (!response.ok) {
+                // Use the error message from the backend if available
                 throw new Error(result.message || 'Failed to submit application.');
             }
 
             toast({
-                title: "Application Submitted!",
+                title: result.message || "Application Submitted!",
                 description: "Thank you for your application. We will review your submission and be in touch shortly.",
             });
             
             e.currentTarget.reset();
             setInstituteName('');
-            setSlug('');
             
         } catch (error) {
-            console.error("Submission Error:", error);
             const msg = error instanceof Error ? error.message : "An unknown error occurred.";
             toast({ variant: 'destructive', title: "Submission Failed", description: msg });
         } finally {
@@ -108,7 +76,7 @@ export default function RegistrationPage() {
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                     <Label htmlFor="name">Institute Name</Label>
-                    <Input id="name" name="name" placeholder="e.g., Global Tech University" required value={instituteName} onChange={handleNameChange} disabled={isLoading} />
+                    <Input id="name" name="name" placeholder="e.g., Global Tech University" required value={instituteName} onChange={(e) => setInstituteName(e.target.value)} disabled={isLoading} />
                 </div>
                 
                 <div className="space-y-2">
