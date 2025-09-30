@@ -35,7 +35,7 @@ export default function NewCoursePage() {
 
       const payload = {
           institute_id: parseInt(instituteId),
-          name: formData.get('courseName') as string,
+          course_name: formData.get('courseName') as string,
           course_code: formData.get('courseCode') as string,
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
@@ -58,7 +58,7 @@ export default function NewCoursePage() {
 
         toast({
             title: "Course Added",
-            description: `The course "${payload.name}" has been successfully added.`,
+            description: `The course "${payload.course_name}" has been successfully added.`,
         });
 
         router.push('/dashboard/courses');

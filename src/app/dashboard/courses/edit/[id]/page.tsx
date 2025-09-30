@@ -68,7 +68,10 @@ export default function EditCoursePage() {
       
       const formData = new FormData(e.currentTarget);
       const token = sessionStorage.getItem('ukcas_token');
-       if (!token || !course) {
+      const userData = sessionStorage.getItem('ukcas_user');
+      const user = userData ? JSON.parse(userData) : null;
+
+       if (!token || !course || !user) {
           toast({ variant: 'destructive', title: "Error", description: "Authentication error or missing course data." });
           setIsLoading(false);
           return;
@@ -76,10 +79,12 @@ export default function EditCoursePage() {
       
       const payload = {
           id: course.id,
-          name: formData.get('courseName') as string,
+          institute_id: course.institute_id,
+          course_name: formData.get('courseName') as string,
           course_code: formData.get('courseCode') as string,
           description: formData.get('description') as string,
           duration: formData.get('duration') as string,
+          created_by: user.user_name || 'system',
           active_status: course.active_status,
       };
 
@@ -97,7 +102,7 @@ export default function EditCoursePage() {
 
         toast({
             title: "Course Updated",
-            description: `The course "${payload.name}" has been successfully updated.`,
+            description: `The course "${payload.course_name}" has been successfully updated.`,
         });
 
         router.push('/dashboard/courses');
@@ -156,11 +161,11 @@ export default function EditCoursePage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="duration">Course Duration</Label>
-              <Input id="duration" name="duration" defaultValue={course.duration} required disabled={isLoading} />
+              <Input id="duration" name="duration" defaultValue={course.duration || ''} required disabled={isLoading} />
             </div>
              <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" name="description" defaultValue={course.description} placeholder="A brief description of the course." disabled={isLoading} />
+              <Textarea id="description" name="description" defaultValue={course.description || ''} placeholder="A brief description of the course." disabled={isLoading} />
             </div>
             <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
