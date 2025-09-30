@@ -60,13 +60,10 @@ export async function POST(request: Request) {
 
     try {
         const formData = await request.formData();
-        const instituteId = formData.get('id') as string | null;
-
-        let fetchUrl = `${apiUrl}/institutes`;
-        if (instituteId) {
-            // If an ID is present, this is an update.
-            fetchUrl = `${apiUrl}/institutes/${instituteId}`;
-        }
+        
+        // The endpoint is the same for create and update.
+        // The presence of an 'id' in the form data dictates the operation on the backend.
+        const fetchUrl = `${apiUrl}/institutes`;
         
         const headers: HeadersInit = { 'X-API-KEY': apiKey };
         const token = request.headers.get('Authorization')?.replace('Bearer ', '');
@@ -138,3 +135,4 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
 }
+
