@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import Link from 'next/link';
 import type { ApiInstitute } from '@/lib/types';
 import { SidebarTrigger } from '../ui/sidebar';
+import { ThemeSwitcher } from './theme-switcher';
 
 interface UserData {
     email: string;
@@ -78,11 +79,12 @@ export default function DashboardHeader() {
                 )}
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
                 <div className="relative hidden md:block">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search..." className="pl-10 bg-card" />
                 </div>
+                <ThemeSwitcher />
                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                      <Button variant="ghost" className="relative h-9 w-9 rounded-full">
