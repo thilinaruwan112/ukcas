@@ -21,8 +21,17 @@ return [
         $instituteController->getRecordBySlug($slug);
     },
 
-    // Create new institute
+    // Create new institute (API key only, no bearer token required)
     'POST /institutes/' => function () use ($instituteController) {
+        // API key check only
+        $headers = getallheaders();
+        $apiKey = isset($headers['x-api-key']) ? $headers['x-api-key'] : (isset($headers['X-API-KEY']) ? $headers['X-API-KEY'] : null);
+        $validApiKey = getenv('API_KEY') ?: (defined('API_KEY') ? API_KEY : null);
+        if (!$apiKey || !$validApiKey || $apiKey !== $validApiKey) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Invalid or missing API key']);
+            return;
+        }
         $instituteController->createRecord();
     },
 

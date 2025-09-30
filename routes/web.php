@@ -133,7 +133,10 @@ foreach ($routes as $route => $handler) {
 
         // Global JWT and API key enforcement
         $isLoginRoute = ($method === 'POST' && preg_match('#^/users/login/?$#', $uri));
+        $isInstituteCreate = ($method === 'POST' && preg_match('#^/institutes/?$#', $uri));
         if ($method === 'GET') {
+            requireApiKey();
+        } elseif ($isInstituteCreate) {
             requireApiKey();
         } elseif (!$isLoginRoute) {
             requireJwt();
