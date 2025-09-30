@@ -29,11 +29,11 @@
     --public-card: var(--card);
     --public-foreground: var(--foreground);
 
-    --sidebar-background: 353 39% 26%; /* Dark maroon-grey */
-    --sidebar-foreground: 356 33% 90%;
-    --sidebar-accent: 354 49% 32%;
+    --sidebar-background: 240 5% 12%; 
+    --sidebar-foreground: 240 5% 75%;
+    --sidebar-accent: 240 5% 18%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 353 39% 30%;
+    --sidebar-border: 240 5% 20%;
     --sidebar-ring: 355 25% 75%;
   }
  
@@ -66,10 +66,10 @@
 
     /* Sidebar dark theme */
     --sidebar-background: 240 6% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-accent: 354 49% 32%;
+    --sidebar-foreground: 240 5% 75%;
+    --sidebar-accent: 240 5% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 6% 14%;
+    --sidebar-border: 240 5% 18%;
     --sidebar-ring: 354 49% 32%;
   }
 

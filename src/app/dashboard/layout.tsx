@@ -43,7 +43,7 @@ export default function InstituteLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <Sidebar className="border-r bg-sidebar text-sidebar-foreground">
-          <SidebarHeader>
+          <SidebarHeader className="p-4">
             <Logo variant="white" />
           </SidebarHeader>
           <SidebarContent>
