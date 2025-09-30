@@ -30,9 +30,22 @@ export default function RegistrationPage() {
         const contactPerson = formData.get('contact_person') as string;
         formData.set('created_by', contactPerson || 'public_applicant');
         
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+        if (!apiUrl || !apiKey) {
+            toast({ variant: 'destructive', title: "Configuration Error", description: "API endpoint is not configured." });
+            setIsLoading(false);
+            return;
+        }
+
+        const headers = new Headers();
+        headers.append('X-API-KEY', apiKey);
+
         try {
-            const response = await fetch('/api/institutes', {
+            const response = await fetch(`${apiUrl}/institutes`, {
                 method: 'POST',
+                headers: headers,
                 body: formData,
             });
 
