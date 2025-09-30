@@ -47,6 +47,22 @@ async function getCertificates(instituteId: string, token: string): Promise<Cert
     }
 }
 
+async function getBalance(instituteId: string, token: string): Promise<number> {
+    try {
+        const response = await fetch(`/api/institute-payments/${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            return 0;
+        }
+        const data = await response.json();
+        return data.balance || 0;
+    } catch (error) {
+        console.error(`Failed to fetch balance for institute ${instituteId}:`, error);
+        return 0;
+    }
+}
+
 
 function DashboardSkeleton() {
     return (
@@ -99,6 +115,7 @@ export default function InstituteDashboardPage() {
     const [stats, setStats] = useState<{ title: string, value: string, icon: JSX.Element }[]>([]);
     const [recentCertificates, setRecentCertificates] = useState<Certificate[]>([]);
     const [loading, setLoading] = useState(true);
+    const [balance, setBalance] = useState<number>(0);
 
     useEffect(() => {
         const instituteDataString = sessionStorage.getItem('ukcas_active_institute');
@@ -116,15 +133,18 @@ export default function InstituteDashboardPage() {
         async function fetchData() {
             try {
                 // Fetch all data in parallel
-                const [studentsData, certificatesData] = await Promise.all([
+                const [studentsData, certificatesData, balanceData] = await Promise.all([
                     getStudents(instituteId, token),
-                    getCertificates(instituteId, token)
+                    getCertificates(instituteId, token),
+                    getBalance(instituteId, token)
                 ]);
                 
+                setBalance(balanceData);
+
                 setStats([
                     { title: "Total Students", value: studentsData.length.toLocaleString(), icon: <Users className="h-8 w-8 text-muted-foreground" /> },
                     { title: "Certificates Issued", value: certificatesData.length.toLocaleString(), icon: <GraduationCap className="h-8 w-8 text-muted-foreground" /> },
-                    { title: "Account Balance", value: `$${activeInstitute.balance ? Number(activeInstitute.balance).toFixed(2) : '0.00'}`, icon: <Wallet className="h-8 w-8 text-muted-foreground" /> },
+                    { title: "Account Balance", value: `$${Number(balanceData).toFixed(2)}`, icon: <Wallet className="h-8 w-8 text-muted-foreground" /> },
                 ]);
 
                 setRecentCertificates(certificatesData.slice(0, 5));
