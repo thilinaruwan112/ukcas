@@ -31,6 +31,27 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const instituteId = searchParams.get('instituteId');
     const all = searchParams.get('all');
+    const check = searchParams.get('check');
+
+    if (check) {
+        const studentId = searchParams.get('studentId');
+        const courseId = searchParams.get('courseId');
+        const checkInstituteId = searchParams.get('instituteId');
+        if (!studentId || !courseId || !checkInstituteId) {
+             return NextResponse.json({ status: 'error', message: 'Student ID, Course ID, and Institute ID are required for checking.' }, { status: 400 });
+        }
+         try {
+            const checkUrl = `${apiUrl}/students-certificates/institute/check-certificate?student_id=${studentId}&course_id=${courseId}&institute_id=${checkInstituteId}`;
+            const response = await fetch(checkUrl, {
+                 headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            return NextResponse.json(data, { status: response.status });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+            return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
+        }
+    }
 
 
     try {
@@ -161,14 +182,35 @@ async function handlePatch(request: Request) {
             },
             body: JSON.stringify(payload)
         });
-
-        const updateResult = await updateResponse.json();
-
-        if (!updateResponse.ok || updateResult.status !== 'success') {
-            throw new Error(updateResult.message || 'Failed to update certificate status.');
+        
+        if (!updateResponse.ok) {
+             const errorData = await updateResponse.json().catch(() => ({ message: 'Failed to update and could not parse error' }));
+             throw new Error(errorData.message || 'Failed to update certificate status.');
         }
 
-        return NextResponse.json({ status: 'success', data: updateResult.data });
+        const textResponse = await updateResponse.text();
+
+        // Check if the response contains multiple JSON objects
+        if (textResponse.startsWith('{') && textResponse.endsWith('}')) {
+             try {
+                // It looks like a single JSON object
+                const singleResult = JSON.parse(textResponse);
+                return NextResponse.json({ status: 'success', message: singleResult.message || 'Status updated successfully.' });
+            } catch (e) {
+                 // It might be the multi-part response
+                try {
+                    const jsonParts = textResponse.replace(/}\s*{/g, '}|{').split('|');
+                    const firstPart = JSON.parse(jsonParts[0]);
+                    const secondPart = JSON.parse(jsonParts[1]);
+                    const combinedMessage = `${firstPart.message} ${secondPart.message}`;
+                    return NextResponse.json({ status: 'success', message: combinedMessage });
+                } catch (multiE) {
+                     return NextResponse.json({ status: 'success', message: 'Status updated, but response was not in the expected format.' });
+                }
+            }
+        }
+        
+        return NextResponse.json({ status: 'success', message: 'Status updated successfully.' });
 
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
@@ -179,3 +221,5 @@ async function handlePatch(request: Request) {
 export async function PATCH(request: Request) {
     return handlePatch(request);
 }
+
+    

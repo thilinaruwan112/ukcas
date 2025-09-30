@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,13 +70,9 @@ async function getCourses(instituteId: string, token: string): Promise<Course[]>
 }
 
 async function checkExistingCertificate(studentId: string, courseId: string, instituteId: string, token: string): Promise<Certificate | null> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-    if (!apiUrl || !apiKey) return null;
-
     try {
-        const response = await fetch(`${apiUrl}/students-certificates/institute/check-certificate?student_id=${studentId}&course_id=${courseId}&institute_id=${instituteId}`, {
-            headers: { 'X-API-KEY': apiKey, 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`/api/certificates?check=true&studentId=${studentId}&courseId=${courseId}&instituteId=${instituteId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) return null;
         const data = await response.json();
@@ -471,3 +466,5 @@ export default function IssueCertificatePage() {
         </div>
     );
 }
+
+    
