@@ -28,6 +28,43 @@ const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
+// Function to get a cookie value by name
+function getCookie(name: string): string | undefined {
+  if (typeof document === "undefined") {
+    return undefined
+  }
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) {
+    return parts.pop()?.split(";").shift()
+  }
+}
+
+// Store for sidebar state that syncs with cookies
+function createSidebarStore(defaultOpen: boolean) {
+  let open = defaultOpen
+  const listeners = new Set<() => void>()
+
+  // Initial state from cookie
+  const cookieValue = getCookie(SIDEBAR_COOKIE_NAME)
+  if (cookieValue) {
+    open = cookieValue === "true"
+  }
+
+  return {
+    getSnapshot: () => open,
+    subscribe: (listener: () => void) => {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
+    setOpen: (newOpen: boolean) => {
+      open = newOpen
+      document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      listeners.forEach((listener) => listener())
+    },
+  }
+}
+
 type SidebarContext = {
   state: "expanded" | "collapsed"
   open: boolean
@@ -72,23 +109,24 @@ const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
 
-    // This is the internal state of the sidebar.
-    // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
+    // Create a memoized store instance
+    const store = React.useMemo(() => createSidebarStore(defaultOpen), [defaultOpen]);
+
+    // useSyncExternalStore to get the sidebar state
+    const _open = React.useSyncExternalStore(store.subscribe, store.getSnapshot);
+
     const open = openProp ?? _open
+    
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
         if (setOpenProp) {
           setOpenProp(openState)
         } else {
-          _setOpen(openState)
+          store.setOpen(openState)
         }
-
-        // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
-      [setOpenProp, open]
+      [setOpenProp, open, store]
     )
 
     // Helper to toggle the sidebar.
