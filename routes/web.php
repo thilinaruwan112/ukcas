@@ -9,6 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// Set default timezone for Sri Lanka
+date_default_timezone_set('Asia/Colombo');
+
 ini_set('memory_limit', '256M');
 
 // Report all PHP errors

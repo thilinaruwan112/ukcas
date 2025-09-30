@@ -35,6 +35,7 @@ class StudentCertificateController
                 'created_by' => $certificate['created_by'] ?? null,
                 'active_status' => 1,
                 'remark' => 'Certificate approval payment for certificate ID ' . $certificate_id,
+                'ref_id' => $certificate_id
             ];
             $paymentController->create($paymentData);
         }
