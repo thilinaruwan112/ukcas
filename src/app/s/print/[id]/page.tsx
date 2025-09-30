@@ -192,21 +192,22 @@ export default function PrintCertificatePage() {
             </div>
             <style jsx global>{`
                 @media print {
-                    body > *:not(#print-area) {
-                        display: none !important;
+                    body, #__next {
+                        visibility: hidden !important;
+                    }
+                    #print-area, #print-area * {
+                        visibility: visible !important;
                     }
                     #print-area {
-                        display: block !important;
-                        visibility: visible !important;
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        height: auto;
-                        margin: 0;
-                        padding: 0;
-                        border: none;
-                        box-shadow: none;
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: 100% !important;
+                        height: auto !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        border: none !important;
+                        box-shadow: none !important;
                     }
                 }
                  @page {
