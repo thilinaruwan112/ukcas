@@ -21,7 +21,8 @@ export default function RegistrationPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        const formData = new FormData(e.currentTarget);
+        const form = e.currentTarget;
+        const formData = new FormData(form);
         
         // Hardcode values for a public application
         formData.set('accreditation_status', 'Pending');
@@ -61,7 +62,7 @@ export default function RegistrationPage() {
                 description: "Thank you for your application. We will review your submission and be in touch shortly.",
             });
             
-            e.currentTarget.reset();
+            form.reset();
             setInstituteName('');
             
         } catch (error) {
