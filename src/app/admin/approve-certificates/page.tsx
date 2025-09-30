@@ -33,18 +33,44 @@ async function getPendingCertificates(token: string): Promise<Certificate[]> {
     }
 }
 
-async function updateCertificateStatus(id: string, status: 'Approved' | 'Rejected', token: string): Promise<any> {
+async function updateCertificateStatus(id: string, status: 'Approved' | 'Rejected', token: string): Promise<string> {
     const response = await fetch('/api/certificates', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ id, status }),
     });
 
-    const result = await response.json();
+    const responseText = await response.text();
     if (!response.ok) {
-        throw new Error(result.message || `Failed to update status to ${status}`);
+        try {
+            const result = JSON.parse(responseText);
+             throw new Error(result.message || `Failed to update status to ${status}`);
+        } catch (e) {
+             throw new Error(responseText || `Failed to update status to ${status}`);
+        }
     }
-    return result;
+
+    try {
+        // Handle multi-part JSON response
+        const jsonObjects = responseText.replace(/}{/g, '}\n{').split('\n');
+        const messages = jsonObjects.map(objStr => {
+            if (objStr.trim() === '') return null;
+            const parsed = JSON.parse(objStr);
+            return parsed.message;
+        }).filter(Boolean);
+
+        return messages.join(' ');
+
+    } catch (error) {
+        console.error("Failed to parse multi-part JSON response:", error);
+        // Fallback for single JSON object
+        try {
+            const result = JSON.parse(responseText);
+            return result.message || 'Status updated successfully.';
+        } catch (e) {
+            return 'Status updated successfully, but response was unclear.';
+        }
+    }
 }
 
 
@@ -87,10 +113,10 @@ export default function ApproveCertificatesPage() {
         }
 
         try {
-            await updateCertificateStatus(id, status, token);
+            const successMessage = await updateCertificateStatus(id, status, token);
             toast({
                 title: 'Success',
-                description: `Certificate has been ${status.toLowerCase()}.`,
+                description: successMessage || `Certificate has been ${status.toLowerCase()}.`,
             });
             // Refresh the list
             setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== id));
