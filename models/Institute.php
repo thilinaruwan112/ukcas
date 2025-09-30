@@ -40,7 +40,7 @@ class Institute
         $stmt = $this->pdo->prepare("
             INSERT INTO {$this->table}
             (name, code, type, accreditation_status, accreditation_valid_until, email, phone, website,
-             address_line1, address_line2, city, state, country, postal_code, created_at, updated_at, created_by, status, slug)
+             address_line1, address_line2, city, state, country, postal_code, created_at, updated_at, created_by, status, slug, logo_path)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
@@ -62,7 +62,8 @@ class Institute
             $data['updated_at'],
             $data['created_by'],
             $data['status'],
-            $data['slug']
+            $data['slug'],
+            $data['logo_path']
         ]);
 
         return $this->pdo->lastInsertId();
@@ -91,7 +92,8 @@ class Institute
                 updated_at = ?,
                 created_by = ?,
                 status = ?,
-                slug = ?
+                slug = ?,
+                logo_path = ?
             WHERE id = ?
         ");
         $stmt->execute([
@@ -114,6 +116,7 @@ class Institute
             $data['created_by'],
             $data['status'],
             $data['slug'],
+            $data['logo_path'],
             $id
         ]);
     }
