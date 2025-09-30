@@ -75,12 +75,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton href="/admin/accreditation" isActive={pathname.startsWith('/admin/accreditation')}>
-                      <Award />
-                      Accreditation Letters
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
                     <SidebarMenuButton href="/admin/approve-certificates" isActive={pathname.startsWith('/admin/approve-certificates')}>
                       <ShieldCheck />
                       Approve Certificates
