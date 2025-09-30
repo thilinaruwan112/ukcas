@@ -37,15 +37,24 @@ export default function RegistrationPage() {
         formData.set('status', 'Active');
         formData.set('slug', slug); // Ensure slug is set from state
         
-        // Use contact person's name as 'created_by' for backend tracking if needed
         const contactPerson = formData.get('contact_person') as string;
         formData.set('created_by', contactPerson || 'public_applicant');
         
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+        if (!apiUrl || !apiKey) {
+            toast({ variant: 'destructive', title: "Configuration Error", description: "The API endpoint is not configured correctly." });
+            setIsLoading(false);
+            return;
+        }
 
         try {
-            const response = await fetch('/api/institutes', {
+            const response = await fetch(`${apiUrl}/institutes`, {
                 method: 'POST',
-                // No token needed for public registration
+                headers: {
+                  'X-API-KEY': apiKey,
+                },
                 body: formData,
             });
 
@@ -60,7 +69,6 @@ export default function RegistrationPage() {
                 description: "Thank you for your application. We will review your submission and be in touch shortly.",
             });
             
-            // Optionally, redirect or clear the form
             e.currentTarget.reset();
             setInstituteName('');
             setSlug('');
