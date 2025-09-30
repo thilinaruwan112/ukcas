@@ -97,7 +97,7 @@ function FilePreview({ path, label }: { path?: string | null; label: string }) {
     if (!path) return null;
 
     const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(path);
-    const fullUrl = path; // The full URL is now constructed in the API route
+    const fullUrl = path;
 
     return (
         <div className="mt-2">
@@ -317,13 +317,13 @@ export default function EditStudentPage() {
                     <Label htmlFor="id_card_front">ID Card (Front)</Label>
                     <Input id="id_card_front" name="id_card_front" type="file" disabled={isLoading}/>
                     <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
-                    <FilePreview path={student.id_card_front_path} label="ID Card (Front)" />
+                    <FilePreview path={student.id_card_front} label="ID Card (Front)" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="id_card_back">ID Card (Back)</Label>
                     <Input id="id_card_back" name="id_card_back" type="file" disabled={isLoading}/>
                      <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
-                     <FilePreview path={student.id_card_back_path} label="ID Card (Back)" />
+                     <FilePreview path={student.id_card_back} label="ID Card (Back)" />
                 </div>
             </div>
 
@@ -332,13 +332,13 @@ export default function EditStudentPage() {
                     <Label htmlFor="ol_certificate">O/L Certificate</Label>
                     <Input id="ol_certificate" name="ol_certificate" type="file" disabled={isLoading}/>
                      <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
-                     <FilePreview path={student.ol_certificate_path} label="O/L Certificate" />
+                     <FilePreview path={student.ol_certificate} label="O/L Certificate" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="al_certificate">A/L Certificate</Label>
                     <Input id="al_certificate" name="al_certificate" type="file" disabled={isLoading}/>
                      <p className="text-xs text-muted-foreground">Upload a new file to replace the current one.</p>
-                     <FilePreview path={student.al_certificate_path} label="A/L Certificate" />
+                     <FilePreview path={student.al_certificate} label="A/L Certificate" />
                 </div>
             </div>
 
@@ -346,7 +346,7 @@ export default function EditStudentPage() {
                 <Label htmlFor="student_photo">Student Photo</Label>
                 <Input id="student_photo" name="student_photo" type="file" accept="image/*" disabled={isLoading}/>
                  <p className="text-xs text-muted-foreground">Upload a new photo to replace the current one.</p>
-                <FilePreview path={student.student_photo_path} label="Student Photo" />
+                <FilePreview path={student.student_photo} label="Student Photo" />
             </div>
             
             <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
@@ -389,3 +389,5 @@ function EditStudentPageSkeleton() {
         </div>
     )
 }
+
+    

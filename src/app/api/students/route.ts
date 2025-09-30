@@ -38,24 +38,26 @@ async function handleRequest(request: Request) {
                 // Ensure all path properties are present, even if null
                 if (data.status === 'success' && data.data) {
                     const studentData = data.data;
-                    const requiredPaths = [
-                        'student_photo_path',
-                        'id_card_front_path',
-                        'id_card_back_path',
-                        'ol_certificate_path',
-                        'al_certificate_path'
+                    const fileFields = [
+                        'student_photo',
+                        'id_card_front',
+                        'id_card_back',
+                        'ol_certificate',
+                        'al_certificate'
                     ];
-                    requiredPaths.forEach(path => {
-                        if (!(path in studentData)) {
-                            studentData[path] = null;
+                    
+                    const contentBaseUrl = 'https://content-provider.payshia.com/ukcas/';
+
+                    fileFields.forEach(field => {
+                        if (studentData[field]) {
+                            // Only add prefix if it's not already a full URL
+                             if (!studentData[field].startsWith('http')) {
+                                studentData[field] = `${contentBaseUrl}${studentData[field]}`;
+                            }
+                        } else {
+                            studentData[field] = null;
                         }
                     });
-                     // Make sure full URL is constructed if not already
-                    studentData.student_photo_path = studentData.student_photo_path ? `https://content-provider.payshia.com/ukcas/${studentData.student_photo_path}` : null;
-                    studentData.id_card_front_path = studentData.id_card_front_path ? `https://content-provider.payshia.com/ukcas/${studentData.id_card_front_path}` : null;
-                    studentData.id_card_back_path = studentData.id_card_back_path ? `https://content-provider.payshia.com/ukcas/${studentData.id_card_back_path}` : null;
-                    studentData.ol_certificate_path = studentData.ol_certificate_path ? `https://content-provider.payshia.com/ukcas/${studentData.ol_certificate_path}` : null;
-                    studentData.al_certificate_path = studentData.al_certificate_path ? `https://content-provider.payshia.com/ukcas/${studentData.al_certificate_path}` : null;
                 }
 
                 return NextResponse.json(data, { status: response.status });
@@ -110,3 +112,5 @@ async function handleRequest(request: Request) {
 
 export async function GET(request: Request) { return handleRequest(request); }
 export async function POST(request: Request) { return handleRequest(request); }
+
+    

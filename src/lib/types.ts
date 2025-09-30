@@ -114,11 +114,11 @@ export interface Student {
   address: string;
   country: string;
   created_at: string;
-  student_photo_path?: string;
-  id_card_front_path?: string;
-  id_card_back_path?: string;
-  ol_certificate_path?: string;
-  al_certificate_path?: string;
+  student_photo?: string | null;
+  id_card_front?: string | null;
+  id_card_back?: string | null;
+  ol_certificate?: string | null;
+  al_certificate?: string | null;
 }
 
 export interface CertificateVerificationData {
@@ -141,3 +141,5 @@ export interface CertificateVerificationData {
   address: string;
   student_photo: string;
 }
+
+    
