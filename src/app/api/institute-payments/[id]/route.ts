@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const { id } = params;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+    const apiUrl = 'https://ukcas-server.payshia.com';
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY || 'your_default_api_key';
+
 
     if (!apiUrl || !apiKey) {
         return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
@@ -24,11 +25,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
             },
         });
 
-        const result = await response.json();
-
         if (!response.ok) {
-            throw new Error(result.message || 'Failed to fetch balance.');
+            const errorData = await response.json().catch(() => ({ message: 'Failed to fetch balance and could not parse error.' }));
+            throw new Error(errorData.message || 'Failed to fetch balance.');
         }
+        
+        const result = await response.json();
 
         return NextResponse.json(result);
 
@@ -37,5 +39,3 @@ export async function GET(request: Request, { params }: { params: { id: string }
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
 }
-
-    
