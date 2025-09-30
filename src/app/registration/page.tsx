@@ -100,9 +100,11 @@ export default function RegistrationPage() {
                             <SelectValue placeholder="Select the type of your institution" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Institute">Institute</SelectItem>
                             <SelectItem value="University">University</SelectItem>
                             <SelectItem value="College">College</SelectItem>
+                            <SelectItem value="Training Center">Training Center</SelectItem>
+                            <SelectItem value="School">School</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
