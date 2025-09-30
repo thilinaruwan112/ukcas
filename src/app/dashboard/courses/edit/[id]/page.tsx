@@ -85,7 +85,7 @@ export default function EditCoursePage() {
 
       try {
         const response = await fetch('/api/courses', {
-            method: 'PATCH',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
             body: JSON.stringify(payload),
         });
