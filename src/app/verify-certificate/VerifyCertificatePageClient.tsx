@@ -5,15 +5,15 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileSearch, CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { mockCertificates, mockInstitutes } from "@/lib/mock-data";
+import { FileSearch, CheckCircle, XCircle, Loader2, User, BookOpen as BookIcon, Calendar, Building } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { Certificate, Institute } from "@/lib/types";
+import type { ApiInstitute, Course } from "@/lib/types";
+import { Separator } from "@/components/ui/separator";
 
 interface VerificationResult {
-    certificate: Certificate;
-    instituteName: string;
-    instituteStatus: Institute['status'];
+    certificate: any; // Using 'any' as the structure is complex and nested
+    institute: ApiInstitute;
+    course: Course;
 }
 
 export function VerifyCertificatePageClient() {
@@ -22,7 +22,7 @@ export function VerifyCertificatePageClient() {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleVerify = (e: React.FormEvent) => {
+    const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!certificateId.trim()) {
             setError("Please enter a Certificate ID.");
@@ -33,28 +33,26 @@ export function VerifyCertificatePageClient() {
         setResult(null);
         setError(null);
 
-        // Simulate API call
-        setTimeout(() => {
-            const foundCertificate = mockCertificates.find(cert => cert.id.toLowerCase() === certificateId.trim().toLowerCase());
+        try {
+            const response = await fetch(`/api/verify-certificate/${certificateId.trim()}`);
+            const data = await response.json();
 
-            if (foundCertificate) {
-                const foundInstitute = mockInstitutes.find(inst => inst.id === foundCertificate.instituteId);
-
-                if (foundInstitute) {
-                    setResult({
-                        certificate: foundCertificate,
-                        instituteName: foundInstitute.name,
-                        instituteStatus: foundInstitute.status,
-                    });
-                } else {
-                    setError("Internal Error: Could not find the issuing institute for this certificate.");
-                }
-            } else {
-                setError(`Certificate with ID "${certificateId}" not found. Please check the ID and try again.`);
+            if (!response.ok) {
+                throw new Error(data.message || 'Verification failed.');
             }
 
+            if (data.status === 'success') {
+                setResult(data.data);
+            } else {
+                throw new Error(data.message || `Certificate with ID "${certificateId}" not found.`);
+            }
+
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
+            setError(errorMessage);
+        } finally {
             setIsLoading(false);
-        }, 1000);
+        }
     };
 
     return (
@@ -76,14 +74,15 @@ export function VerifyCertificatePageClient() {
                                 <label htmlFor="certificateId" className="sr-only">Certificate ID</label>
                                 <Input 
                                     id="certificateId" 
-                                    placeholder="Enter Certificate ID (e.g., UKCAS-12345678)" 
-                                    className="h-12 text-base" 
+                                    placeholder="Enter Certificate ID" 
+                                    className="h-12 text-base text-center font-mono tracking-wider" 
                                     value={certificateId}
                                     onChange={(e) => setCertificateId(e.target.value)}
                                     autoFocus
+                                    disabled={isLoading}
                                 />
                             </div>
-                            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading}>
+                            <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isLoading || !certificateId}>
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -113,7 +112,7 @@ export function VerifyCertificatePageClient() {
 
                 {result && !isLoading && (
                     <Card className="w-full max-w-lg border-primary/30 shadow-lg animate-in fade-in-50">
-                        <CardHeader className="text-center items-center bg-primary/5 dark:bg-primary/10 rounded-t-lg">
+                        <CardHeader className="text-center items-center bg-primary/5 dark:bg-primary/10 rounded-t-lg p-6">
                             <div className="text-primary">
                                 <CheckCircle className="h-12 w-12" />
                             </div>
@@ -121,29 +120,26 @@ export function VerifyCertificatePageClient() {
                             <CardDescription>This certificate is authentic and valid.</CardDescription>
                         </CardHeader>
                         <CardContent className="p-6 grid gap-4 text-sm">
-                           <div className="flex justify-between border-b pb-2">
-                                <span className="text-muted-foreground">Student Name</span>
-                                <span className="font-semibold text-right">{result.certificate.studentName}</span>
-                            </div>
-                           <div className="flex justify-between border-b pb-2">
-                                <span className="text-muted-foreground">Certificate ID</span>
-                                <span className="font-semibold font-mono text-right">{result.certificate.id}</span>
-                            </div>
-                            <div className="flex justify-between border-b pb-2">
-                                <span className="text-muted-foreground">Course Name</span>
-                                <span className="font-semibold text-right">{result.certificate.courseName}</span>
-                            </div>
-                            <div className="flex justify-between border-b pb-2">
-                                <span className="text-muted-foreground">Date of Issue</span>
-                                <span className="font-semibold text-right">{result.certificate.issueDate}</span>
-                            </div>
-                            <div className="flex justify-between border-b pb-2">
-                                <span className="text-muted-foreground">Issuing Institute</span>
-                                <span className="font-semibold text-right">{result.instituteName}</span>
-                            </div>
-                            <div className="flex justify-between items-center pt-2">
-                                <span className="text-muted-foreground">Accreditation Status</span>
-                                <Badge variant="default">{result.instituteStatus}</Badge>
+                           <div className="flex flex-col space-y-2 text-center border-b pb-4">
+                                <span className="font-semibold text-xl text-foreground">{result.certificate.name}</span>
+                                <span className="text-muted-foreground">{result.certificate.email_address}</span>
+                           </div>
+                           <div className="grid grid-cols-2 gap-4">
+                               <InfoItem icon={<FileSearch size={16}/>} label="Certificate ID" value={result.certificate.certificate_id} mono />
+                               <InfoItem icon={<Calendar size={16}/>} label="Issue Date" value={new Date(result.certificate.created_at).toLocaleDateString()} />
+                           </div>
+                            <InfoItem icon={<BookIcon size={16}/>} label="Qualification/Course" value={result.course.course_name} />
+                           
+                           <Separator />
+
+                           <div className="flex flex-col space-y-2 text-center">
+                                <span className="text-muted-foreground text-xs">Issuing Institute</span>
+                                <span className="font-semibold text-lg">{result.institute.name}</span>
+                           </div>
+
+                            <div className="flex justify-between items-center bg-secondary/50 p-3 rounded-md">
+                                <span className="text-muted-foreground font-medium flex items-center gap-2"><Building size={16}/> Accreditation Status</span>
+                                <Badge variant={result.institute.accreditation_status === 'Accredited' ? 'default' : 'secondary'}>{result.institute.accreditation_status}</Badge>
                             </div>
                         </CardContent>
                     </Card>
@@ -152,4 +148,14 @@ export function VerifyCertificatePageClient() {
             </div>
         </div>
     );
+}
+
+
+function InfoItem({ label, value, icon, mono = false }: { label: string, value: string, icon: React.ReactNode, mono?: boolean }) {
+    return (
+        <div className="space-y-1">
+            <p className="text-muted-foreground text-xs flex items-center gap-1">{icon} {label}</p>
+            <p className={`font-semibold ${mono ? 'font-mono' : ''}`}>{value}</p>
+        </div>
+    )
 }

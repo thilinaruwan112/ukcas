@@ -1,4 +1,5 @@
 
+
 export interface Institute {
   id: string;
   name: string;
@@ -111,4 +112,24 @@ export interface Student {
   created_at: string;
 }
 
+export interface CertificateVerificationData {
+  id: number;
+  institute_id: number;
+  student_id: number;
+  course_id: number;
+  certificate_id: number;
+  created_at: string;
+  created_by: string;
+  is_active: number;
+  approved_status: 'Approved' | 'Pending' | 'Rejected';
+  from_date: string;
+  to_date: string;
+  name: string;
+  date_of_birth: string;
+  email_address: string;
+  country: string;
+  phone_number: string;
+  address: string;
+  student_photo: string;
+}
     
