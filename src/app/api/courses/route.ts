@@ -40,25 +40,26 @@ async function handleRequest(request: Request) {
             headers['Authorization'] = `Bearer ${token}`;
         }
         
-        // POST can be for creation or fetching, based on payload.
         if (request.method === 'POST') {
             const body = await request.json();
+            
+            if (!token) {
+                return NextResponse.json({ status: 'error', message: 'Authentication is required for this action.' }, { status: 401 });
+            }
 
-            // Fetching courses for an institute
-            if (body.institute_id && Object.keys(body).length === 1) {
-                const response = await fetch(`${apiUrl}/institute-courses`, { 
+            // If an ID is present, it's an update (POST to /institute-courses/{id})
+            if (body.id) {
+                const { id, ...updateData } = body;
+                const response = await fetch(`${apiUrl}/institute-courses/${id}`, { 
                     method: 'POST', 
-                    headers,
-                    body: JSON.stringify({ institute_id: body.institute_id })
+                    headers, 
+                    body: JSON.stringify(updateData) 
                 });
                 const data = await response.json();
                 return NextResponse.json(data, { status: response.status });
             } 
             
-            // Creating a new course
-            if (!token) {
-                return NextResponse.json({ status: 'error', message: 'Authentication is required for this action.' }, { status: 401 });
-            }
+            // Otherwise, it's a create (POST to /institute-courses)
             const response = await fetch(`${apiUrl}/institute-courses`, { method: 'POST', headers, body: JSON.stringify(body) });
             const data = await response.json();
             return NextResponse.json(data, { status: response.status });
@@ -69,16 +70,6 @@ async function handleRequest(request: Request) {
         }
         
         const body = await request.json();
-
-        if (request.method === 'PATCH') {
-            if (!body.id) {
-                return NextResponse.json({ status: 'error', message: 'Course ID is required for update.' }, { status: 400 });
-            }
-            const { id, ...patchData } = body;
-            const response = await fetch(`${apiUrl}/institute-courses/${id}`, { method: 'PATCH', headers, body: JSON.stringify(patchData) });
-            const data = await response.json();
-            return NextResponse.json(data, { status: response.status });
-        }
 
         if (request.method === 'DELETE') {
             if (!body.id) {
@@ -102,5 +93,4 @@ async function handleRequest(request: Request) {
 
 export async function GET(request: Request) { return handleRequest(request); }
 export async function POST(request: Request) { return handleRequest(request); }
-export async function PATCH(request: Request) { return handleRequest(request); }
 export async function DELETE(request: Request) { return handleRequest(request); }
