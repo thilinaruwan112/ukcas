@@ -12,6 +12,12 @@ return [
     'GET /students-certificates/{id}' => function ($id) use ($controller) {
         $controller->getById($id);
     },
+    'GET /students-certificates/institute/check-certificate' => function () use ($controller) {
+        $student_id = $_GET['student_id'] ?? null;
+        $course_id = $_GET['course_id'] ?? null;
+        $institute_id = $_GET['institute_id'] ?? null;
+        $controller->existsForStudentAndCourse($student_id, $course_id, $institute_id);
+    },
     'GET /students-certificates/institute/{institute_id}' => function ($institute_id) use ($controller) {
         $controller->getByInstituteId($institute_id);
     },
@@ -29,5 +35,5 @@ return [
     },
     'DELETE /students-certificates/{id}' => function ($id) use ($controller) {
         $controller->delete($id);
-    },
+    }
 ];

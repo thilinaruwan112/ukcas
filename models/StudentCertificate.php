@@ -2,6 +2,7 @@
 // models/StudentCertificate.php
 class StudentCertificate
 
+
 {
     private $pdo;
     public function __construct($pdo)
@@ -81,5 +82,13 @@ class StudentCertificate
         $stmt = $this->pdo->prepare("UPDATE students_certificates SET approved_status = ? WHERE certificate_id = ?");
         $stmt->execute([$status, $certificate_id]);
         return $stmt->rowCount() > 0;
+    }
+
+    // Check if certificate entry exists for student_id and course_id
+    public function existsForStudentAndCourse($student_id, $course_id, $institute_id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM students_certificates WHERE student_id = ? AND course_id = ? AND institute_id = ?");
+        $stmt->execute([$student_id, $course_id, $institute_id]);
+        return $stmt->fetchAll();
     }
 }

@@ -4,6 +4,7 @@ require_once './models/StudentCertificate.php';
 require_once './controllers/InstitutePaymentController.php';
 
 class StudentCertificateController
+
 {
     private $model;
     public function __construct($pdo)
@@ -110,6 +111,18 @@ class StudentCertificateController
         echo json_encode([
             'status' => 'success',
             'data' => $result
+        ]);
+    }
+
+    // Check if certificate exists for student and course
+    public function existsForStudentAndCourse($student_id, $course_id, $institute_id)
+    {
+
+        $result = $this->model->existsForStudentAndCourse($student_id, $course_id, $institute_id);
+        echo json_encode([
+            'status' => 'success',
+            'data' => $result,
+            'debug' => $student_id . '|' . $course_id . '|' . $institute_id
         ]);
     }
 }
