@@ -21,11 +21,12 @@ class InstituteCourse
     }
     public function create($data)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO institute_courses (institute_id, course_code, course_name, created_at, created_by, active_status) VALUES (?, ?, ?, NOW(), ?, ?)");
+        $stmt = $this->pdo->prepare("INSERT INTO institute_courses (institute_id, course_code, course_name, duration, created_at, created_by, active_status) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
         $stmt->execute([
             $data['institute_id'],
             $data['course_code'],
             $data['course_name'],
+            $data['duration'],
             $data['created_by'],
             $data['active_status']
         ]);
@@ -33,11 +34,12 @@ class InstituteCourse
     }
     public function update($id, $data)
     {
-        $stmt = $this->pdo->prepare("UPDATE institute_courses SET institute_id = ?, course_code = ?, course_name = ?, created_by = ?, active_status = ? WHERE id = ?");
+        $stmt = $this->pdo->prepare("UPDATE institute_courses SET institute_id = ?, course_code = ?, course_name = ?, duration = ?, created_by = ?, active_status = ? WHERE id = ?");
         $stmt->execute([
             $data['institute_id'],
             $data['course_code'],
             $data['course_name'],
+            $data['duration'],
             $data['created_by'],
             $data['active_status'],
             $id
