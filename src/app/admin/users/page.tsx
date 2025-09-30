@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building, Eye, X, BookUser } from "lucide-react";
+import { UserPlus, MoreHorizontal, UserCog, Trash2, Wallet, Loader2, AlertTriangle, Building, Eye, X, BookUser, Mail, Calendar } from "lucide-react";
 import Link from 'next/link';
 import { AdminUser, ApiInstitute } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
+import { Separator } from '@/components/ui/separator';
 
 
 export default function UserMaintenancePage() {
@@ -170,6 +171,27 @@ export default function UserMaintenancePage() {
         </TableBody>
     );
 
+    const MobileSkeleton = () => (
+        <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+                 <Card key={i} className="p-4">
+                    <div className="flex justify-between items-start">
+                        <div className="space-y-1.5">
+                            <Skeleton className="h-5 w-40" />
+                            <Skeleton className="h-4 w-24" />
+                        </div>
+                        <Skeleton className="h-8 w-8" />
+                    </div>
+                    <Separator className="my-3" />
+                    <div className="space-y-2 text-sm">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-2/3" />
+                    </div>
+                </Card>
+            ))}
+        </div>
+    );
+
     return (
         <>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -195,86 +217,152 @@ export default function UserMaintenancePage() {
             </div>
             <Card>
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>User/Institute Name</TableHead>
-                                <TableHead>Balance</TableHead>
-                                <TableHead>Registered Date</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        {loading ? <UserTableSkeleton /> : (
-                            <TableBody>
-                                {error && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-48 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-2">
-                                                <AlertTriangle className="h-8 w-8 text-destructive" />
-                                                <p className="text-destructive font-medium">Failed to load users.</p>
-                                                <p className="text-muted-foreground text-sm">{error}</p>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                                {!error && currentItems.length > 0 ? (
-                                    currentItems.map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell className="font-medium">{user.instituteName}</TableCell>
-                                        <TableCell>${user.balance.toFixed(2)}</TableCell>
-                                        <TableCell>{new Date(user.registeredDate).toLocaleDateString()}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onClick={() => handleEditClick(user.id)}>
-                                                        <UserCog className="mr-2 h-4 w-4" />
-                                                        <span>Edit</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleTopUpClick(user)}>
-                                                        <Wallet className="mr-2 h-4 w-4" />
-                                                        <span>Top-up Balance</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/users/assignments/${user.id}`}>
-                                                            <BookUser className="mr-2 h-4 w-4" />
-                                                            <span>Manage Assignments</span>
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        className="text-red-500 focus:text-red-500"
-                                                        onClick={() => handleDeleteClick(user)}
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        <span>Delete</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    ))
-                                ) : (
-                                    !error && (
+                    <div className="hidden md:block">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>User/Institute Name</TableHead>
+                                    <TableHead>Balance</TableHead>
+                                    <TableHead>Registered Date</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            {loading ? <UserTableSkeleton /> : (
+                                <TableBody>
+                                    {error && (
                                         <TableRow>
                                             <TableCell colSpan={5} className="h-48 text-center">
-                                                <p className="text-muted-foreground">
-                                                    {searchTerm ? `No users found for "${searchTerm}".` : "No users have been created yet."}
-                                                </p>
+                                                <div className="flex flex-col items-center justify-center gap-2">
+                                                    <AlertTriangle className="h-8 w-8 text-destructive" />
+                                                    <p className="text-destructive font-medium">Failed to load users.</p>
+                                                    <p className="text-muted-foreground text-sm">{error}</p>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
-                                    )
-                                )}
-                            </TableBody>
+                                    )}
+                                    {!error && currentItems.length > 0 ? (
+                                        currentItems.map((user) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell className="font-medium">{user.instituteName}</TableCell>
+                                            <TableCell>${user.balance.toFixed(2)}</TableCell>
+                                            <TableCell>{new Date(user.registeredDate).toLocaleDateString()}</TableCell>
+                                            <TableCell>{user.email}</TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => handleEditClick(user.id)}>
+                                                            <UserCog className="mr-2 h-4 w-4" />
+                                                            <span>Edit</span>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleTopUpClick(user)}>
+                                                            <Wallet className="mr-2 h-4 w-4" />
+                                                            <span>Top-up Balance</span>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/admin/users/assignments/${user.id}`}>
+                                                                <BookUser className="mr-2 h-4 w-4" />
+                                                                <span>Manage Assignments</span>
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            className="text-red-500 focus:text-red-500"
+                                                            onClick={() => handleDeleteClick(user)}
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            <span>Delete</span>
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                        ))
+                                    ) : (
+                                        !error && (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="h-48 text-center">
+                                                    <p className="text-muted-foreground">
+                                                        {searchTerm ? `No users found for "${searchTerm}".` : "No users have been created yet."}
+                                                    </p>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    )}
+                                </TableBody>
+                            )}
+                        </Table>
+                    </div>
+
+                    <div className="block md:hidden p-4 space-y-4">
+                        {loading ? <MobileSkeleton /> : error ? (
+                             <div className="flex flex-col items-center justify-center gap-2 p-8">
+                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                <p className="text-destructive font-medium">Failed to load users.</p>
+                                <p className="text-muted-foreground text-sm text-center">{error}</p>
+                            </div>
+                        ) : currentItems.length > 0 ? (
+                            currentItems.map((user) => (
+                                <Card key={user.id} className="p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-semibold">{user.instituteName}</h3>
+                                            <p className="text-sm font-medium text-muted-foreground">Balance: <span className="font-semibold text-foreground">${user.balance.toFixed(2)}</span></p>
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => handleEditClick(user.id)}>
+                                                    <UserCog className="mr-2 h-4 w-4" />
+                                                    <span>Edit</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleTopUpClick(user)}>
+                                                    <Wallet className="mr-2 h-4 w-4" />
+                                                    <span>Top-up Balance</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/admin/users/assignments/${user.id}`}>
+                                                        <BookUser className="mr-2 h-4 w-4" />
+                                                        <span>Manage Assignments</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    className="text-red-500 focus:text-red-500"
+                                                    onClick={() => handleDeleteClick(user)}
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    <span>Delete</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                    <Separator className="my-3" />
+                                     <div className="space-y-2 text-sm text-muted-foreground">
+                                        <p className="flex items-center gap-2"><Mail size={14} /> {user.email}</p>
+                                        <p className="flex items-center gap-2"><Calendar size={14} /> Registered: {new Date(user.registeredDate).toLocaleDateString()}</p>
+                                    </div>
+                                </Card>
+                            ))
+                        ) : (
+                            <div className="text-center text-muted-foreground py-12">
+                                <p>
+                                    {searchTerm ? `No users found for "${searchTerm}".` : "No users have been created yet."}
+                                </p>
+                            </div>
                         )}
-                    </Table>
+                    </div>
                 </CardContent>
                 {totalPages > 1 && (
                     <div className="p-4 border-t">

@@ -12,11 +12,12 @@ import type { Certificate } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Check, X, Printer } from 'lucide-react';
+import { Check, X, Printer, User, BookOpen, Calendar as CalendarIcon, Building } from 'lucide-react';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
+import { Separator } from '@/components/ui/separator';
 
 async function getPendingCertificates(token: string): Promise<Certificate[]> {
     try {
@@ -126,6 +127,24 @@ export default function ApproveCertificatesPage() {
             ))}
         </TableBody>
     );
+
+     const MobileSkeleton = () => (
+        <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+                 <Card key={i} className="p-4">
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+                    <Separator className="my-3" />
+                     <div className="flex justify-end gap-2">
+                        <Skeleton className="h-9 w-24" />
+                        <Skeleton className="h-9 w-20" />
+                    </div>
+                </Card>
+            ))}
+        </div>
+    );
     
     const pendingCertificates = certificates.filter(c => c.status === 'Pending');
 
@@ -154,91 +173,147 @@ export default function ApproveCertificatesPage() {
                     <CardDescription>The following certificates are awaiting administrative approval.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Student Name</TableHead>
-                                <TableHead>Course</TableHead>
-                                <TableHead>Institute</TableHead>
-                                <TableHead>Issue Date</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        {loading ? <CertificatesSkeleton /> : error ? (
-                             <TableBody>
+                    <div className="hidden md:block">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <AlertTriangle className="h-8 w-8 text-destructive" />
-                                            <p className="text-destructive font-medium">Failed to load certificates.</p>
-                                            <p className="text-muted-foreground text-sm">{error}</p>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead>Student Name</TableHead>
+                                    <TableHead>Course</TableHead>
+                                    <TableHead>Institute</TableHead>
+                                    <TableHead>Issue Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            </TableBody>
-                        ) : (
-                            <TableBody>
-                                {currentItems.length > 0 ? (
-                                    currentItems.map((cert) => (
-                                    <TableRow key={cert.id}>
-                                        <TableCell className="font-medium">{cert.studentName}</TableCell>
-                                        <TableCell>{cert.courseName}</TableCell>
-                                        <TableCell>{cert.instituteId}</TableCell>
-                                        <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
-                                        <TableCell className="text-right">
-                                            {cert.status === 'Pending' ? (
-                                                <div className="space-x-2">
-                                                    <Button 
-                                                        size="sm" 
-                                                        variant="outline" 
-                                                        className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
-                                                        onClick={() => handleStatusUpdate(cert.id, 'Approved')}
-                                                        disabled={updatingId === cert.id}
-                                                    >
-                                                        {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                                                        Approve
-                                                    </Button>
-                                                    <Button 
-                                                        size="sm" 
-                                                        variant="outline" 
-                                                        className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
-                                                        onClick={() => handleStatusUpdate(cert.id, 'Rejected')}
-                                                        disabled={updatingId === cert.id}
-                                                    >
-                                                        {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
-                                                        Deny
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                 <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent>
-                                                        <DropdownMenuItem asChild>
-                                                             <Link href={`/s/print/${cert.id}`} target="_blank">
-                                                                <Printer className="mr-2 h-4 w-4" />
-                                                                Print Certificate
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                    ))
-                                ) : (
+                            </TableHeader>
+                            {loading ? <CertificatesSkeleton /> : error ? (
+                                <TableBody>
                                     <TableRow>
                                         <TableCell colSpan={5} className="h-48 text-center">
-                                            <p className="text-muted-foreground">There are no pending certificate requests.</p>
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                                <p className="text-destructive font-medium">Failed to load certificates.</p>
+                                                <p className="text-muted-foreground text-sm">{error}</p>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
+                                </TableBody>
+                            ) : (
+                                <TableBody>
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map((cert) => (
+                                        <TableRow key={cert.id}>
+                                            <TableCell className="font-medium">{cert.studentName}</TableCell>
+                                            <TableCell>{cert.courseName}</TableCell>
+                                            <TableCell>{cert.instituteId}</TableCell>
+                                            <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
+                                            <TableCell className="text-right">
+                                                {cert.status === 'Pending' ? (
+                                                    <div className="space-x-2">
+                                                        <Button 
+                                                            size="sm" 
+                                                            variant="outline" 
+                                                            className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                                                            onClick={() => handleStatusUpdate(cert.id, 'Approved')}
+                                                            disabled={updatingId === cert.id}
+                                                        >
+                                                            {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                                                            Approve
+                                                        </Button>
+                                                        <Button 
+                                                            size="sm" 
+                                                            variant="outline" 
+                                                            className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+                                                            onClick={() => handleStatusUpdate(cert.id, 'Rejected')}
+                                                            disabled={updatingId === cert.id}
+                                                        >
+                                                            {updatingId === cert.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                                                            Deny
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent>
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                                    <Printer className="mr-2 h-4 w-4" />
+                                                                    Print Certificate
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-48 text-center">
+                                                <p className="text-muted-foreground">There are no pending certificate requests.</p>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            )}
+                        </Table>
+                    </div>
+
+                    <div className="block md:hidden p-4 space-y-4">
+                         {loading ? <MobileSkeleton /> : error ? (
+                            <div className="flex flex-col items-center justify-center gap-2 p-8">
+                                <AlertTriangle className="h-8 w-8 text-destructive" />
+                                <p className="text-destructive font-medium">Failed to load certificates.</p>
+                                <p className="text-muted-foreground text-sm text-center">{error}</p>
+                            </div>
+                        ) : currentItems.length > 0 ? (
+                            currentItems.map((cert) => (
+                                <Card key={cert.id} className="p-4">
+                                     <div className="space-y-2 text-sm">
+                                        <p className="font-semibold text-base flex items-center gap-2"><User size={16} /> {cert.studentName}</p>
+                                        <p className="text-muted-foreground flex items-center gap-2"><BookOpen size={16} /> {cert.courseName}</p>
+                                        <p className="text-muted-foreground flex items-center gap-2"><Building size={16} /> {cert.instituteId}</p>
+                                        <p className="text-muted-foreground flex items-center gap-2"><CalendarIcon size={16} /> {new Date(cert.issueDate).toLocaleDateString()}</p>
+                                     </div>
+                                     <Separator className="my-3" />
+                                     {cert.status === 'Pending' ? (
+                                        <div className="flex justify-end gap-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline" 
+                                                className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                                                onClick={() => handleStatusUpdate(cert.id, 'Approved')}
+                                                disabled={updatingId === cert.id}
+                                            >
+                                                {updatingId === cert.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                                Approve
+                                            </Button>
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline" 
+                                                className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+                                                onClick={() => handleStatusUpdate(cert.id, 'Rejected')}
+                                                disabled={updatingId === cert.id}
+                                            >
+                                                {updatingId === cert.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
+                                                Deny
+                                            </Button>
+                                        </div>
+                                     ) : (
+                                        <div className="flex justify-end">
+                                            <Badge>{cert.status}</Badge>
+                                        </div>
+                                     )}
+                                </Card>
+                            ))
+                        ) : (
+                            <div className="text-center text-muted-foreground py-12">
+                                <p>There are no pending certificate requests.</p>
+                            </div>
                         )}
-                    </Table>
+                    </div>
                 </CardContent>
                 {totalPages > 1 && (
                     <div className="p-4 border-t">
