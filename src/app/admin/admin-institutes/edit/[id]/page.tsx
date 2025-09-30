@@ -122,11 +122,16 @@ export default function EditInstitutePage() {
       formData.set('slug', slug);
       
       const token = localStorage.getItem('ukcas_token');
-      if (!token) {
+      const userStr = localStorage.getItem('ukcas_user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      
+      if (!token || !user) {
         toast({ variant: 'destructive', title: 'Authentication Error', description: 'You are not logged in.' });
         setIsSubmitting(false);
         return;
       }
+      
+      formData.set('created_by', user.user_name || 'admin');
 
       try {
         const response = await fetch('/api/institutes', {
@@ -328,3 +333,5 @@ export default function EditInstitutePage() {
       </div>
   );
 }
+
+    
