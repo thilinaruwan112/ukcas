@@ -122,8 +122,8 @@ class InstituteController
         $ftpController = new FtpController($GLOBALS['pdo']);
         $current = $this->model->getById($id);
         // Handle logo upload
-        if (isset($_FILES['logo_path']) && $_FILES['logo_path']['error'] === UPLOAD_ERR_OK) {
-            $file = $_FILES['logo_path'];
+        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['logo'];
             $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', pathinfo($file['name'], PATHINFO_FILENAME));
             $safeName = preg_replace('/\s+/', '-', trim($safeName));
             $safeName = strtolower($safeName);
