@@ -36,7 +36,10 @@ export default function NewInstitutePage() {
 
       const formData = new FormData(e.currentTarget);
       const token = localStorage.getItem('ukcas_token');
-       if (!token) {
+      const userStr = localStorage.getItem('ukcas_user');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+       if (!token || !user) {
           toast({ variant: 'destructive', title: "Authentication Error", description: "You must be logged in to create an institute." });
           setIsLoading(false);
           return;
@@ -48,6 +51,7 @@ export default function NewInstitutePage() {
       }
        // Ensure slug is set from state
       formData.set('slug', slug);
+      formData.set('created_by', user.user_name || 'admin');
 
       try {
           const response = await fetch('/api/institutes', {
@@ -140,6 +144,25 @@ export default function NewInstitutePage() {
                   </div>
               </div>
               
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="type">Institute Type</Label>
+                        <Input id="type" name="type" placeholder="e.g., University" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select name="status" defaultValue="Active">
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Active">Active</SelectItem>
+                                <SelectItem value="Inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div className="space-y-2">
                   <Label htmlFor="email">Contact Email</Label>
