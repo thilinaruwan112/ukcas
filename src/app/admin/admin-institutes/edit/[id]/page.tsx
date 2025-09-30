@@ -8,11 +8,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Building, ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
+import { Building, ArrowLeft, Loader2, AlertTriangle, CalendarIcon } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ApiInstitute } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
+import { cn, slugify } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format, parseISO } from 'date-fns';
 
 async function getInstituteById(id: string): Promise<ApiInstitute | null> {
     try {
@@ -61,16 +66,26 @@ export default function EditInstitutePage() {
   const { toast } = useToast();
   const params = useParams();
   const { id } = params;
+  
   const [institute, setInstitute] = useState<ApiInstitute | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [instituteName, setInstituteName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [validUntilDate, setValidUntilDate] = useState<Date | undefined>();
 
   useEffect(() => {
     if (typeof id === 'string') {
         getInstituteById(id).then(data => {
             if (data) {
                 setInstitute(data);
+                setInstituteName(data.name);
+                setSlug(data.slug);
+                if (data.accreditation_valid_until) {
+                    setValidUntilDate(parseISO(data.accreditation_valid_until));
+                }
             } else {
                 setError("Could not find an institute with this ID.");
             }
@@ -85,17 +100,26 @@ export default function EditInstitutePage() {
     }
   }, [id]);
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const name = e.target.value;
+      setInstituteName(name);
+      setSlug(slugify(name));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setIsSubmitting(true);
       
       const formData = new FormData(e.currentTarget);
-      const instituteName = formData.get('instituteName') as string;
       
-      // The backend API for updates requires the ID to be part of the form data
       if (typeof id === 'string') {
         formData.append('id', id);
       }
+      
+      if (validUntilDate) {
+          formData.set('accreditation_valid_until', format(validUntilDate, 'yyyy-MM-dd'));
+      }
+      formData.set('slug', slug);
       
       const token = localStorage.getItem('ukcas_token');
       if (!token) {
@@ -106,7 +130,7 @@ export default function EditInstitutePage() {
 
       try {
         const response = await fetch('/api/institutes', {
-            method: 'POST', // Backend expects POST for create and update
+            method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData,
         });
@@ -123,7 +147,7 @@ export default function EditInstitutePage() {
         });
 
         router.push('/admin/admin-institutes');
-        router.refresh(); // Refresh the data on the previous page
+        router.refresh();
 
       } catch (error) {
         const msg = error instanceof Error ? error.message : "An unknown error occurred.";
@@ -171,28 +195,113 @@ export default function EditInstitutePage() {
           </CardHeader>
           <CardContent>
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="instituteName">Institute Name</Label>
-                  <Input id="instituteName" name="name" defaultValue={institute.name} required disabled={isSubmitting} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input id="country" name="country" defaultValue={institute.country} disabled={isSubmitting} />
-                </div>
-              </div>
               <div className="space-y-2">
-                <Label htmlFor="address">Full Address</Label>
-                <Input id="address" name="address_line1" defaultValue={institute.address_line1} disabled={isSubmitting} />
+                <Label htmlFor="name">Institute Name</Label>
+                <Input id="name" name="name" required value={instituteName} onChange={handleNameChange} disabled={isSubmitting} />
               </div>
+               <div className="space-y-2">
+                <Label htmlFor="slug">URL Slug</Label>
+                <Input id="slug" name="slug" required value={slug} onChange={(e) => setSlug(e.target.value)} disabled={isSubmitting} />
+                <p className="text-xs text-muted-foreground">This is auto-generated from the name but can be customized.</p>
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                      <Label htmlFor="accreditation_status">Accreditation Status</Label>
+                       <Select name="accreditation_status" defaultValue={institute.accreditation_status} disabled={isSubmitting}>
+                          <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              <SelectItem value="Accredited">Accredited</SelectItem>
+                              <SelectItem value="Conditional">Conditional</SelectItem>
+                              <SelectItem value="Pending">Pending</SelectItem>
+                              <SelectItem value="Rejected">Rejected</SelectItem>
+                          </SelectContent>
+                      </Select>
+                  </div>
+                  <div className="space-y-2">
+                      <Label htmlFor="accreditation_valid_until">Accreditation Valid Until</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant={"outline"}
+                            className={cn("w-full justify-start text-left font-normal", !validUntilDate && "text-muted-foreground")}
+                            disabled={isSubmitting}
+                            >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {validUntilDate ? format(validUntilDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={validUntilDate} onSelect={setValidUntilDate} initialFocus />
+                        </PopoverContent>
+                    </Popover>
+                  </div>
+              </div>
+              
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="type">Institute Type</Label>
+                        <Input id="type" name="type" defaultValue={institute.type} placeholder="e.g., University" disabled={isSubmitting} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select name="status" defaultValue={institute.status} disabled={isSubmitting}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Active">Active</SelectItem>
+                                <SelectItem value="Inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div className="space-y-2">
                   <Label htmlFor="email">Contact Email</Label>
                   <Input id="email" name="email" type="email" defaultValue={institute.email} required disabled={isSubmitting} />
                 </div>
                  <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" name="phone" defaultValue={institute.phone} placeholder="+44 123 456 7890" disabled={isSubmitting} />
+                </div>
+              </div>
+
+               <div className="space-y-2">
                   <Label htmlFor="website">Website URL</Label>
-                  <Input id="website" name="website" type="url" defaultValue={institute.website} disabled={isSubmitting} />
+                  <Input id="website" name="website" type="url" defaultValue={institute.website} placeholder="https://university.com" disabled={isSubmitting} />
+                </div>
+              
+               <div className="space-y-2">
+                <Label htmlFor="address_line1">Address Line 1</Label>
+                <Input id="address_line1" name="address_line1" defaultValue={institute.address_line1} placeholder="e.g., 123 University Avenue" disabled={isSubmitting} />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="address_line2">Address Line 2 (Optional)</Label>
+                <Input id="address_line2" name="address_line2" defaultValue={institute.address_line2} placeholder="e.g., Science Park" disabled={isSubmitting} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" name="city" defaultValue={institute.city} placeholder="e.g., London" disabled={isSubmitting} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="state">State/Province</Label>
+                    <Input id="state" name="state" defaultValue={institute.state} placeholder="e.g., England" disabled={isSubmitting} />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="postal_code">Postal Code</Label>
+                    <Input id="postal_code" name="postal_code" defaultValue={institute.postal_code} placeholder="e.g., W1A 1AA" disabled={isSubmitting} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input id="country" name="country" defaultValue={institute.country} placeholder="e.g., United Kingdom" disabled={isSubmitting} />
                 </div>
               </div>
 
@@ -203,8 +312,8 @@ export default function EditInstitutePage() {
                     <p className="text-xs text-muted-foreground">Upload a new logo to replace the current one.</p>
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor="coverImage">Cover Image</Label>
-                    <Input id="coverImage" name="cover_image" type="file" accept="image/*" disabled={isSubmitting} />
+                    <Label htmlFor="cover_image">Cover Image</Label>
+                    <Input id="cover_image" name="cover_image" type="file" accept="image/*" disabled={isSubmitting} />
                      <p className="text-xs text-muted-foreground">Upload a new cover or banner image.</p>
                 </div>
               </div>

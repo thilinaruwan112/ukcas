@@ -58,18 +58,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
     }
 
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    
     try {
         const formData = await request.formData();
+        const instituteId = formData.get('id') as string | null;
+
+        let fetchUrl = `${apiUrl}/institutes`;
+        if (instituteId) {
+            // If an ID is present, this is an update.
+            fetchUrl = `${apiUrl}/institutes/${instituteId}`;
+        }
         
-        const fetchUrl = `${apiUrl}/institutes`;
-
-        const headers: HeadersInit = {
-            'X-API-KEY': apiKey,
-        };
-
-        if(token) {
+        const headers: HeadersInit = { 'X-API-KEY': apiKey };
+        const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+        if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
@@ -80,11 +81,14 @@ export async function POST(request: Request) {
         });
 
         const result = await response.json();
+
         if (!response.ok) {
-            throw new Error(result.message || 'Failed to create institute.');
+            // Forward the exact error message and status code from the backend
+            return NextResponse.json({ message: result.message || 'An error occurred with the external API.' }, { status: response.status });
         }
 
-        return NextResponse.json({ status: 'success', data: result });
+        return NextResponse.json(result, { status: response.status });
+
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
