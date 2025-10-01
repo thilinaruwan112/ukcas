@@ -29,7 +29,7 @@ class JwtHelper
     {
         self::loadSecret();
         $payload = [
-            'iss' => 'ukcas-server',
+            'iss' => 'https://ukcas-server.payshia.com',
             'iat' => time(),
             'exp' => time() + self::$expire,
             'sub' => $user['id'],
