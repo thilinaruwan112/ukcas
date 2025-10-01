@@ -1,4 +1,5 @@
 
+
 import { NextResponse } from 'next/server';
 
 async function getCourseDetails(courseId: string, apiKey: string, apiUrl: string, token: string) {
@@ -102,59 +103,15 @@ export async function GET(request: Request) {
     }
 }
 
-async function handlePost(request: Request) {
+
+async function handleStatusUpdate(request: Request, body: any) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
     if (!apiUrl || !apiKey) {
         return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
     }
-
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
-    }
-
-    try {
-        const certificateData = await request.json();
-        
-        // Create the certificate
-        const createResponse = await fetch(`${apiUrl}/students-certificates`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': apiKey,
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(certificateData),
-        });
-
-        const createResult = await createResponse.json();
-
-        if (!createResponse.ok || createResult.status !== 'success') {
-            throw new Error(createResult.message || 'Failed to create the certificate.');
-        }
-
-        return NextResponse.json({ status: 'success', data: createResult.data });
-
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
-        return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
-    }
-}
-
-export async function POST(request: Request) {
-    return handlePost(request);
-}
-
-async function handlePatch(request: Request, body: any) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-    if (!apiUrl || !apiKey) {
-        return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
-    }
-
+    
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
     if (!token) {
         return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
@@ -218,9 +175,57 @@ async function handlePatch(request: Request, body: any) {
     }
 }
 
-export async function PATCH(request: Request) {
+
+export async function POST(request: Request) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+    if (!apiUrl || !apiKey) {
+        return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
+    }
+
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
+    }
+    
     const body = await request.json();
-    return handlePatch(request, body);
+
+    // Check if this is a status update or a new certificate creation
+    if (body.isUpdate) {
+        return handleStatusUpdate(request, body);
+    }
+
+
+    try {
+        // Create the certificate
+        const createResponse = await fetch(`${apiUrl}/students-certificates`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': apiKey,
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body),
+        });
+
+        const createResult = await createResponse.json();
+
+        if (!createResponse.ok || createResult.status !== 'success') {
+            throw new Error(createResult.message || 'Failed to create the certificate.');
+        }
+
+        return NextResponse.json({ status: 'success', data: createResult.data });
+
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+        return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
+    }
+}
+
+// Keep PATCH empty or remove if not used elsewhere, but for safety let's keep it and have it do nothing or return an error.
+export async function PATCH(request: Request) {
+    return NextResponse.json({ status: 'error', message: 'This method is deprecated. Please use POST for updates.' }, { status: 405 });
 }
 
     

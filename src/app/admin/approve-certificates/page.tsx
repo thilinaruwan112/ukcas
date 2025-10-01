@@ -44,9 +44,9 @@ async function getPendingCertificates(token: string): Promise<Certificate[]> {
 
 async function updateCertificateStatus(id: string, status: 'Approved' | 'Rejected', token: string): Promise<string> {
     const response = await fetch('/api/certificates', {
-        method: 'PATCH',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ id, status }),
+        body: JSON.stringify({ id, status, isUpdate: true }),
     });
 
     if (!response.ok) {
@@ -357,3 +357,5 @@ export default function ApproveCertificatesPage() {
         </>
     )
 }
+
+    
