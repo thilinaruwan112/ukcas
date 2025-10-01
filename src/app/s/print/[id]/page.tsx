@@ -167,7 +167,7 @@ export default function PrintCertificatePage() {
                         </div>
 
                          <div className="mt-auto pt-16 flex justify-between items-end">
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 <div className="relative h-14 w-48">
                                     <Image 
                                         src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png" 
