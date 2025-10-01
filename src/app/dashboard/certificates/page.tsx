@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2, Printer } from "lucide-react";
+import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2, Printer, Eye } from "lucide-react";
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
@@ -183,9 +183,15 @@ export default function CertificateListPage() {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem asChild>
+                                                             <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                <span>View Details</span>
+                                                              </Link>
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuItem>
                                                             <FilePenLine className="mr-2 h-4 w-4" />
-                                                            <span>View/Edit</span>
+                                                            <span>Edit</span>
                                                         </DropdownMenuItem>
                                                         {cert.status === 'Approved' && (
                                                             <DropdownMenuItem asChild>
@@ -263,7 +269,11 @@ export default function CertificateListPage() {
                                         <p className="flex items-center gap-2"><Calendar size={16} /> Issued: {new Date(cert.issueDate).toLocaleDateString()}</p>
                                     </div>
                                      <div className="mt-3 flex flex-wrap justify-end gap-2">
-                                        <Button size="sm" variant="outline"><FilePenLine className="mr-2 h-4 w-4" /> Edit</Button>
+                                        <Button size="sm" variant="outline" asChild>
+                                            <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                <Eye className="mr-2 h-4 w-4" /> View
+                                            </Link>
+                                        </Button>
                                          {cert.status === 'Approved' && (
                                             <Button size="sm" variant="outline" asChild>
                                                 <Link href={`/s/print/${cert.id}`} target="_blank">
@@ -320,5 +330,6 @@ export default function CertificateListPage() {
 }
 
     
+
 
 
