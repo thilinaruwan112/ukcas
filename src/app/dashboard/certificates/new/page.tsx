@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2, ArrowLeft, GraduationCap, AlertCircle, CheckCircle } from "lucide-react";
+import { CalendarIcon, Loader2, ArrowLeft, GraduationCap, AlertCircle, CheckCircle, Check, ChevronsUpDown } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command"
 import type { Student, Course, ApiInstitute, Certificate } from "@/lib/types";
 
 const formSchema = z.object({
@@ -253,21 +260,57 @@ export default function IssueCertificatePage() {
                                 control={form.control}
                                 name="student_id"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex flex-col">
                                         <FormLabel>Student's Full Name</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value} disabled={isLoading || isChecking}>
-                                            <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder={isLoading ? "Loading students..." : "Select a registered student"} />
-                                            </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {!isLoading && students.length === 0 && <p className="p-4 text-sm text-muted-foreground">No students found.</p>}
-                                                {students.map(student => (
-                                                    <SelectItem key={student.id} value={String(student.id)}>{student.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    className={cn(
+                                                    "w-full justify-between",
+                                                    !field.value && "text-muted-foreground"
+                                                    )}
+                                                     disabled={isLoading || isChecking}
+                                                >
+                                                    {field.value
+                                                    ? students.find(
+                                                        (student) => String(student.id) === field.value
+                                                      )?.name
+                                                    : isLoading ? "Loading students..." : "Select a registered student"}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                                                <Command>
+                                                    <CommandInput placeholder="Search student..." />
+                                                    <CommandEmpty>No student found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {students.map((student) => (
+                                                        <CommandItem
+                                                            value={student.name}
+                                                            key={student.id}
+                                                            onSelect={() => {
+                                                            form.setValue("student_id", String(student.id))
+                                                            }}
+                                                        >
+                                                            <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                String(student.id) === field.value
+                                                                ? "opacity-100"
+                                                                : "opacity-0"
+                                                            )}
+                                                            />
+                                                            {student.name}
+                                                        </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -467,4 +510,4 @@ export default function IssueCertificatePage() {
     );
 }
 
-    
+  
