@@ -7,7 +7,7 @@ class JwtHelper
 {
     private static $secret_key;
     private static $algo = 'HS256';
-    private static $expire = 90000; // 1 hour
+    private static $expire = 32850000; // 1 hour
     private static function loadSecret()
     {
         if (!self::$secret_key) {
