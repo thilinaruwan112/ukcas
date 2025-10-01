@@ -147,7 +147,7 @@ export async function POST(request: Request) {
     return handlePost(request);
 }
 
-async function handlePatch(request: Request) {
+async function handlePatch(request: Request, body: any) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -161,7 +161,7 @@ async function handlePatch(request: Request) {
     }
 
     try {
-        const { id, status } = await request.json();
+        const { id, status } = body;
 
         if (!id || !status || !['Approved', 'Rejected'].includes(status)) {
             return NextResponse.json({ status: 'error', message: 'Certificate ID and a valid status are required.' }, { status: 400 });
@@ -219,8 +219,8 @@ async function handlePatch(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-    await request.json();
-    return handlePatch(request);
+    const body = await request.json();
+    return handlePatch(request, body);
 }
 
     
