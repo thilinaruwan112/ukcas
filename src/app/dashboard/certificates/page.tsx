@@ -184,14 +184,10 @@ export default function CertificateListPage() {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                             <Link href={`/s/print/${cert.id}`} target="_blank">
-                                                                <Eye className="mr-2 h-4 w-4" />
-                                                                <span>View Details</span>
+                                                             <Link href={`/dashboard/certificates/edit/${cert.id}`}>
+                                                                <FilePenLine className="mr-2 h-4 w-4" />
+                                                                <span>View / Edit</span>
                                                               </Link>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            <FilePenLine className="mr-2 h-4 w-4" />
-                                                            <span>Edit</span>
                                                         </DropdownMenuItem>
                                                         {cert.status === 'Approved' && (
                                                             <DropdownMenuItem asChild>
@@ -270,8 +266,8 @@ export default function CertificateListPage() {
                                     </div>
                                      <div className="mt-3 flex flex-wrap justify-end gap-2">
                                         <Button size="sm" variant="outline" asChild>
-                                            <Link href={`/s/print/${cert.id}`} target="_blank">
-                                                <Eye className="mr-2 h-4 w-4" /> View
+                                             <Link href={`/dashboard/certificates/edit/${cert.id}`}>
+                                                <FilePenLine className="mr-2 h-4 w-4" /> Edit
                                             </Link>
                                         </Button>
                                          {cert.status === 'Approved' && (
@@ -330,6 +326,7 @@ export default function CertificateListPage() {
 }
 
     
+
 
 
 
