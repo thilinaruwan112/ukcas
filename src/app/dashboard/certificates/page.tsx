@@ -69,7 +69,6 @@ export default function CertificateListPage() {
 
     const filteredCertificates = certificates.filter(cert =>
         cert.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cert.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (cert.id && cert.id.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
@@ -101,7 +100,6 @@ export default function CertificateListPage() {
                  <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                     <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
@@ -146,7 +144,6 @@ export default function CertificateListPage() {
                                 <TableRow>
                                     <TableHead>Certificate ID</TableHead>
                                     <TableHead>Student Name</TableHead>
-                                    <TableHead>Course</TableHead>
                                     <TableHead>Issue Date</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
@@ -155,7 +152,7 @@ export default function CertificateListPage() {
                             {loading ? <CertificatesSkeleton /> : error ? (
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell colSpan={6} className="h-48 text-center">
+                                        <TableCell colSpan={5} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <AlertTriangle className="h-8 w-8 text-destructive" />
                                                 <p className="text-destructive font-medium">Failed to load certificates.</p>
@@ -171,7 +168,6 @@ export default function CertificateListPage() {
                                         <TableRow key={cert.id}>
                                             <TableCell className="font-mono">{cert.id}</TableCell>
                                             <TableCell className="font-medium">{cert.studentName}</TableCell>
-                                            <TableCell>{cert.courseName}</TableCell>
                                             <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
                                             <TableCell>
                                                 <Badge variant={cert.status === 'Pending' ? 'secondary' : cert.status === 'Approved' ? 'default' : 'destructive'}>
@@ -211,7 +207,7 @@ export default function CertificateListPage() {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="h-48 text-center">
+                                            <TableCell colSpan={5} className="h-48 text-center">
                                                 <div className="flex flex-col items-center justify-center gap-4">
                                                     <p className="text-muted-foreground">
                                                         {searchTerm ? `No certificates found for "${searchTerm}".` : "No certificates have been issued yet."}
@@ -324,3 +320,4 @@ export default function CertificateListPage() {
 }
 
     
+

@@ -76,98 +76,23 @@ export async function GET(request: Request) {
             return NextResponse.json({ status: 'success', data: [] });
         }
 
-        // 2. Fetch details for each certificate
-        const detailedCertificates = await Promise.all(
-            certificatesData.data.map(async (cert: any) => {
-                const course = await getCourseDetails(cert.course_id, apiKey, apiUrl, token);
-
-                return {
-                    id: cert.certificate_id,
-                    studentName: cert.student_name || 'Unknown Student',
-                    courseName: course?.course_name || 'Unknown Course',
-                    issueDate: cert.created_at,
-                    instituteId: cert.institute_id,
-                    studentId: cert.student_id,
-                    courseId: cert.course_id,
-                    status: cert.approved_status || (cert.is_active === '1' ? 'Approved' : 'Pending'),
-                    student_name: cert.student_name
-                };
-            })
-        );
-        
-        return NextResponse.json({ status: 'success', data: detailedCertificates });
-
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
-        return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
-    }
-}
-
-
-async function handleStatusUpdate(request: Request, body: any) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-    if (!apiUrl || !apiKey) {
-        return NextResponse.json({ status: 'error', message: 'API URL or Key is not configured.' }, { status: 500 });
-    }
-    
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return NextResponse.json({ status: 'error', message: 'Authentication is required.' }, { status: 401 });
-    }
-
-    try {
-        const { id, status } = body;
-
-        if (!id || !status || !['Approved', 'Rejected'].includes(status)) {
-            return NextResponse.json({ status: 'error', message: 'Certificate ID and a valid status are required.' }, { status: 400 });
-        }
-
-        const updateUrl = `${apiUrl}/students-certificates/approved-status`;
-        const payload = {
-            certificate_id: id,
-            status: status.toLowerCase()
-        };
-
-        const updateResponse = await fetch(updateUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': apiKey,
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(payload)
+        // 2. Format certificate data without fetching course details
+        const detailedCertificates = certificatesData.data.map((cert: any) => {
+            return {
+                id: cert.certificate_id,
+                studentName: cert.student_name || 'Unknown Student',
+                courseName: cert.course_name || 'Unknown Course',
+                issueDate: cert.created_at,
+                instituteId: cert.institute_id,
+                studentId: cert.student_id,
+                courseId: cert.course_id,
+                status: cert.approved_status || (cert.is_active === '1' ? 'Approved' : 'Pending'),
+                student_name: cert.student_name,
+                institute_name: cert.institute_name, // Pass through institute name if available
+            };
         });
         
-        if (!updateResponse.ok) {
-             const errorData = await updateResponse.json().catch(() => ({ message: 'Failed to update and could not parse error' }));
-             throw new Error(errorData.message || 'Failed to update certificate status.');
-        }
-
-        const textResponse = await updateResponse.text();
-
-        // Check if the response contains multiple JSON objects
-        if (textResponse.startsWith('{') && textResponse.endsWith('}')) {
-             try {
-                // It looks like a single JSON object
-                const singleResult = JSON.parse(textResponse);
-                return NextResponse.json({ status: 'success', message: singleResult.message || 'Status updated successfully.' });
-            } catch (e) {
-                 // It might be the multi-part response
-                try {
-                    const jsonParts = textResponse.replace(/}\s*{/g, '}|{').split('|');
-                    const firstPart = JSON.parse(jsonParts[0]);
-                    const secondPart = JSON.parse(jsonParts[1]);
-                    const combinedMessage = `${firstPart.message} ${secondPart.message}`;
-                    return NextResponse.json({ status: 'success', message: combinedMessage });
-                } catch (multiE) {
-                     return NextResponse.json({ status: 'success', message: 'Status updated, but response was not in the expected format.' });
-                }
-            }
-        }
-        
-        return NextResponse.json({ status: 'success', message: 'Status updated successfully.' });
+        return NextResponse.json({ status: 'success', data: detailedCertificates });
 
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
@@ -191,9 +116,43 @@ export async function POST(request: Request) {
     
     const body = await request.json();
 
-    // Check if this is a status update or a new certificate creation
+    // Differentiate between creation and status update
     if (body.isUpdate) {
-        return handleStatusUpdate(request, body);
+         try {
+            const { id, status } = body;
+
+            if (!id || !status || !['Approved', 'Rejected'].includes(status)) {
+                return NextResponse.json({ status: 'error', message: 'Certificate ID and a valid status are required.' }, { status: 400 });
+            }
+
+            const updateUrl = `${apiUrl}/students-certificates/approved-status`;
+            const payload = {
+                certificate_id: id,
+                status: status.toLowerCase()
+            };
+
+            const updateResponse = await fetch(updateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': apiKey,
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!updateResponse.ok) {
+                const errorData = await updateResponse.json().catch(() => ({ message: 'Failed to update and could not parse error' }));
+                throw new Error(errorData.message || 'Failed to update certificate status.');
+            }
+            
+            const result = await updateResponse.json();
+            return NextResponse.json({ status: 'success', message: result.message || 'Status updated successfully.' });
+
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
+            return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
+        }
     }
 
 
@@ -222,10 +181,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ status: 'error', message: errorMessage }, { status: 500 });
     }
 }
-
-// Keep PATCH empty or remove if not used elsewhere, but for safety let's keep it and have it do nothing or return an error.
-export async function PATCH(request: Request) {
-    return NextResponse.json({ status: 'error', message: 'This method is deprecated. Please use POST for updates.' }, { status: 405 });
-}
-
     

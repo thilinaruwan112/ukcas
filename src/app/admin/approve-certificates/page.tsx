@@ -121,7 +121,6 @@ export default function ApproveCertificatesPage() {
             {[...Array(5)].map((_, i) => (
                 <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                     <TableCell className="text-right"><div className="flex justify-end gap-2"><Skeleton className="h-8 w-24" /><Skeleton className="h-8 w-20" /></div></TableCell>
@@ -186,7 +185,6 @@ export default function ApproveCertificatesPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Student Name</TableHead>
-                                    <TableHead>Course</TableHead>
                                     <TableHead>Institute</TableHead>
                                     <TableHead>Issue Date</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
@@ -195,7 +193,7 @@ export default function ApproveCertificatesPage() {
                             {loading ? <CertificatesSkeleton /> : error ? (
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-48 text-center">
+                                        <TableCell colSpan={4} className="h-48 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <AlertTriangle className="h-8 w-8 text-destructive" />
                                                 <p className="text-destructive font-medium">Failed to load certificates.</p>
@@ -210,8 +208,7 @@ export default function ApproveCertificatesPage() {
                                         currentItems.map((cert) => (
                                         <TableRow key={cert.id}>
                                             <TableCell className="font-medium">{cert.studentName}</TableCell>
-                                            <TableCell>{cert.courseName}</TableCell>
-                                            <TableCell>{cert.instituteId}</TableCell>
+                                            <TableCell>{cert.institute_name}</TableCell>
                                             <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
                                             <TableCell className="text-right">
                                                 {cert.status === 'Pending' ? (
@@ -259,7 +256,7 @@ export default function ApproveCertificatesPage() {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="h-48 text-center">
+                                            <TableCell colSpan={4} className="h-48 text-center">
                                                 <p className="text-muted-foreground">There are no pending certificate requests.</p>
                                             </TableCell>
                                         </TableRow>
@@ -282,7 +279,7 @@ export default function ApproveCertificatesPage() {
                                      <div className="space-y-2 text-sm">
                                         <p className="font-semibold text-base flex items-center gap-2"><User size={16} /> {cert.studentName}</p>
                                         <p className="text-muted-foreground flex items-center gap-2"><BookOpen size={16} /> {cert.courseName}</p>
-                                        <p className="text-muted-foreground flex items-center gap-2"><Building size={16} /> {cert.instituteId}</p>
+                                        <p className="text-muted-foreground flex items-center gap-2"><Building size={16} /> {cert.institute_name}</p>
                                         <p className="text-muted-foreground flex items-center gap-2"><CalendarIcon size={16} /> {new Date(cert.issueDate).toLocaleDateString()}</p>
                                      </div>
                                      <Separator className="my-3" />

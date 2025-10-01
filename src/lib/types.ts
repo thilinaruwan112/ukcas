@@ -90,6 +90,7 @@ export interface Certificate {
   courseId?: string;
   status: 'Approved' | 'Pending' | 'Denied' | 'Rejected';
   student_name?: string;
+  institute_name?: string;
 }
 
 export interface AdminUser {
