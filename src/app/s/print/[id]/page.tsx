@@ -150,7 +150,7 @@ export default function PrintCertificatePage() {
                     </div>
                     <div className="relative z-10 flex flex-col pt-4">
 
-                        <div className="text-center mt-[150px] space-y-4">
+                        <div className="text-center mt-[140px] space-y-4">
                              <p className="text-lg">This is to certify that</p>
                              <h1 className="text-4xl font-bold tracking-wide">{certificate.name}</h1>
                              <p className="text-base max-w-xl mx-auto">has completed the United Kingdom College of Advanced Studies endorsed course of learning</p>
@@ -167,7 +167,7 @@ export default function PrintCertificatePage() {
                         </div>
 
                          <div className="mt-auto pt-16 flex justify-between items-end">
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <div className="relative h-14 w-48">
                                     <Image 
                                         src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png" 
