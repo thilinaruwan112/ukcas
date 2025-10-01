@@ -12,7 +12,7 @@ import type { Certificate } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Check, X, Printer, User, BookOpen, Calendar as CalendarIcon, Building } from 'lucide-react';
+import { Check, X, Printer, User, BookOpen, Calendar as CalendarIcon, Building, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
@@ -213,6 +213,9 @@ export default function ApproveCertificatesPage() {
                                             <TableCell className="text-right">
                                                 {cert.status === 'Pending' ? (
                                                     <div className="space-x-2">
+                                                         <Button asChild size="sm" variant="outline">
+                                                            <Link href={`/s/print/${cert.id}`} target="_blank"><Eye className="mr-2 h-4 w-4" /> View Details</Link>
+                                                        </Button>
                                                         <Button 
                                                             size="sm" 
                                                             variant="outline" 
@@ -278,13 +281,15 @@ export default function ApproveCertificatesPage() {
                                 <Card key={cert.id} className="p-4">
                                      <div className="space-y-2 text-sm">
                                         <p className="font-semibold text-base flex items-center gap-2"><User size={16} /> {cert.studentName}</p>
-                                        <p className="text-muted-foreground flex items-center gap-2"><BookOpen size={16} /> {cert.courseName}</p>
                                         <p className="text-muted-foreground flex items-center gap-2"><Building size={16} /> {cert.institute_name}</p>
                                         <p className="text-muted-foreground flex items-center gap-2"><CalendarIcon size={16} /> {new Date(cert.issueDate).toLocaleDateString()}</p>
                                      </div>
                                      <Separator className="my-3" />
                                      {cert.status === 'Pending' ? (
-                                        <div className="flex justify-end gap-2">
+                                        <div className="flex flex-wrap justify-end gap-2">
+                                            <Button asChild size="sm" variant="outline">
+                                                <Link href={`/s/print/${cert.id}`} target="_blank"><Eye className="h-4 w-4" /></Link>
+                                            </Button>
                                             <Button 
                                                 size="sm" 
                                                 variant="outline" 
