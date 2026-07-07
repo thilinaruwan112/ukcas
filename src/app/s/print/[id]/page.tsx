@@ -158,7 +158,7 @@ export default function PrintCertificatePage() {
                              <p className="text-base max-w-xl mx-auto">and completed the final examination in accordance with the standards of United Kingdom College of Advanced Studies.</p>
                         </div>
                         
-                        <div className="max-w-md mx-auto grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-lg mt-8 font-sans">
+                        <div className="max-w-xl mx-auto grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-lg mt-8 font-sans">
                             <span className="font-semibold">Course Duration</span><span>: {course.duration}</span>
                             <span className="font-semibold">Awarded On</span><span>: {new Date(certificate.created_at).toLocaleDateString('en-GB')}</span>
                             <span className="font-semibold">Certificate Number</span><span>: {certificate.certificate_id}</span>
