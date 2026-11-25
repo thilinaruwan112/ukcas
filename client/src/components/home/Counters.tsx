@@ -1,10 +1,10 @@
-import { Briefcase, Globe, Users, Award } from "lucide-react";
+import { Building2, Globe, QrCode, ShieldCheck } from "lucide-react";
 
 const stats = [
-  { value: "150+", label: "Accredited Institutes", icon: Briefcase },
-  { value: "45+", label: "Countries Reached", icon: Globe },
-  { value: "500K+", label: "Students Benefited", icon: Users },
-  { value: "25+", label: "Years of Excellence", icon: Award },
+  { value: "UKRLP", label: "UKPRN #10099298", icon: ShieldCheck },
+  { value: "UK Ltd", label: "Reg. #16348189 (Est. 2025)", icon: Building2 },
+  { value: "24/7", label: "Instant QR Verification", icon: QrCode },
+  { value: "Global", label: "Accredited Partner Network", icon: Globe },
 ];
 
 export default function Counters() {
