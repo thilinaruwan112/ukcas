@@ -7,6 +7,7 @@ import type { ApiInstitute, CertificateVerificationData, Course } from '@/lib/ty
 const A4_WIDTH = 595.28;
 const A4_HEIGHT = 841.89;
 const SIGNATURE_URL = 'https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png';
+export const PUBLIC_VERIFICATION_BASE_URL = 'https://ukcas.co.uk';
 
 export class CertificateApiError extends Error {
   status: number;
@@ -274,9 +275,9 @@ export async function generateCertificatePdf(params: {
 
 export async function buildApprovedCertificatePdfBundle(params: {
   certificateId: string;
-  siteUrl: string;
+  siteUrl?: string;
 }) {
-  const { certificateId, siteUrl } = params;
+  const { certificateId, siteUrl = PUBLIC_VERIFICATION_BASE_URL } = params;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 

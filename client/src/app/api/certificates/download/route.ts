@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { buildApprovedCertificatePdfBundle, CertificateApiError } from '@/lib/certificate-pdf';
+import {
+  buildApprovedCertificatePdfBundle,
+  CertificateApiError,
+  PUBLIC_VERIFICATION_BASE_URL,
+} from '@/lib/certificate-pdf';
 
 export async function GET(request: Request) {
   const token = request.headers.get('Authorization')?.replace('Bearer ', '');
@@ -20,12 +24,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const requestOrigin = new URL(request.url).origin;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || requestOrigin || 'https://ukcas.co.uk';
-
     const bundle = await buildApprovedCertificatePdfBundle({
       certificateId,
-      siteUrl,
+      siteUrl: PUBLIC_VERIFICATION_BASE_URL,
     });
 
     return new NextResponse(Buffer.from(bundle.pdfBytes), {

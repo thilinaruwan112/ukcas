@@ -88,7 +88,7 @@ export default function PrintCertificatePage() {
             getCertificateDetails(id).then(data => {
                 if (data) {
                     setCertificateData(data);
-                    const verificationUrl = `${window.location.origin}/verify-certificate?id=${data.certificate.certificate_id}`;
+                    const verificationUrl = `https://ukcas.co.uk/verify-certificate?id=${data.certificate.certificate_id}`;
                      QRCode.toDataURL(verificationUrl, { errorCorrectionLevel: 'H' })
                         .then(url => {
                             setQrCodeUrl(url);
