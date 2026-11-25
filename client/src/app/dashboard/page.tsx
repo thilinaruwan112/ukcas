@@ -142,9 +142,9 @@ export default function InstituteDashboardPage() {
                 setBalance(balanceData);
 
                 setStats([
-                    { title: "Total Students", value: studentsData.length.toLocaleString(), icon: <Users className="h-8 w-8 text-muted-foreground" /> },
-                    { title: "Certificates Issued", value: certificatesData.length.toLocaleString(), icon: <GraduationCap className="h-8 w-8 text-muted-foreground" /> },
-                    { title: "Account Balance", value: `$${Number(balanceData).toFixed(2)}`, icon: <Wallet className="h-8 w-8 text-muted-foreground" /> },
+                    { title: "Total Students", value: studentsData.length.toLocaleString(), icon: <Users className="h-6 w-6" /> },
+                    { title: "Certificates Issued", value: certificatesData.length.toLocaleString(), icon: <GraduationCap className="h-6 w-6" /> },
+                    { title: "Account Balance", value: `$${Number(balanceData).toFixed(2)}`, icon: <Wallet className="h-6 w-6" /> },
                 ]);
 
                 setRecentCertificates(certificatesData.slice(0, 5));
@@ -167,23 +167,34 @@ export default function InstituteDashboardPage() {
     return (
         <>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                 <h1 className="text-2xl font-bold">Dashboard</h1>
-                 <Button asChild className="w-full sm:w-auto"><Link href="/dashboard/certificates/new">Issue New Certificate</Link></Button>
+                 <div>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <p className="text-sm text-muted-foreground">Overview of your institute&apos;s students, certificates, and balance.</p>
+                 </div>
+                 <Button asChild className="w-full sm:w-auto shadow-sm"><Link href="/dashboard/certificates/new">Issue New Certificate</Link></Button>
             </div>
 
-            <Card className="bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800/50">
-                <CardContent className="p-4">
-                    <p className="font-semibold text-green-900 dark:text-green-100">Welcome, {institute.name}!</p>
+            <Card className="border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+                <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-primary">Active Institute</p>
+                        <p className="text-lg font-semibold text-foreground">Welcome back, {institute.name}</p>
+                    </div>
+                    <Badge variant="outline" className="w-fit bg-background">Code: {institute.code}</Badge>
                 </CardContent>
             </Card>
            
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-3">
                 {stats.map((stat) => (
-                    <Card key={stat.title}>
-                        <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
-                            {stat.icon}
-                            <p className="text-xs text-muted-foreground">{stat.title}</p>
-                            <p className="text-3xl font-bold">{stat.value}</p>
+                    <Card key={stat.title} className="transition-shadow hover:shadow-md">
+                        <CardContent className="p-6 flex items-center justify-between">
+                            <div className="space-y-1">
+                                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{stat.title}</p>
+                                <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                            </div>
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                {stat.icon}
+                            </div>
                         </CardContent>
                     </Card>
                 ))}

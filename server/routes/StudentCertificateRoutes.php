@@ -30,6 +30,9 @@ return [
         $status = $input['status'] ?? null;
         $controller->updateApprovedStatus($certificate_id, $status);
     },
+    'POST /students-certificates/send-email' => function () use ($controller) {
+        $controller->sendCertificateEmail();
+    },
     'POST /students-certificates/' => function () use ($controller) {
         $controller->create();
     },

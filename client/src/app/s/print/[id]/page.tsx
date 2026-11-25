@@ -5,10 +5,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Printer, AlertTriangle } from 'lucide-react';
+import { Printer, AlertTriangle, Mail, Download, Loader2, ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import QRCode from 'qrcode';
+import { EmailCertificateDialog } from '@/components/certificates/EmailCertificateDialog';
+import { downloadCertificatePdf } from '@/lib/download-certificate';
+import { useToast } from '@/hooks/use-toast';
 
 import type { ApiInstitute, Course, CertificateVerificationData } from '@/lib/types';
 
@@ -71,10 +74,13 @@ function PrintCertificateSkeleton() {
 export default function PrintCertificatePage() {
     const params = useParams();
     const { id } = params;
+    const { toast } = useToast();
     const [certificateData, setCertificateData] = useState<VerificationResult | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [qrCodeUrl, setQrCodeUrl] = useState('');
+    const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+    const [downloadingPdf, setDownloadingPdf] = useState(false);
 
 
     useEffect(() => {
@@ -108,6 +114,33 @@ export default function PrintCertificatePage() {
         window.print();
     };
 
+    const handleDownloadPdf = async () => {
+        if (!certificateData) return;
+        const token = localStorage.getItem('ukcas_token');
+        if (!token) {
+            toast({
+                variant: 'destructive',
+                title: 'Authentication Required',
+                description: 'Please log in to download the official PDF.',
+            });
+            return;
+        }
+        const certId = String(certificateData.certificate.certificate_id);
+        setDownloadingPdf(true);
+        try {
+            await downloadCertificatePdf(certId, token);
+            toast({
+                title: 'Certificate Downloaded',
+                description: `Saved UKCAS-Certificate-${certId}.pdf`,
+            });
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Failed to download certificate PDF.';
+            toast({ variant: 'destructive', title: 'Download Failed', description: msg });
+        } finally {
+            setDownloadingPdf(false);
+        }
+    };
+
     if (loading) {
         return <PrintCertificateSkeleton />;
     }
@@ -130,27 +163,57 @@ export default function PrintCertificatePage() {
     const { certificate, course, institute } = certificateData;
 
     return (
-        <>
-            <div className="fixed top-4 right-4 z-50 print:hidden">
-                <Button onClick={handlePrint} >
-                    <Printer className="mr-2 h-4 w-4" />
-                    Print Certificate
-                </Button>
-            </div>
-            <div id="print-area" className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
-                <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[1in] font-serif text-black flex flex-col">
+        <div className="min-h-screen bg-slate-200/75 dark:bg-slate-950 print:bg-white">
+            <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-md print:hidden">
+                <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
+                            <ArrowLeft className="mr-1.5 h-4 w-4" />
+                            Back
+                        </Button>
+                        <span className="hidden sm:inline-block text-sm font-medium text-muted-foreground">
+                            Certificate <span className="font-mono text-foreground">#{certificate.certificate_id}</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {String(certificate.approved_status || '').toLowerCase() === 'approved' && (
+                            <>
+                                <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloadingPdf}>
+                                    {downloadingPdf ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Download className="mr-2 h-4 w-4" />
+                                    )}
+                                    Download PDF
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => setEmailDialogOpen(true)}>
+                                    <Mail className="mr-2 h-4 w-4" />
+                                    Email to Student
+                                </Button>
+                            </>
+                        )}
+                        <Button size="sm" onClick={handlePrint}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Print Certificate
+                        </Button>
+                    </div>
+                </div>
+            </header>
+            <div id="print-area" className="flex justify-center py-8 px-4 print:p-0">
+                <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-xl print:shadow-none p-[1in] font-serif text-black flex flex-col overflow-hidden">
                      <div className="absolute inset-0 z-0 opacity-100">
                         <Image 
-                            src="https://content-provider.payshia.com/ukcas/institutes/1/docs/ukcas-letter-head.jpg" 
+                            src="/images/certificate-letterhead.png" 
                             alt="Letterhead" 
                             fill
                             objectFit="cover"
                             quality={100}
+                            priority
                         />
                     </div>
-                    <div className="relative z-10 flex flex-col pt-4">
+                    <div className="relative z-10 flex flex-1 flex-col pt-4 pb-6">
 
-                        <div className="text-center mt-[140px] space-y-4">
+                        <div className="text-center mt-[110px] space-y-4">
                              <p className="text-lg">This is to certify that</p>
                              <h1 className="text-4xl font-bold tracking-wide">{certificate.name}</h1>
                              <p className="text-base max-w-xl mx-auto">has completed the United Kingdom College of Advanced Studies endorsed course of learning</p>
@@ -166,11 +229,11 @@ export default function PrintCertificatePage() {
                             <span className="font-semibold">LPC</span><span>: {institute.code}</span>
                         </div>
 
-                         <div className="mt-auto pt-16 flex justify-between items-end">
+                         <div className="mt-auto pt-12 flex justify-between items-end">
                             <div className="space-y-1">
                                 <div className="relative h-14 w-48">
                                     <Image 
-                                        src="https://content-provider.payshia.com/ukcas/institutes/1/docs/sign-updated.png" 
+                                        src="/images/director-signature.jpg" 
                                         alt="Signature"
                                         layout="fill"
                                         objectFit="contain"
@@ -215,6 +278,15 @@ export default function PrintCertificatePage() {
                     margin: 0;
                 }
             `}</style>
-        </>
+            <EmailCertificateDialog
+                open={emailDialogOpen}
+                onOpenChange={setEmailDialogOpen}
+                certificateId={String(certificate.certificate_id)}
+                studentName={certificate.name}
+                courseName={course?.course_name}
+                initialEmail={certificate.email_address}
+                studentCountry={certificate.country}
+            />
+        </div>
     );
 }

@@ -74,19 +74,20 @@ export default function RegistrationPage() {
     };
 
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6 flex justify-center">
-        <Card className="w-full max-w-2xl shadow-lg">
-          <CardHeader className="text-center">
-             <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
-              <BadgeCheck className="h-8 w-8" />
+    <div className="relative overflow-hidden py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(125,28,38,0.07),_transparent_55%)]" />
+      <div className="container relative mx-auto px-4 md:px-6 flex justify-center">
+        <Card className="w-full max-w-2xl shadow-xl border-border/70">
+          <CardHeader className="text-center space-y-2 pb-6 border-b bg-muted/25 rounded-t-xl">
+             <div className="mx-auto bg-primary text-primary-foreground w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-lg shadow-primary/20">
+              <BadgeCheck className="h-7 w-7" />
             </div>
-            <CardTitle className="text-2xl font-headline">Institute Accreditation Application</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl md:text-3xl font-headline tracking-tight">Institute Accreditation Application</CardTitle>
+            <CardDescription className="max-w-md mx-auto">
               Complete the form below to begin the accreditation process with UKCAS.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                     <Label htmlFor="name">Institute Name</Label>

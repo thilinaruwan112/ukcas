@@ -100,11 +100,15 @@ export default function InstituteSearch() {
   );
 
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center space-y-4 mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold font-headline">Accredited Institutes</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+    <div className="relative overflow-hidden py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(125,28,38,0.07),_transparent_55%)]" />
+      <div className="container relative mx-auto px-4 md:px-6">
+        <div className="text-center space-y-3 mb-12 max-w-2xl mx-auto">
+          <span className="inline-block rounded-full bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+            Global Directory
+          </span>
+          <h1 className="text-3xl md:text-5xl font-bold font-headline tracking-tight">Accredited Institutes</h1>
+          <p className="text-base md:text-lg text-muted-foreground">
             Explore our global network of trusted and accredited institutions.
           </p>
         </div>
@@ -113,8 +117,8 @@ export default function InstituteSearch() {
             <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                    placeholder="Search by institute name..."
-                    className="pl-12 h-14 text-lg"
+                    placeholder="Search by institute name (min. 2 characters)..."
+                    className="pl-12 h-14 text-base rounded-2xl shadow-lg border-border/80 bg-card"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />

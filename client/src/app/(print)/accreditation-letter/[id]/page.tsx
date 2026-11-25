@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Printer, AlertTriangle } from 'lucide-react';
+import { Printer, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ApiInstitute } from '@/lib/types';
@@ -99,14 +99,25 @@ export default function PrintAccreditationLetterPage() {
         .filter(Boolean).join(', ');
 
     return (
-        <>
-             <div className="fixed top-4 right-4 z-50 print:hidden">
-                <Button onClick={handlePrint} >
-                    <Printer className="mr-2 h-4 w-4" />
-                    Print Letter
-                </Button>
-            </div>
-            <div id="print-area" className="bg-gray-100 print:bg-white min-h-screen flex justify-center py-8 print:p-0">
+        <div className="min-h-screen bg-slate-200/75 dark:bg-slate-950 print:bg-white">
+            <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-md print:hidden">
+                <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
+                            <ArrowLeft className="mr-1.5 h-4 w-4" />
+                            Back
+                        </Button>
+                        <span className="hidden sm:inline-block text-sm font-medium text-muted-foreground">
+                            Accreditation Letter &bull; <span className="text-foreground">{institute.name}</span>
+                        </span>
+                    </div>
+                    <Button size="sm" onClick={handlePrint}>
+                        <Printer className="mr-2 h-4 w-4" />
+                        Print Letter
+                    </Button>
+                </div>
+            </header>
+            <div id="print-area" className="flex justify-center py-8 px-4 print:p-0">
                 <div className="letter-container print-container relative w-[210mm] h-[297mm] bg-white shadow-lg print:shadow-none p-[50px] font-body text-black flex flex-col">
                     <div className="absolute inset-0 z-0 opacity-80">
                         <Image 
@@ -182,6 +193,6 @@ export default function PrintAccreditationLetterPage() {
                     margin: 0;
                 }
             `}</style>
-        </>
+        </div>
     );
 }

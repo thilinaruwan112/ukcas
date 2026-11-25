@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2, Printer, Eye } from "lucide-react";
+import { PlusCircle, Download, FilePenLine, Trash2, MoreHorizontal, AlertTriangle, Loader2, User, Book, Calendar, FileCheck2, Printer, Eye, Mail } from "lucide-react";
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +18,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
 import { usePagination, DOTS } from '@/hooks/use-pagination';
+import { EmailCertificateDialog } from '@/components/certificates/EmailCertificateDialog';
+import { downloadCertificatePdf } from '@/lib/download-certificate';
 
 async function getCertificates(instituteId: string, token: string): Promise<Certificate[]> {
     try {
@@ -44,6 +46,8 @@ export default function CertificateListPage() {
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [emailDialogCert, setEmailDialogCert] = useState<Certificate | null>(null);
+    const [downloadingId, setDownloadingId] = useState<string | null>(null);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -92,6 +96,27 @@ export default function CertificateListPage() {
 
     const handleExport = () => {
         // Export logic remains the same
+    };
+
+    const handleDownloadPdf = async (certificateId: string) => {
+        const token = localStorage.getItem('ukcas_token');
+        if (!token) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Authentication token not found.' });
+            return;
+        }
+        setDownloadingId(certificateId);
+        try {
+            await downloadCertificatePdf(certificateId, token);
+            toast({
+                title: 'Certificate Downloaded',
+                description: `Saved UKCAS-Certificate-${certificateId}.pdf`,
+            });
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Failed to download certificate PDF.';
+            toast({ variant: 'destructive', title: 'Download Failed', description: msg });
+        } finally {
+            setDownloadingId(null);
+        }
     };
     
     const CertificatesSkeleton = () => (
@@ -189,13 +214,30 @@ export default function CertificateListPage() {
                                                                 <span>View / Edit</span>
                                                               </Link>
                                                         </DropdownMenuItem>
-                                                        {cert.status === 'Approved' && (
-                                                            <DropdownMenuItem asChild>
-                                                                <Link href={`/s/print/${cert.id}`} target="_blank">
-                                                                    <Printer className="mr-2 h-4 w-4" />
-                                                                    <span>Print Certificate</span>
-                                                                </Link>
-                                                            </DropdownMenuItem>
+                                                        {cert.status?.toLowerCase() === 'approved' && (
+                                                            <>
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                                        <Printer className="mr-2 h-4 w-4" />
+                                                                        <span>Print Certificate</span>
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    disabled={downloadingId === cert.id}
+                                                                    onSelect={() => handleDownloadPdf(cert.id)}
+                                                                >
+                                                                    {downloadingId === cert.id ? (
+                                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                    ) : (
+                                                                        <Download className="mr-2 h-4 w-4" />
+                                                                    )}
+                                                                    <span>Generate &amp; Download PDF</span>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onSelect={() => setTimeout(() => setEmailDialogCert(cert), 0)}>
+                                                                    <Mail className="mr-2 h-4 w-4" />
+                                                                    <span>Email to Student</span>
+                                                                </DropdownMenuItem>
+                                                            </>
                                                         )}
                                                          <DropdownMenuSeparator />
                                                         <DropdownMenuItem className="text-red-500 focus:text-red-500">
@@ -270,12 +312,30 @@ export default function CertificateListPage() {
                                                 <FilePenLine className="mr-2 h-4 w-4" /> Edit
                                             </Link>
                                         </Button>
-                                         {cert.status === 'Approved' && (
-                                            <Button size="sm" variant="outline" asChild>
-                                                <Link href={`/s/print/${cert.id}`} target="_blank">
-                                                    <Printer className="mr-2 h-4 w-4" /> Print
-                                                </Link>
-                                            </Button>
+                                         {cert.status?.toLowerCase() === 'approved' && (
+                                            <>
+                                                <Button size="sm" variant="outline" asChild>
+                                                    <Link href={`/s/print/${cert.id}`} target="_blank">
+                                                        <Printer className="mr-2 h-4 w-4" /> Print
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    disabled={downloadingId === cert.id}
+                                                    onClick={() => handleDownloadPdf(cert.id)}
+                                                >
+                                                    {downloadingId === cert.id ? (
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Download className="mr-2 h-4 w-4" />
+                                                    )}
+                                                    PDF
+                                                </Button>
+                                                <Button size="sm" variant="outline" onClick={() => setEmailDialogCert(cert)}>
+                                                    <Mail className="mr-2 h-4 w-4" /> Email
+                                                </Button>
+                                            </>
                                         )}
                                         <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"><Trash2 className="mr-2 h-4 w-4" /> Revoke</Button>
                                     </div>
@@ -321,6 +381,15 @@ export default function CertificateListPage() {
                     </div>
                 )}
             </Card>
+            <EmailCertificateDialog
+                open={!!emailDialogCert}
+                onOpenChange={(open) => {
+                    if (!open) setEmailDialogCert(null);
+                }}
+                certificateId={emailDialogCert?.id || null}
+                studentName={emailDialogCert?.studentName}
+                courseName={emailDialogCert?.courseName}
+            />
         </>
     );
 }

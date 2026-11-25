@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -7,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2, Mail, Lock, ShieldCheck } from "lucide-react";
 import { useI18n } from "@/context/i18n-provider";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 export function LoginPageClient() {
   const { t } = useI18n();
@@ -21,7 +21,7 @@ export function LoginPageClient() {
   useEffect(() => {
     const userToken = localStorage.getItem('ukcas_token');
     const userDataString = localStorage.getItem('ukcas_user');
-    
+
     if (userToken && userDataString) {
       try {
         const userData = JSON.parse(userDataString);
@@ -30,13 +30,11 @@ export function LoginPageClient() {
         } else {
           router.replace('/admin/select-institute');
         }
-      } catch (error) {
-        // If parsing fails, clear storage and let them log in again
+      } catch {
         localStorage.clear();
       }
     }
   }, [router]);
-
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,9 +52,8 @@ export function LoginPageClient() {
         },
         body: JSON.stringify({ email: identifier, pass: password }),
       });
-      
+
       const data = await response.json();
-      console.log('API Response:', data);
 
       if (response.ok && data.status === 'success') {
         localStorage.setItem('ukcas_token', data.token);
@@ -68,15 +65,14 @@ export function LoginPageClient() {
         });
 
         if (data.data.acc_type === 'admin') {
-            router.push('/admin/admin-institutes');
+          router.push('/admin/admin-institutes');
         } else {
-            router.push('/admin/select-institute');
+          router.push('/admin/select-institute');
         }
       } else {
         throw new Error(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
-      console.error('Login Error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
         variant: 'destructive',
@@ -88,58 +84,77 @@ export function LoginPageClient() {
     }
   };
 
-  const LoginForm = () => (
-    <form className="space-y-4" onSubmit={handleLogin}>
-      <div className="space-y-2">
-        <Label htmlFor="identifier">
-          Username or Email
-        </Label>
-        <Input
-          id="identifier"
-          name="identifier"
-          type="text"
-          placeholder="Enter your username or email"
-          required
-          disabled={isLoading}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">{t('Login.passwordLabel')}</Label>
-        <Input id="password" name="password" type="password" required disabled={isLoading} />
-      </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        Login
-      </Button>
-    </form>
-  );
-
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6 flex justify-center">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
-              <LogIn className="h-8 w-8" />
+    <div className="relative overflow-hidden py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(125,28,38,0.08),_transparent_60%)]" />
+      <div className="container relative mx-auto px-4 md:px-6 flex justify-center">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center space-y-3">
+            <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+              <LogIn className="h-7 w-7" />
             </div>
-            <h1 className="text-3xl font-bold font-headline">{t('Login.portalLogin')}</h1>
-            <p className="text-muted-foreground">{t('Login.accessDashboard')}</p>
+            <h1 className="text-3xl font-bold font-headline tracking-tight">{t('Login.portalLogin')}</h1>
+            <p className="text-sm text-muted-foreground">{t('Login.accessDashboard')}</p>
           </div>
 
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center">
             <LanguageSwitcher />
           </div>
 
-          <Card>
-              <CardHeader>
-                <CardTitle>Welcome Back</CardTitle>
-                <CardDescription>Enter your credentials to access your portal.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <LoginForm />
-              </CardContent>
-            </Card>
+          <Card className="shadow-xl border-border/70">
+            <CardHeader className="space-y-1 pb-4">
+              <CardTitle className="text-xl">Welcome Back</CardTitle>
+              <CardDescription>Enter your credentials to access your institute or admin portal.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <form className="space-y-4" onSubmit={handleLogin}>
+                <div className="space-y-2">
+                  <Label htmlFor="identifier">Username or Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="identifier"
+                      name="identifier"
+                      type="text"
+                      placeholder="Enter your username or email"
+                      className="h-11 pl-10"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">{t('Login.passwordLabel')}</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      className="h-11 pl-10"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full h-11 text-base font-medium shadow-sm" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Sign In to Portal
+                </Button>
+              </form>
 
+              <div className="border-t pt-4 flex items-center justify-between text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                  JWT Protected Session
+                </span>
+                <Link href="/registration" className="font-medium text-primary hover:underline">
+                  Register an institute
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

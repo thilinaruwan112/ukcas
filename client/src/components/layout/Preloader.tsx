@@ -1,8 +1,6 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -23,11 +21,11 @@ export default function Preloader() {
         const fadeOutTimer = setTimeout(() => {
           setIsFadingOut(true);
           localStorage.setItem('ukcas_preloader_shown', 'true');
-        }, 1500); // Time logo is visible
+        }, 600);
 
         const unmountTimer = setTimeout(() => {
           setShouldRender(false);
-        }, 2000); // Visible time + fade-out duration
+        }, 950);
 
         return () => {
           clearTimeout(fadeOutTimer);
@@ -44,12 +42,22 @@ export default function Preloader() {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[9999] flex items-center justify-center bg-background transition-opacity duration-500',
+        'fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/95 backdrop-blur-sm transition-opacity duration-300',
         isFadingOut ? 'opacity-0' : 'opacity-100'
       )}
     >
       <div className="animate-pulse">
-         <Image src="https://content-provider.pharmacollege.lk/ukcas/logo-long-1.png" alt="UKCAS Logo" width={280} height={80} className="h-20 w-auto" />
+        <Image
+          src="https://content-provider.pharmacollege.lk/ukcas/logo-long-1.png"
+          alt="UKCAS Logo"
+          width={240}
+          height={68}
+          className="h-16 w-auto"
+          priority
+        />
+      </div>
+      <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
+        <div className="h-full w-1/2 animate-[pulse_1s_ease-in-out_infinite] rounded-full bg-primary" />
       </div>
     </div>
   );

@@ -21,19 +21,14 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Load environment variables from .env using Dotenv
-require_once __DIR__ . '/../vendor/autoload.php';
-$envDir = __DIR__ . '/../';
-if (file_exists($envDir . '.env')) {
-    $dotenv = Dotenv\Dotenv::createImmutable($envDir);
-    $dotenv->load();
-}
+require_once __DIR__ . '/../config/env.php';
 
 // JWT and API Key Middleware
 require_once './utils/JwtHelper.php';
 function requireJwt()
 {
-    $headers = getallheaders();
-    $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : null;
+    $headers = array_change_key_case(getallheaders(), CASE_LOWER);
+    $authHeader = $headers['authorization'] ?? null;
     if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
         http_response_code(401);
         echo json_encode(['status' => 'error', 'message' => 'Missing or invalid Authorization header']);
@@ -50,8 +45,8 @@ function requireJwt()
 }
 function requireApiKey()
 {
-    $headers = getallheaders();
-    $apiKey = isset($headers['X-API-KEY']) ? $headers['X-API-KEY'] : null;
+    $headers = array_change_key_case(getallheaders(), CASE_LOWER);
+    $apiKey = $headers['x-api-key'] ?? null;
     $validKey = getenv('API_KEY') ?: (isset($_ENV['API_KEY']) ? $_ENV['API_KEY'] : null);
     if (!$apiKey || $apiKey !== $validKey) {
         http_response_code(401);
@@ -95,9 +90,9 @@ if (substr($uri, -1) !== '/') {
 }
 
 // Determine if the application is running on localhost
-if ($_SERVER['HTTP_HOST'] === 'localhost') {
+if (in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'], true)) {
     // Adjust URI if needed (only on localhost)
-    $uri = str_replace(['ukcas/server/', 'ukcas-server/'], '', $uri);
+    $uri = preg_replace('#^/(ukcas/server|ukcas-server)(?=/|$)#', '', $uri) ?: '/';
 } else {
     // Adjust URI if needed (if using a subdirectory)
     $uri = $uri;

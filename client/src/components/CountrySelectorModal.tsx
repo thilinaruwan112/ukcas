@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -21,15 +22,20 @@ const languages = [
 ];
 
 export default function CountrySelectorModal() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const { setLocale } = useI18n();
 
   useEffect(() => {
+    if (pathname.startsWith('/s/print') || pathname.startsWith('/accreditation-letter')) {
+      setIsOpen(false);
+      return;
+    }
     const languageSelected = localStorage.getItem('ukcas_language_selected');
     if (!languageSelected) {
       setIsOpen(true);
     }
-  }, []);
+  }, [pathname]);
 
   const handleLanguageSelect = (lang: string) => {
     setLocale(lang);

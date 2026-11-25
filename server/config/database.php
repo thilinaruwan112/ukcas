@@ -1,38 +1,26 @@
 <?php
 // config/database.php
+require_once __DIR__ . '/env.php';
 
-// $host = 'localhost';
-// $db   = 'erp_server';
-// $user = 'root';
-// $pass = "";
-// $charset = 'utf8mb4';
+$host = envValue('DB_HOST', 'localhost');
+$db = envValue('DB_NAME');
+$user = envValue('DB_USER');
+$pass = envValue('DB_PASS');
+$charset = envValue('DB_CHARSET', 'utf8mb4');
 
-$host = '91.204.209.19';
-$db   = 'payshiac_ukcas_admin';
-$user = 'payshiac_erp_server';
-$pass = "MBAl%WyfN0Bqc~{m";
-$charset = 'utf8mb4';
+if ($db === '' || $user === '') {
+    throw new \RuntimeException('Database configuration (DB_NAME, DB_USER) is missing in server/.env.');
+}
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
+    PDO::ATTR_EMULATE_PREPARES => false,
 ];
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    throw new \PDOException($e->getMessage(), (int) $e->getCode());
 }
-
-
-// Connect to Webserver
-// Test
-
-// $host = '91.204.209.19';
-// $db   = 'payshiac_kdu_test';
-// $user = 'payshiac';
-// $pass = "1999tr@thilina";
-// $charset = 'utf8mb4';
-// $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=$charset";

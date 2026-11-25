@@ -61,15 +61,15 @@ export default function AdminHeader() {
     }
 
     return (
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b bg-background px-6">
-             <div className="flex items-center gap-4">
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-border/70 bg-background/85 backdrop-blur-md px-4 md:px-6">
+             <div className="flex items-center gap-3">
                 <SidebarTrigger className="md:hidden" />
                 {institute && user?.acc_type !== 'admin' && (
-                    <Button variant="outline" asChild className="hidden sm:flex">
+                    <Button variant="outline" size="sm" asChild className="hidden sm:flex rounded-full bg-card">
                         <Link href="/admin/select-institute">
-                            <Building className="mr-2 h-4 w-4" />
-                            <span className="truncate max-w-xs">{institute.name}</span>
-                            <ChevronsUpDown className="ml-2 h-4 w-4 text-muted-foreground"/>
+                            <Building className="mr-2 h-4 w-4 text-primary" />
+                            <span className="truncate max-w-xs font-medium">{institute.name}</span>
+                            <ChevronsUpDown className="ml-2 h-3.5 w-3.5 text-muted-foreground"/>
                         </Link>
                     </Button>
                 )}

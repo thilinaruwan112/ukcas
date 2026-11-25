@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { Plus_Jakarta_Sans, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { I18nProvider } from '@/context/i18n-provider';
@@ -8,6 +9,18 @@ import { ThemeProvider } from '@/components/layout/theme-provider';
 import TopProgressBar from '@/components/layout/TopProgressBar';
 import Preloader from '@/components/layout/Preloader';
 import AppShell from '@/components/layout/AppShell';
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ukcas.co.uk';
 
@@ -68,12 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="en" suppressHydrationWarning className={`${plusJakarta.variable} ${playfair.variable}`}>
       <body className="font-body antialiased min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
